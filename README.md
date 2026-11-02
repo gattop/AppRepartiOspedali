@@ -46,7 +46,7 @@ Con `DEV_USER` impostato l'app ti considera loggato con quel nome e con i permes
 | tag `v1.2.3`        | `1.2.3`, `1.2`, `sha-xxxxxxx`              |
 | pull request        | build e test, nessun push                  |
 
-L'immagine è `ghcr.io/<owner>/<repo>` in minuscolo, per esempio `ghcr.io/pippi/apprepartiospedali`. Con il repo pubblico anche il package è pubblico (verifica in *Packages → Package settings → visibility*), quindi sulla VPS non serve `docker login`.
+L'immagine è `ghcr.io/<owner>/<repo>` in minuscolo, per esempio `ghcr.io/gattop/apprepartiospedali`. Con il repo pubblico anche il package è pubblico (verifica in *Packages → Package settings → visibility*), quindi sulla VPS non serve `docker login`.
 
 ## Configurazione Keycloak
 
@@ -65,13 +65,13 @@ Se dopo il login i log di oauth2-proxy mostrano `audience ... does not match`, a
 
 ## Deploy sulla VPS
 
-Tutta la configurazione non segreta (dominio, Keycloak, Traefik) è nel [docker-compose.yml](docker-compose.yml) come default. Sulla VPS il `.env`, che non va nel repo, contiene solo l'immagine e i due segreti:
+Tutta la configurazione non segreta (dominio, Keycloak, Traefik) è nel [docker-compose.yml](docker-compose.yml) come default. Sulla VPS il `.env`, che non va nel repo, contiene solo i due segreti:
 
 ```sh
-git clone https://github.com/<utente>/AppRepartiOspedali.git /opt/reparti && cd /opt/reparti
+git clone https://github.com/gattop/AppRepartiOspedali.git /home/gattp/appRepartiOspedali && cd /home/gattp/appRepartiOspedali
 cp .env.example .env && chmod 600 .env
 openssl rand -base64 32 | tr -- '+/' '-_'   # -> COOKIE_SECRET
-nano .env                                   # IMAGE, OIDC_CLIENT_SECRET, COOKIE_SECRET
+nano .env                                   # OIDC_CLIENT_SECRET, COOKIE_SECRET
 
 docker compose pull
 docker compose up -d
@@ -85,7 +85,7 @@ Il compose presuppone che la rete Docker di Traefik (`proxy`) esista già, e che
 Dopo ogni push su `main`:
 
 ```sh
-cd /opt/reparti && git pull && docker compose pull && docker compose up -d
+cd /home/gattp/appRepartiOspedali && git pull && docker compose pull && docker compose up -d
 ```
 
 Per tornare a una versione precedente imposta `TAG=sha-xxxxxxx` (o `TAG=1.2.3`) nel `.env` e rilancia `up -d`. Il service worker scarica la nuova versione dell'app alla prima apertura successiva.

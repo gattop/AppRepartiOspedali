@@ -10,7 +10,7 @@
 
 services:
   app:
-    image: ${IMAGE:?imposta IMAGE nel .env}:${TAG:-latest}
+    image: ${IMAGE:-ghcr.io/gattop/apprepartiospedali}:${TAG:-latest}
     restart: unless-stopped
     environment:
       # Ruoli Keycloak che possono modificare i dati; vuoto = tutti gli utenti autenticati
