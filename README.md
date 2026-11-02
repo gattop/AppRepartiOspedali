@@ -61,7 +61,7 @@ Su `https://login.gattp.it/admin/`, realm **vps.homelab**:
    - Valid post logout redirect URIs: `https://ospedali.kyrie.ee/*`
    - Web origins: `https://ospedali.kyrie.ee`
 2. **Credentials** del client: copia il *Client secret* in `OIDC_CLIENT_SECRET` nel `.env`.
-3. **Realm roles → Create role** `reparti-editor` e assegnalo (*Users → utente → Role mapping*) a chi deve poter modificare. Se non lo vuoi, metti `EDITOR_GROUPS=` (vuoto) nel `.env`: allora possono modificare tutti gli utenti autenticati.
+3. Crea il ruolo `reparti-editor`, come **ruolo del client** `reparti` (*Clients → reparti → Roles*) oppure come ruolo di realm: vanno bene entrambi. Assegnalo poi (*Users → utente → Role mapping*) a chi deve poter modificare. Dopo l'assegnazione bisogna uscire e rientrare nell'app. Se non vuoi gestire i ruoli, metti `EDITOR_GROUPS=` (vuoto) nel `.env`: allora possono modificare tutti gli utenti autenticati.
 
 Il compose imposta già `OAUTH2_PROXY_OIDC_EXTRA_AUDIENCES: account`, perché Keycloak mette solo `account` nel campo `aud` dei token: non serve nessun mapper.
 

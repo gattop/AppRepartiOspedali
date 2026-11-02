@@ -38,7 +38,12 @@ test('seeds Jesi and demo data on first start', async () => {
 });
 
 test('reports who is logged in and whether they can edit', async () => {
-  assert.deepEqual(await (await req('GET', '/api/me', { headers: EDITOR })).json(), { user: { name: 'mario', email: null }, canEdit: true, version: 'test123' });
+  assert.deepEqual(await (await req('GET', '/api/me', { headers: EDITOR })).json(), {
+    user: { name: 'mario', email: null, groups: ['role:reparti-editor', 'altro'] },
+    canEdit: true,
+    editorGroups: ['role:reparti-editor'],
+    version: 'test123'
+  });
   assert.equal((await (await req('GET', '/api/me', { headers: READER })).json()).canEdit, false);
   assert.equal((await (await req('GET', '/api/me')).json()).user, null);
 });

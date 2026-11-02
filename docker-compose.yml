@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
     environment:
       # Ruoli Keycloak che possono modificare i dati; vuoto = tutti gli utenti autenticati
-      EDITOR_GROUPS: ${EDITOR_GROUPS-role:reparti-editor}
+      EDITOR_GROUPS: ${EDITOR_GROUPS-role:reparti-editor,role:reparti:reparti-editor}
       # true = al primo avvio carica anche gli ospedali di esempio (finti)
       SEED_DEMO: ${SEED_DEMO:-false}
       # Snapshot giornaliero consistente del database in ./backup, tiene gli ultimi N

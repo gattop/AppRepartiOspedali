@@ -112,7 +112,13 @@ export function createApp(cfg) {
     const parts = pathname.split('/').filter(Boolean).slice(1); // drop "api"
 
     if (req.method === 'GET' && parts[0] === 'me') {
-      return send(res, 200, { user: user && { name: user.name, email: user.email }, canEdit: canEdit(user, cfg), version: cfg.version });
+      // groups and editorGroups are returned so a missing role can be diagnosed from the browser.
+      return send(res, 200, {
+        user: user && { name: user.name, email: user.email, groups: user.groups },
+        canEdit: canEdit(user, cfg),
+        editorGroups: cfg.editorGroups,
+        version: cfg.version
+      });
     }
     if (req.method === 'GET' && parts[0] === 'data') {
       return send(res, 200, store.all());

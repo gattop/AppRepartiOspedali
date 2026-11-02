@@ -443,7 +443,8 @@ function viewOspedali() {
         </a>`;
       })}
       ${!osps.length && html`<div class="empty"><b>Nessun ospedale</b><span>Aggiungi il primo ospedale per iniziare.</span></div>`}
-      <p class="who">${S.me.user ? html`Accesso come <b>${S.me.user.name}</b> · <a href="/oauth2/sign_out?rd=%2F">Esci</a>` : ''}<br>Versione ${VERSION}</p>
+      <p class="who">${S.me.user ? html`Accesso come <b>${S.me.user.name}</b> · ${S.me.canEdit ? 'puoi modificare' : 'sola lettura'} · <a href="/oauth2/sign_out?rd=%2F">Esci</a>` : ''}<br>Versione ${VERSION}</p>
+      ${S.me.user && !S.me.canEdit && html`<p class="who">Per modificare serve il ruolo ${(S.me.editorGroups || []).join(' o ')}. Ruoli ricevuti: ${S.me.user.groups?.length ? S.me.user.groups.join(', ') : 'nessuno'}.</p>`}
     </main>
     ${tabbar('ospedali')}`;
 }
