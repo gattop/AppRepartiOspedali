@@ -61,7 +61,7 @@ Su `https://login.gattp.it/admin/`, realm **vps.homelab**:
 2. **Credentials** del client: copia il *Client secret* in `OIDC_CLIENT_SECRET` nel `.env`.
 3. **Realm roles → Create role** `reparti-editor` e assegnalo (*Users → utente → Role mapping*) a chi deve poter modificare. Se non lo vuoi, metti `EDITOR_GROUPS=` (vuoto) nel `.env`: allora possono modificare tutti gli utenti autenticati.
 
-Se dopo il login i log di oauth2-proxy mostrano `audience ... does not match`, aggiungi `OAUTH2_PROXY_OIDC_EXTRA_AUDIENCES: account` all'`environment` di oauth2-proxy nel compose.
+Il compose imposta già `OAUTH2_PROXY_OIDC_EXTRA_AUDIENCES: account`, perché Keycloak mette solo `account` nel campo `aud` dei token: non serve nessun mapper.
 
 ## Deploy sulla VPS
 

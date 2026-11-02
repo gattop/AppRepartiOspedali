@@ -40,6 +40,8 @@ services:
       OAUTH2_PROXY_OIDC_ISSUER_URL: ${OIDC_ISSUER_URL:-https://login.gattp.it/realms/vps.homelab}
       OAUTH2_PROXY_CLIENT_ID: ${OIDC_CLIENT_ID:-reparti}
       OAUTH2_PROXY_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:?imposta OIDC_CLIENT_SECRET nel .env}
+      # Keycloak mette solo "account" nel campo aud dei token: senza questa riga il login dà 500.
+      OAUTH2_PROXY_OIDC_EXTRA_AUDIENCES: account
       OAUTH2_PROXY_COOKIE_SECRET: ${COOKIE_SECRET:?imposta COOKIE_SECRET nel .env}
       OAUTH2_PROXY_HTTP_ADDRESS: 0.0.0.0:4180
       OAUTH2_PROXY_UPSTREAMS: http://reparti-app:3000/
@@ -55,8 +57,9 @@ services:
       # Gli equipaggi tengono l'app aperta per tutto il turno: sessione lunga, rinnovata in silenzio.
       OAUTH2_PROXY_COOKIE_EXPIRE: 168h
       OAUTH2_PROXY_COOKIE_REFRESH: 1h
-      # Manifest e icone della PWA vengono scaricati dal browser senza passare dal login.
-      OAUTH2_PROXY_SKIP_AUTH_ROUTES: '^/(manifest\.webmanifest|icons/.+)$$'
+      # Manifest, icone e favicon vengono scaricati dal browser senza passare dal login
+      # (altrimenti la richiesta della favicon avvia un secondo login che rompe il primo).
+      OAUTH2_PROXY_SKIP_AUTH_ROUTES: '^/(manifest\.webmanifest|icons/.+|favicon\.ico)$$'
       OAUTH2_PROXY_SILENCE_PING_LOGGING: "true"
     networks:
       - internal
