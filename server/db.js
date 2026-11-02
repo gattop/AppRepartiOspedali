@@ -186,6 +186,10 @@ class Store {
     this.db.close();
   }
 
+  backupTo(file) {
+    this.db.exec(`VACUUM INTO '${file.replaceAll("'", "''")}'`);
+  }
+
   isEmpty() {
     return this.db.prepare('SELECT COUNT(*) AS n FROM ospedali').get().n === 0;
   }

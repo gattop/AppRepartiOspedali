@@ -2,7 +2,9 @@ FROM node:24-alpine
 
 ENV NODE_ENV=production \
     PORT=3000 \
-    DATA_DIR=/data
+    DATA_DIR=/data \
+    BACKUP_DIR=/backup \
+    BACKUPS_TO_KEEP=3
 
 WORKDIR /app
 

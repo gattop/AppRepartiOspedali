@@ -17,9 +17,13 @@ services:
       EDITOR_GROUPS: ${EDITOR_GROUPS-role:reparti-editor}
       # true = al primo avvio carica anche gli ospedali di esempio (finti)
       SEED_DEMO: ${SEED_DEMO:-false}
+      # Snapshot giornaliero consistente del database in ./backup, tiene gli ultimi N
+      BACKUPS_TO_KEEP: ${BACKUPS_TO_KEEP:-3}
     volumes:
-      # Database e backup nella cartella del compose (./data, esclusa da git)
+      # Database SQLite vivo: NON copiarlo a caldo, usa gli snapshot in ./backup
       - ./data:/data
+      # Solo snapshot già consistenti (reparti-AAAA-MM-GG.db): sicuri da copiare
+      - ./backup:/backup
     networks:
       internal:
         aliases:
@@ -63,7 +67,7 @@ services:
       - traefik.http.routers.reparti-ospedali.rule=Host(`${APP_HOST:-ospedali.kyrie.ee}`)
       - traefik.http.routers.reparti-ospedali.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}
       - traefik.http.routers.reparti-ospedali.tls=true
-      - traefik.http.routers.reparti-ospedali.tls.certresolver=${TRAEFIK_CERTRESOLVER:-le}
+      - traefik.http.routers.reparti-ospedali.tls.certresolver=${TRAEFIK_CERTRESOLVER:-letsencrypt}
       - traefik.http.services.reparti-ospedali.loadbalancer.server.port=4180
 
 networks:

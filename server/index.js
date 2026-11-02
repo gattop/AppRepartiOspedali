@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { openDb, ENTITIES, ValidationError } from './db.js';
 import { seed } from './seed.js';
+import { scheduleBackups } from './backup.js';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(ROOT, '..', 'public');
@@ -162,14 +163,17 @@ export function configFromEnv(env = process.env) {
     seedDemo: env.SEED_DEMO === 'true',
     devUser: env.DEV_USER || '',
     editorGroups: String(env.EDITOR_GROUPS || '').split(',').map((g) => g.trim()).filter(Boolean),
-    version: env.APP_VERSION || 'dev'
+    version: env.APP_VERSION || 'dev',
+    backupDir: env.BACKUP_DIR || '',
+    backupsToKeep: Math.max(1, Number(env.BACKUPS_TO_KEEP || 3))
   };
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const cfg = configFromEnv();
   fs.mkdirSync(cfg.dataDir, { recursive: true });
-  const { server } = createApp(cfg);
+  const { server, store } = createApp(cfg);
+  if (cfg.backupDir) scheduleBackups(store, cfg.backupDir, cfg.backupsToKeep);
   server.listen(cfg.port, () => console.log(`Reparti in ascolto su :${cfg.port} (versione ${cfg.version})`));
   const stop = () => server.close(() => process.exit(0));
   process.on('SIGTERM', stop);

@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { createApp, configFromEnv } from '../server/index.js';
+import { snapshot } from '../server/backup.js';
+import { openDb } from '../server/db.js';
 
 let server, store, base, dir;
 const EDITOR = { 'x-forwarded-preferred-username': 'mario', 'x-forwarded-groups': 'role:reparti-editor,altro' };
@@ -90,6 +92,18 @@ test('deleting a hospital cascades to its sites and wards', async () => {
   const data = await (await req('GET', '/api/data')).json();
   assert.ok(!data.sedi.some((x) => x.id === s.id));
   assert.ok(!data.reparti.some((x) => x.sede_id === s.id));
+});
+
+test('writes one consistent backup per day and keeps the last N', () => {
+  const bdir = path.join(dir, 'backup');
+  for (const day of ['2026-10-30', '2026-10-31', '2026-11-01', '2026-11-02']) {
+    assert.ok(snapshot(store, bdir, 3, new Date(day + 'T10:00:00Z')));
+  }
+  assert.equal(snapshot(store, bdir, 3, new Date('2026-11-02T22:00:00Z')), null);
+  assert.deepEqual(fs.readdirSync(bdir).sort(), ['reparti-2026-10-31.db', 'reparti-2026-11-01.db', 'reparti-2026-11-02.db']);
+  const copy = openDb(path.join(bdir, 'reparti-2026-11-02.db'));
+  assert.ok(copy.all().reparti.length > 0);
+  copy.close();
 });
 
 test('serves the app shell with the build version', async () => {

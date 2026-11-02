@@ -3,8 +3,11 @@
 # like ./data created by Docker as root), then runs the app as the unprivileged "node" user.
 set -e
 if [ "$(id -u)" = "0" ]; then
-  mkdir -p "$DATA_DIR"
-  chown -R node:node "$DATA_DIR"
+  for dir in "$DATA_DIR" "$BACKUP_DIR"; do
+    [ -n "$dir" ] || continue
+    mkdir -p "$dir"
+    chown -R node:node "$dir"
+  done
   exec su-exec node "$@"
 fi
 exec "$@"

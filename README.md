@@ -78,7 +78,7 @@ docker compose up -d
 docker compose logs -f
 ```
 
-Il compose presuppone che la rete Docker di Traefik (`proxy`) esista già, e che Traefik abbia l'entrypoint `websecure` e il certresolver `le`. Si possono cambiare nel `.env` (vedi le righe commentate in [.env.example](.env.example)).
+Il compose presuppone che la rete Docker di Traefik (`proxy`) esista già, e che Traefik abbia l'entrypoint `websecure` e il certresolver `letsencrypt`. Si possono cambiare nel `.env` (vedi le righe commentate in [.env.example](.env.example)).
 
 ### Aggiornare
 
@@ -92,11 +92,12 @@ Per tornare a una versione precedente imposta `TAG=sha-xxxxxxx` (o `TAG=1.2.3`) 
 
 ### Backup
 
-Tutti i dati sono in `./data` accanto al `docker-compose.yml`. Per un backup basta copiare la cartella ad app ferma (`docker compose stop app`). Ad app avviata, questo comando crea una copia consistente in `./data/backups/`:
+Tutto sta nella cartella del compose, con la stessa convenzione degli altri servizi:
 
-```sh
-docker compose exec -u node app node -e "require('fs').mkdirSync('/data/backups',{recursive:true});new (require('node:sqlite').DatabaseSync)('/data/reparti.db').exec(\"VACUUM INTO '/data/backups/reparti-$(date +%F-%H%M).db'\")"
-```
+- `./data`: database SQLite vivo. **Non copiarlo a caldo**: escludilo dai backup raw.
+- `./backup`: snapshot consistenti `reparti-AAAA-MM-GG.db`, scritti dall'app all'avvio e poi una volta al giorno. Vengono tenuti gli ultimi `BACKUPS_TO_KEEP` (default 3). Questa è la cartella da includere nei backup.
+
+Per ripristinare: `docker compose stop app`, copia lo snapshot in `./data/reparti.db` (cancellando `reparti.db-wal` e `reparti.db-shm`), poi `docker compose start app`.
 
 ## Variabili d'ambiente dell'app
 
@@ -105,6 +106,8 @@ docker compose exec -u node app node -e "require('fs').mkdirSync('/data/backups'
 | `EDITOR_GROUPS` | (vuoto)   | Gruppi/ruoli che possono modificare, separati da virgola. Vuoto = tutti gli utenti autenticati. |
 | `SEED_DEMO`     | `false`   | Al primo avvio carica anche gli ospedali di esempio. |
 | `DATA_DIR`      | `/data`   | Cartella del database. |
+| `BACKUP_DIR`    | `/backup` | Cartella degli snapshot giornalieri (vuoto = nessun backup automatico). |
+| `BACKUPS_TO_KEEP` | `3`     | Quanti snapshot tenere. |
 | `PORT`          | `3000`    | Porta HTTP interna. |
 | `DEV_USER`      | (vuoto)   | Solo sviluppo: utente fittizio quando mancano gli header di oauth2-proxy. **Non usarlo in produzione.** |
 | `APP_VERSION`   | `dev`     | Impostata dalla CI (sha o tag); rinnova la cache offline a ogni deploy. |

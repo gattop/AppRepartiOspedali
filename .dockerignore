@@ -10,3 +10,4 @@ test
 public/icons/*.png
 docker-compose*.yml
 README.md
+backup
