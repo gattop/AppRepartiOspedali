@@ -63,6 +63,11 @@ export function updateSeededMaps(store) {
           store.db.prepare('UPDATE ingressi SET piano = ?, corpo = ? WHERE id = ? AND piano IS NULL AND corpo IS NULL')
             .run(ing.piano ?? null, ing.corpo ?? null, ing.id);
         }
+        // Lifts seeded before they had a position on the map.
+        for (const asc of s.ascensori || []) {
+          if (!asc.corpo) continue;
+          store.db.prepare('UPDATE ascensori SET corpo = ? WHERE id = ? AND corpo IS NULL').run(asc.corpo, asc.id);
+        }
       }
     }
   }

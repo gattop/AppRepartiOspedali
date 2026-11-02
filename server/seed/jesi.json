@@ -250,19 +250,22 @@
               "id": "asc-ab",
               "sigla": "A-B",
               "tipo": "Nodo A-B",
-              "nota": "Corpi A, B e Sinistro centrale"
+              "nota": "Corpi A, B e Sinistro centrale",
+              "corpo": "nAB"
             },
             {
               "id": "asc-centrale",
               "sigla": "Centr.",
               "tipo": "Nodo centrale",
-              "nota": "Corpo centrale (PS, CUP)"
+              "nota": "Corpo centrale (PS, CUP)",
+              "corpo": "nC"
             },
             {
               "id": "asc-cd",
               "sigla": "C-D",
               "tipo": "Nodo C-D",
-              "nota": "Corpi C, D e Destro centrale; unico che scende al livello 0"
+              "nota": "Corpi C, D e Destro centrale; unico che scende al livello 0",
+              "corpo": "nCD"
             }
           ],
           "reparti": [

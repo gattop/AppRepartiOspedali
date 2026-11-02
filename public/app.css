@@ -330,6 +330,19 @@ a.hero-sub:hover { color: #FFFFFF; text-decoration: underline; }
 .map-marker.exact, .map-pin.exact .t { box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
 .map-pin.exact { transform: translate(-50%, calc(-100% + 5px)); }
 .map-legend .sw.round { border-radius: 999px; }
+.map-legend .sw.line { width: 16px; height: 0; border-top: 3px dashed #FACC15; border-radius: 0; }
+
+/* route on the 3D map: entrance -> lift -> ward */
+.map-route { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+.map-route path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.map-route .halo { stroke: rgba(11, 18, 32, 0.75); stroke-width: 8; }
+.map-route .line { stroke: #FACC15; stroke-width: 3.5; stroke-dasharray: 9 7; animation: route-flow 1s linear infinite; }
+.map-route .ride { stroke: #FFFFFF; stroke-width: 2; stroke-dasharray: 2 5; }
+.map-route circle { stroke: #0B1220; stroke-width: 2.5; }
+.map-route circle.ing { fill: #22C55E; }
+.map-route circle.asc { fill: #60A5FA; }
+@keyframes route-flow { to { stroke-dashoffset: -16; } }
+@media (prefers-reduced-motion: reduce) { .map-route .line { animation: none; } }
 .ing-floor { flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 52px; height: 52px; border-radius: 12px; background: var(--ink); color: #FFFFFF; font-size: 20px; font-weight: 800; line-height: 1; gap: 2px; }
 .ing-floor small { font-size: 9px; letter-spacing: 0.06em; color: var(--hero-sub); }
 
@@ -477,6 +490,7 @@ a.hero-sub:hover { color: #FFFFFF; text-decoration: underline; }
   .gtable.ings.withc .ghead, .gtable.ings.withc .grow-r { grid-template-columns: 80px minmax(180px, 1.5fr) 90px 170px minmax(140px, 1.2fr) 180px 150px; }
   .pickfield .map-stage.pick { height: 460px; }
   .gtable.ascs .ghead, .gtable.ascs .grow-r { grid-template-columns: 110px minmax(160px, 1fr) minmax(240px, 2fr) 104px; }
+  .gtable.ascs.withc .ghead, .gtable.ascs.withc .grow-r { grid-template-columns: 110px minmax(160px, 1fr) 190px minmax(220px, 2fr) 104px; }
 }
 
 /* splash and toast */

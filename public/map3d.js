@@ -6,9 +6,10 @@ import { html, raw } from './util.js';
 // `target`  = block/point to highlight: { corpo, liv, punto?, text } (defaults to the selected ward).
 // `points`  = extra markers (entrances): { corpo, liv, punto?, text, dot }.
 // `pick`    = every visible block top becomes a button (used to choose a position).
+// `route`   = path to draw: [{ corpo, liv, punto?, kind: 'ing' | 'asc' | 'rep' }], entrance first.
 // The returned markup carries `geo.unproject(sx, sy, liv)`, which turns a click on the stage
 // back into plan coordinates on that level.
-export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 300, target, points = [], pick = false }) {
+export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 300, target, points = [], pick = false, route = null }) {
   const B = mappa.blocks || [];
   const byId = Object.fromEntries(B.map((b) => [b.id, b]));
   const selR = sel ? reparti.find((r) => r.id === sel) || null : null;
@@ -159,13 +160,29 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
     }
   }
 
+  // The route's entrance stays labelled even when its floor is not the one shown.
+  const start = route?.[0];
   const markers = points
-    .filter((m) => visible(m.liv))
+    .filter((m) => visible(m.liv) || (start && m.corpo === start.corpo && m.liv === start.liv))
     .map((m) => {
       const p = spot(m.corpo, m.liv, m.punto);
       if (!p) return '';
       return html`<span class="map-marker${m.punto ? ' exact' : ''}" style="${`left: ${p.x.toFixed(1)}px; top: ${p.y.toFixed(1)}px`}"><span class="dot" style="${`background: ${m.dot}`}"></span>${m.text}</span>`;
     });
+
+  // Route: walk on the entrance floor, ride the lift (vertical segment), walk to the ward.
+  let routeSvg = '';
+  const rpts = (route || []).map((p) => ({ ...p, at: spot(p.corpo, p.liv, p.punto) })).filter((p) => p.at);
+  if (rpts.length >= 2) {
+    const d = rpts.map((p, i) => `${i ? 'L' : 'M'}${p.at.x.toFixed(1)} ${p.at.y.toFixed(1)}`).join(' ');
+    const ride = rpts.filter((p) => p.kind === 'asc');
+    routeSvg = html`<svg class="map-route" width="${W}" height="${H}" viewBox="${`0 0 ${W} ${H}`}" aria-hidden="true">
+      <path class="halo" d="${d}"></path>
+      <path class="line" d="${d}"></path>
+      ${ride.length === 2 && html`<path class="ride" d="${`M${ride[0].at.x.toFixed(1)} ${ride[0].at.y.toFixed(1)} L${ride[1].at.x.toFixed(1)} ${ride[1].at.y.toFixed(1)}`}"></path>`}
+      ${rpts.filter((p) => p.kind !== 'rep').map((p) => html`<circle class="${p.kind}" cx="${p.at.x.toFixed(1)}" cy="${p.at.y.toFixed(1)}" r="${p.kind === 'ing' ? 7 : 5}"></circle>`)}
+    </svg>`;
+  }
 
   let pin = '';
   if (hi && hi.liv != null) {
@@ -185,7 +202,7 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
   });
 
   const out = html`
-    ${faces}${floorLabels}${blockLabels}${markers}${pin}
+    ${faces}${floorLabels}${blockLabels}${routeSvg}${markers}${pin}
     <div class="map-ctrl">
       <button type="button" class="map-cbtn" data-act="mapRot" data-d="-45" aria-label="Ruota a sinistra">${raw(ICON_ROT_L)}</button>
       <button type="button" class="map-cbtn" data-act="mapRot" data-d="45" aria-label="Ruota a destra">${raw(ICON_ROT_R)}</button>
@@ -195,6 +212,7 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
       <span><span class="sw" style="background: #3B82F6"></span>Scale / ascensori</span>
       <span><span class="sw" style="background: #F43F5E"></span>${pick ? 'Posizione scelta' : 'Reparto'}</span>
       ${points.length > 0 && html`<span><span class="sw round" style="background: #22C55E"></span>Ingressi</span>`}
+      ${rpts.length >= 2 && html`<span><span class="sw line"></span>Percorso</span>`}
     </div>`;
 
   out.geo = {

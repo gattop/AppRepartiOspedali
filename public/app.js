@@ -38,7 +38,8 @@ const ICON = {
   info: (w = 20) => svg('<circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 12h1v5h1"></path>', { w }),
   layers: (w = 20) => svg('<path d="M12 3l9 5-9 5-9-5z"></path><path d="M3 13l9 5 9-5"></path>', { w }),
   check: (w = 18) => svg('<path d="M5 12l5 5L20 7"></path>', { w, sw: 2.4 }),
-  pin: (w = 18) => svg('<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle>', { w })
+  pin: (w = 18) => svg('<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle>', { w }),
+  user: (w = 22) => svg('<circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path>', { w })
 };
 
 // ---------------------------------------------------------------- state
@@ -129,13 +130,17 @@ async function loadData() {
   }
 }
 
+// The app is public: /api/me answers only for logged-in users (oauth2-proxy returns 401 otherwise),
+// so a 401 here just means "not logged in".
 async function loadMe() {
   try {
     const res = await fetch('/api/me', { headers: { accept: 'application/json' } });
-    if (res.ok) S.me = await res.json();
-    else if (res.status === 401) S.sessionExpired = true;
-  } catch { /* offline: keep defaults */ }
+    const me = res.ok ? await res.json().catch(() => null) : null;
+    S.me = me || { user: null, canEdit: false };
+  } catch { /* offline: keep what we had */ }
 }
+
+const loginUrl = () => '/oauth2/start?rd=' + encodeURIComponent('/' + location.hash);
 
 async function api(method, path, body) {
   let res;
@@ -252,6 +257,22 @@ function entrancePoints(o) {
   return out;
 }
 
+// Route on the 3D map: entrance -> lift shaft on the entrance floor -> lift shaft on the ward floor
+// -> ward. Without a placed entrance there's nothing to start from; without a placed lift the
+// line goes straight from the entrance to the ward.
+function routeFor(r) {
+  if (!r?._osp?.mappa || !r.corpo || r.piano == null) return null;
+  const ing = r._ing;
+  if (!ing?.corpo || ing.piano == null) return null;
+  const pts = [{ corpo: ing.corpo, liv: ing.piano, punto: ing.punto, kind: 'ing' }];
+  const shaft = r._asc?.corpo;
+  if (shaft && ing.piano !== r.piano) {
+    pts.push({ corpo: shaft, liv: ing.piano, kind: 'asc' }, { corpo: shaft, liv: r.piano, kind: 'asc' });
+  }
+  pts.push({ corpo: r.corpo, liv: r.piano, punto: r.punto, kind: 'rep' });
+  return pts;
+}
+
 // "Sali di 2 livelli" / "stesso piano dell'ingresso", from the entrance floor to the ward floor.
 function movement(r) {
   const from = r._ing?.piano, to = r.piano;
@@ -268,8 +289,7 @@ const placeText = (o, corpo, punto) => (corpo ? `Corpo ${corpoName(o, corpo)}${p
 
 function banner() {
   if (S.sessionExpired) {
-    const rd = encodeURIComponent('/' + location.hash);
-    return html`<div class="banner err">Sessione scaduta${S.data ? ': stai vedendo i dati salvati' : ''}. <a href="/oauth2/start?rd=${rd}">Accedi</a></div>`;
+    return html`<div class="banner err">Sessione scaduta: per salvare le modifiche <a href="${loginUrl()}">accedi di nuovo</a>.</div>`;
   }
   if (S.offline) return html`<div class="banner warn">Offline: stai vedendo i dati salvati${S.data?.aggiornato ? ' (aggiornati al ' + fmtDate(S.data.aggiornato) + ')' : ''}.</div>`;
   return '';
@@ -282,8 +302,10 @@ function tabbar(active) {
     ['preferiti', '#/preferiti', 'Preferiti', ICON.star(22)]
   ];
   if (S.me.canEdit) items.push(['aggiungi', '#/aggiungi', 'Aggiungi', ICON.plus(22)]);
+  // Login is optional (only needed to edit): offered while not logged in and online.
+  else if (!S.me.user && !S.offline) items.push(['accedi', loginUrl(), 'Accedi', ICON.user(22)]);
   return html`<nav class="tabbar" style="grid-template-columns: repeat(${items.length}, minmax(0, 1fr))">
-    ${items.map(([k, href, label, icon]) => html`<a href="${href}" class="${k === active ? 'on' : ''}" ${k === active ? raw('aria-current="page"') : ''}>${icon}${label}</a>`)}
+    ${items.map(([k, href, label, icon]) => html`<a href="${href}" class="${k === active ? 'on' : ''} ${k === 'accedi' ? 'login' : ''}" ${k === active ? raw('aria-current="page"') : ''}>${icon}${label}</a>`)}
   </nav>`;
 }
 
@@ -459,7 +481,9 @@ function viewOspedali() {
         </a>`;
       })}
       ${!osps.length && html`<div class="empty"><b>Nessun ospedale</b><span>Aggiungi il primo ospedale per iniziare.</span></div>`}
-      <p class="who">${S.me.user ? html`Accesso come <b>${S.me.user.name}</b> · ${S.me.canEdit ? 'puoi modificare' : 'sola lettura'} · <a href="/oauth2/sign_out?rd=%2F">Esci</a>` : ''}<br>Versione ${VERSION}</p>
+      <p class="who">${S.me.user
+        ? html`Accesso come <b>${S.me.user.name}</b> · ${S.me.canEdit ? 'puoi modificare' : 'sola lettura'} · <a href="/oauth2/sign_out?rd=%2F">Esci</a>`
+        : html`Stai consultando senza accesso. <a href="${loginUrl()}">Accedi</a> solo se devi modificare i dati.`}<br>Versione ${VERSION}</p>
       ${S.me.user && !S.me.canEdit && html`<p class="who">Per modificare serve il ruolo ${(S.me.editorGroups || []).join(' o ')}. Ruoli ricevuti: ${S.me.user.groups?.length ? S.me.user.groups.join(', ') : 'nessuno'}.</p>`}
     </main>
     ${tabbar('ospedali')}`;
@@ -602,6 +626,7 @@ function drawStage(el) {
   const out = renderMap({
     mappa: o.mappa, reparti: X.repByOsp[o.id] || [], sel: st.sel, lvl: st.lvl, rot: st.rot, exp: st.exp,
     target: st.pick ? st.highlight : undefined, pick: !!st.pick, points: entrancePoints(o),
+    route: st.pick ? null : routeFor(X.rep[st.sel]),
     width: el.clientWidth || 390, height: el.clientHeight || 300
   });
   el.innerHTML = String(out);
@@ -816,10 +841,7 @@ function gestReparti(o, sede, g) {
   for (const r of reps) if (r.piano != null && !floors.includes(r.piano)) floors.push(r.piano);
   floors.sort((a, b) => a - b);
   const floorOpts = [['', '—'], ...floors.map((p) => [p, pianoInfo(o, p).short + (o.piani?.nomi?.[p] ? ' · ' + o.piani.nomi[p] : '')])];
-  // Two bodies can share a label (e.g. "centrale"): add the short code to tell them apart.
-  const labelCount = {};
-  for (const [, c] of corpi) labelCount[c.label] = (labelCount[c.label] || 0) + 1;
-  const corpoOpts = [['', '—'], ...corpi.map(([k, c]) => [k, labelCount[c.label] > 1 ? `${c.label} (${k})` : c.label])];
+  const corpoOpts = corpoOptions(o);
   const ingOpts = [['', 'Nessuno'], ...ingressi.map((x) => [x.id, x.nome])];
   const ascOpts = [['', 'Nessuno (a piedi)'], ...ascensori.map((x) => [x.id, x.sigla + (x.tipo ? ' · ' + x.tipo : '')])];
   return html`
@@ -842,6 +864,15 @@ function gestReparti(o, sede, g) {
     </div>`;
 }
 
+// Bodies of the 3D map as select options; two bodies can share a label (e.g. "centrale"),
+// so the code is added to tell them apart. Just [['', '—']] for hospitals without a map.
+function corpoOptions(o) {
+  const corpi = o.mappa?.corpi ? Object.entries(o.mappa.corpi) : [];
+  const count = {};
+  for (const [, c] of corpi) count[c.label] = (count[c.label] || 0) + 1;
+  return [['', '—'], ...corpi.map(([k, c]) => [k, count[c.label] > 1 ? `${c.label} (${k})` : c.label])];
+}
+
 function usage(field, id) {
   return S.data.reparti.filter((r) => r[field] === id).length;
 }
@@ -854,7 +885,7 @@ function gestIngressi(o, sede) {
   floors.sort((a, b) => a - b);
   const floorOpts = [['', '—'], ...floors.map((p) => [p, pianoInfo(o, p).short])];
   const corpi = o.mappa?.corpi ? Object.entries(o.mappa.corpi) : [];
-  const corpoOpts = [['', '—'], ...corpi.map(([k, c]) => [k, corpi.filter(([, y]) => y.label === c.label).length > 1 ? `${c.label} (${k})` : c.label])];
+  const corpoOpts = corpoOptions(o);
   return html`
     <p class="hint">Rinominare un ingresso aggiorna subito tutti i reparti che lo usano.${corpi.length > 0 ? ' Per mettere un puntino preciso sulla mappa 3D usa il pulsante con la mappa.' : ''}</p>
     <div class="gtable ings ${corpi.length ? 'withc' : ''}">
@@ -882,15 +913,17 @@ function gestIngressi(o, sede) {
 
 function gestAscensori(o, sede) {
   const rows = X.ascBySede[sede.id] || [];
+  const corpoOpts = corpoOptions(o);
   return html`
-    <p class="hint">Rinominare un ascensore aggiorna subito tutti i reparti che lo usano.</p>
-    <div class="gtable ascs">
-      <div class="ghead"><span>Sigla</span><span>Tipo</span><span>Dove si trova</span><span></span></div>
+    <p class="hint">Rinominare un ascensore aggiorna subito tutti i reparti che lo usano.${corpoOpts.length > 1 ? ' Il corpo indica dove si trova il vano sulla mappa 3D: serve a disegnare il percorso.' : ''}</p>
+    <div class="gtable ascs ${corpoOpts.length > 1 ? 'withc' : ''}">
+      <div class="ghead"><span>Sigla</span><span>Tipo</span>${corpoOpts.length > 1 && html`<span>Corpo</span>`}<span>Dove si trova</span><span></span></div>
       ${rows.map((x) => {
         const n = usage('ascensore_id', x.id);
         return html`<div class="grow-r">
           ${quickInput('ascensori', x, 'sigla', { label: 'Sigla', placeholder: 'C, A–B…' })}
           ${quickInput('ascensori', x, 'tipo', { label: 'Tipo', placeholder: 'Montalettighe…' })}
+          ${corpoOpts.length > 1 && quickSelect('ascensori', x, 'corpo', corpoOpts, { label: 'Corpo' })}
           ${quickInput('ascensori', x, 'nota', { label: 'Dove si trova', cls: 'name' })}
           <div class="row gap6 gact">
             <span class="usage" title="Reparti che usano questo ascensore">${n} rep.</span>
@@ -985,6 +1018,10 @@ function viewNotFound() {
 }
 
 function viewForbidden() {
+  if (!S.me.user) {
+    return html`${banner()}<header class="hero"><div class="row"><a class="hbtn" href="#/">${ICON.back()}Cerca</a></div><h1>Accesso richiesto</h1></header>
+      <main class="scroll pad"><div class="empty"><b>Per modificare i dati devi accedere</b><span>La consultazione è libera; aggiungere o modificare richiede un account con i permessi.</span><a class="btn primary" href="${loginUrl()}">Accedi</a></div></main>${tabbar('')}`;
+  }
   return html`${banner()}<header class="hero"><div class="row"><a class="hbtn" href="#/">${ICON.back()}Cerca</a></div><h1>Solo lettura</h1></header>
     <main class="scroll pad"><div class="empty"><b>Non hai i permessi per modificare i dati</b><span>Chiedi all'amministratore di aggiungerti al gruppo degli editor.</span></div></main>${tabbar('')}`;
 }

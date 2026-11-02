@@ -5,7 +5,7 @@ PWA per gli equipaggi: cerchi un reparto e vedi **ingresso, ascensore e piano**,
 - **Cerca**: ricerca su tutti gli ospedali (nome, sigla, parole chiave), filtro per ospedale
 - **Scheda reparto**: ingresso / ascensore / piano, percorso, note per l'equipaggio, "Chiama", verifica dei dati
 - **Ospedali**: sedi (plessi/padiglioni), ingressi (con indicazione "consigliato ambulanze" / "non adatto a barelle"), ascensori, reparti piano per piano
-- **Mappa 3D** per gli ospedali che la hanno (oggi l'Ospedale Carlo Urbani di Jesi): l'ospedale si apre direttamente sulla mappa, e la scheda di ogni reparto la mostra con il reparto evidenziato
+- **Mappa 3D** per gli ospedali che la hanno (oggi l'Ospedale Carlo Urbani di Jesi): l'ospedale si apre direttamente sulla mappa, e la scheda di ogni reparto la mostra con il reparto evidenziato e il percorso disegnato (ingresso → ascensore → reparto)
 - **Preferiti** salvati sul dispositivo
 - **Aggiungi / modifica** reparti, ingressi, ascensori, sedi e ospedali (solo per chi ha i permessi)
 - **Gestisci** (matita nella pagina dell'ospedale, solo per chi ha i permessi): tabella per spostare velocemente i reparti (piano, corpo, ingresso, ascensore), rinominare ingressi e ascensori e dare un nome ai piani. Ogni campo si salva appena lo cambi. Se sposti un reparto in un altro corpo della mappa 3D, ascensore e indicazioni standard si aggiornano da soli. La piantina 3D non si modifica da qui.
@@ -25,7 +25,7 @@ Internet ──► Traefik ──► oauth2-proxy ──► app (Node 24 + SQLit
 - `server/seed/`: dati caricati al primo avvio, solo se il database è vuoto. `jesi.json` è reale (Piano di emergenza 2015, da verificare); `demo.json` è finto e si carica solo con `SEED_DEMO=true`.
 - Il database è `data/reparti.db` nella cartella del compose (montata in `/data` nel container, esclusa da git). Ogni modifica finisce anche nella tabella `modifiche` (chi, quando, cosa).
 
-L'app non gestisce login: si fida degli header `X-Forwarded-Preferred-Username/Email/Groups` messi da oauth2-proxy. Per questo il container `app` **non va mai collegato alla rete di Traefik né esposto con una porta**.
+La consultazione è pubblica: oauth2-proxy lascia passare senza login la pagina, i file dell'app e `GET /api/data`. Il login (pulsante "Accedi") serve solo per `/api/me` e per le modifiche. L'app non gestisce login: si fida degli header `X-Forwarded-Preferred-Username/Email/Groups` messi da oauth2-proxy. Per questo il container `app` **non va mai collegato alla rete di Traefik né esposto con una porta**.
 
 ## Sviluppo locale
 

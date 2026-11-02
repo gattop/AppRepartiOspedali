@@ -2,8 +2,9 @@
 #
 #   Internet -> Traefik (rete "proxy") -> oauth2-proxy :4180 -> app :3000 (rete interna)
 #
-# L'app non è mai sulla rete di Traefik: ogni richiesta passa da oauth2-proxy, che gestisce
-# il login e passa l'utente all'app negli header X-Forwarded-*.
+# L'app non è mai sulla rete di Traefik: ogni richiesta passa da oauth2-proxy. La consultazione
+# è pubblica; chi accede (Keycloak) viene passato all'app negli header X-Forwarded-* e, se ha
+# il ruolo, può modificare.
 #
 # Qui c'è tutta la configurazione non segreta (con valori di default sovrascrivibili).
 # I segreti stanno solo nel file .env sulla VPS, che non va nel repo: vedi .env.example.
@@ -57,9 +58,11 @@ services:
       # Gli equipaggi tengono l'app aperta per tutto il turno: sessione lunga, rinnovata in silenzio.
       OAUTH2_PROXY_COOKIE_EXPIRE: 168h
       OAUTH2_PROXY_COOKIE_REFRESH: 1h
-      # Manifest, icone e favicon vengono scaricati dal browser senza passare dal login
-      # (altrimenti la richiesta della favicon avvia un secondo login che rompe il primo).
-      OAUTH2_PROXY_SKIP_AUTH_ROUTES: '^/(manifest\.webmanifest|icons/.+|favicon\.ico)$$'
+      # Consultazione pubblica: la pagina, i file dell'app e i dati (GET /api/data) non chiedono
+      # il login. Il login serve solo per /api/me (chi sei) e per qualsiasi modifica.
+      OAUTH2_PROXY_SKIP_AUTH_ROUTES: 'GET=^/($$|(app|util|map3d|sw)\.js$$|app\.css$$|manifest\.webmanifest$$|favicon\.ico$$|icons/|api/data$$|healthz$$)'
+      # Sulle richieste pubbliche toglie eventuali header di identità falsificati dal client.
+      OAUTH2_PROXY_SKIP_AUTH_STRIP_HEADERS: "true"
       OAUTH2_PROXY_SILENCE_PING_LOGGING: "true"
     networks:
       - internal

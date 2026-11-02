@@ -98,7 +98,8 @@ export const ENTITIES = {
     order: 'ordine, nome'
   },
   ascensori: {
-    fields: { sede_id: 'ref!', sigla: 'text!', tipo: 'text', nota: 'text', ordine: 'int' },
+    // corpo = the lift shaft's block on the 3D map (used to draw the route)
+    fields: { sede_id: 'ref!', sigla: 'text!', tipo: 'text', nota: 'text', corpo: 'textnull', ordine: 'int' },
     parent: { field: 'sede_id', table: 'sedi' },
     order: 'ordine, sigla'
   },
@@ -180,7 +181,8 @@ const ADDED_COLUMNS = [
   ['ingressi', 'piano', 'INTEGER'],
   ['ingressi', 'corpo', 'TEXT'],
   ['ingressi', 'punto', 'TEXT'],
-  ['reparti', 'punto', 'TEXT']
+  ['reparti', 'punto', 'TEXT'],
+  ['ascensori', 'corpo', 'TEXT']
 ];
 
 function migrate(db) {
