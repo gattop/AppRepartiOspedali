@@ -53,6 +53,8 @@ const S = {
   search: { q: '', osp: 'all' },
   sedeTab: {},
   map: {},
+  mapDetail: {},
+  gest: {},
   draft: null,
   pendingSelect: null,
   flash: null,
@@ -183,13 +185,42 @@ async function mutate(fn, okText) {
 
 // ---------------------------------------------------------------- domain helpers
 
-function pianoInfo(osp, p) {
+function pianoDefault(osp, p) {
   const title = osp?.uso_livelli ? 'LIVELLO' : 'PIANO';
   if (p == null) return { short: '—', long: 'Piano non indicato', title };
   if (osp?.uso_livelli) return { short: String(p), long: 'Livello ' + p, title };
   if (p === 0) return { short: 'T', long: 'Piano terra', title };
   if (p < 0) return { short: String(p), long: 'Piano ' + p, title };
   return { short: String(p), long: p + '° piano', title };
+}
+
+// Same as the default, but with the hospital's own floor name when one is set (e.g. "Piano rialzato").
+function pianoInfo(osp, p) {
+  const info = pianoDefault(osp, p);
+  const nome = p != null && osp?.piani?.nomi?.[p];
+  return nome ? { ...info, long: nome } : info;
+}
+
+// Floors offered in the editors: the hospital's own range, else the 3D map levels, else -2..8.
+function floorOptions(osp) {
+  const pr = osp?.piani;
+  if (pr && Number.isInteger(pr.min) && Number.isInteger(pr.max) && pr.min <= pr.max) {
+    return Array.from({ length: pr.max - pr.min + 1 }, (_, i) => pr.min + i);
+  }
+  return osp?.mappa?.livelli || [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8];
+}
+
+const corpoName = (osp, k) => osp?.mappa?.corpi?.[k]?.label || k || '';
+
+// When a ward moves to another body of a mapped hospital, carry over that body's lift and
+// standard directions, but only where the ward still had the old body's defaults.
+function corpoPatch(osp, cur, corpo) {
+  const corpi = osp?.mappa?.corpi || {};
+  const was = corpi[cur.corpo] || {}, now = corpi[corpo] || {};
+  const patch = { corpo };
+  if (now.ascensore && X.asc[now.ascensore] && cur.ascensore_id && cur.ascensore_id === was.ascensore) patch.ascensore_id = now.ascensore;
+  if (now.dove && (!cur.dove || cur.dove === was.dove)) patch.dove = now.dove;
+  return patch;
 }
 
 const ingShort = (ing) => (ing ? ing.sigla || ing.nome.split(' ')[0] : '—');
@@ -326,7 +357,7 @@ function steps(r) {
     <div class="step"><span class="num">1</span><div class="col"><span class="lbl">Vai a</span><b>${multi ? r._sede.nome : r._osp.nome}</b><span class="muted">${[r._sede.indirizzo || r._osp.indirizzo, r._osp.citta].filter(Boolean).join(', ')}</span></div></div>
     <div class="step"><span class="num red">2</span><div class="col"><span class="lbl">Entra da</span><b>${r._ing ? r._ing.nome : 'Ingresso non indicato'}</b>${r._ing?.nota && html`<span class="muted">${r._ing.nota}</span>`}</div></div>
     <div class="step"><span class="num blue">3</span><div class="col"><span class="lbl">Prendi</span><b>${r._asc ? `Ascensore ${r._asc.sigla}${r._asc.tipo ? ' (' + r._asc.tipo + ')' : ''}` : 'Nessun ascensore'}</b>${r._asc?.nota && html`<span class="muted">${r._asc.nota}</span>`}</div></div>
-    <div class="step"><span class="num dark">4</span><div class="col"><span class="lbl">Vai al</span><b>${pi.long}</b>${r.dove && html`<span class="muted">${r.dove}</span>`}</div></div>
+    <div class="step"><span class="num dark">4</span><div class="col"><span class="lbl">Vai al</span><b>${pi.long}${r.corpo && r._osp.mappa ? ', corpo ' + corpoName(r._osp, r.corpo) : ''}</b>${r.dove && html`<span class="muted">${r.dove}</span>`}</div></div>
   </div>`;
 }
 
@@ -336,6 +367,7 @@ function viewReparto(id) {
   const pi = pianoInfo(r._osp, r.piano);
   const fav = S.fav.has(r.id);
   const tel = telInfo(r._osp, r.tel);
+  const hasMap = !!(r._osp.mappa && r.corpo);
   return html`
     ${banner()}
     <header class="hero">
@@ -349,28 +381,36 @@ function viewReparto(id) {
         <a class="hero-sub" href="#/ospedale/${encodeURIComponent(r._osp.id)}">${r._osp.nome} · ${r._sede.nome}</a>
       </div>
     </header>
-    <main class="scroll pad col gap14">
-      <div class="tiles">
-        <div class="tile"><span>INGRESSO</span><b class="red">${ingShort(r._ing)}</b></div>
-        <div class="tile"><span>ASCENSORE</span><b class="blue">${r._asc ? r._asc.sigla : '—'}</b></div>
-        <div class="tile dark"><span>${pi.title}</span><b>${pi.short}</b></div>
+    <main class="scroll pad">
+      <div class="detail-grid ${hasMap ? '' : 'nomap'}">
+        <div class="tiles g-tiles">
+          <div class="tile"><span>INGRESSO</span><b class="red">${ingShort(r._ing)}</b></div>
+          <div class="tile"><span>ASCENSORE</span><b class="blue">${r._asc ? r._asc.sigla : '—'}</b></div>
+          <div class="tile dark"><span>${pi.title}</span><b>${pi.short}</b></div>
+        </div>
+        ${hasMap && html`<div class="panel mappanel g-map">
+          ${stageHtml(r._osp, r)}
+          <a class="mappanel-link" href="#/ospedale/${encodeURIComponent(r._osp.id)}?sel=${encodeURIComponent(r.id)}">${ICON.layers(16)}Apri la mappa 3D completa</a>
+        </div>`}
+        <div class="g-steps">${steps(r)}</div>
+        <div class="col gap14 g-rest">
+          ${r.note && html`<div class="note">${ICON.info()}<div class="col"><b>Da sapere</b><span>${r.note}</span></div></div>`}
+          <div class="col gap8">
+            <a class="btn primary big" href="${mapsUrl(r._osp, r._sede, r._ing)}" target="_blank" rel="noopener">${ICON.nav()}Naviga fino all'ingresso</a>
+            ${tel && (tel.href
+              ? html`<a class="btn secondary" href="${tel.href}">${ICON.phone()}Chiama il reparto · ${tel.label}</a>`
+              : html`<div class="btn secondary disabled">${ICON.phone()}Interno ${r.tel}</div>`)}
+          </div>
+          ${r._osp.fonte && html`<p class="fonte">${r._osp.fonte}</p>`}
+          <div class="verif">
+            ${r.verificato_il ? `Verificato il ${fmtDate(r.verificato_il)}${r.verificato_da ? ' da ' + r.verificato_da : ''}` : 'Mai verificato sul posto'}
+            ${S.me.canEdit && html` · <a href="#/reparto/${encodeURIComponent(r.id)}/modifica">Modifica</a>`}
+          </div>
+          ${S.me.canEdit && html`<button type="button" class="btn ghost" data-act="verify" data-id="${r.id}">${ICON.check()}Ho controllato: i dati sono corretti</button>`}
+        </div>
       </div>
-      ${steps(r)}
-      ${r.note && html`<div class="note">${ICON.info()}<div class="col"><b>Da sapere</b><span>${r.note}</span></div></div>`}
-      <div class="col gap8">
-        <a class="btn primary big" href="${mapsUrl(r._osp, r._sede, r._ing)}" target="_blank" rel="noopener">${ICON.nav()}Naviga fino all'ingresso</a>
-        ${tel && (tel.href
-          ? html`<a class="btn secondary" href="${tel.href}">${ICON.phone()}Chiama il reparto · ${tel.label}</a>`
-          : html`<div class="btn secondary disabled">${ICON.phone()}Interno ${r.tel}</div>`)}
-        ${r._osp.mappa && r.corpo && html`<a class="btn secondary" href="#/ospedale/${encodeURIComponent(r._osp.id)}/mappa?sel=${encodeURIComponent(r.id)}">${ICON.layers(18)}Vedi sulla mappa 3D</a>`}
-      </div>
-      ${r._osp.fonte && html`<p class="fonte">${r._osp.fonte}</p>`}
-      <div class="verif">
-        ${r.verificato_il ? `Verificato il ${fmtDate(r.verificato_il)}${r.verificato_da ? ' da ' + r.verificato_da : ''}` : 'Mai verificato sul posto'}
-        ${S.me.canEdit && html` · <a href="#/reparto/${encodeURIComponent(r.id)}/modifica">Modifica</a>`}
-      </div>
-      ${S.me.canEdit && html`<button type="button" class="btn ghost" data-act="verify" data-id="${r.id}">${ICON.check()}Ho controllato: i dati sono corretti</button>`}
-    </main>`;
+    </main>
+    ${tabbar('')}`;
 }
 
 // ---------------------------------------------------------------- views: hospitals
@@ -433,11 +473,10 @@ function viewOspedale(id) {
     ${banner()}
     <header class="hero">
       <div class="row between">
-        <a class="hbtn" href="#/ospedali">${ICON.back()}Ospedali</a>
-        <div class="row gap6">
-          ${o.mappa && html`<a class="hbtn" href="#/ospedale/${encodeURIComponent(o.id)}/mappa">${ICON.layers(18)}Mappa 3D</a>`}
-          ${S.me.canEdit && html`<a class="hbtn icon" href="#/ospedale/${encodeURIComponent(o.id)}/modifica" aria-label="Modifica ospedale">${ICON.edit()}</a>`}
-        </div>
+        ${o.mappa
+          ? html`<a class="hbtn" href="#/ospedale/${encodeURIComponent(o.id)}">${ICON.back()}Mappa 3D</a>`
+          : html`<a class="hbtn" href="#/ospedali">${ICON.back()}Ospedali</a>`}
+        ${S.me.canEdit && html`<a class="hbtn" href="#/ospedale/${encodeURIComponent(o.id)}/gestisci">${ICON.edit(18)}Gestisci</a>`}
       </div>
       <div class="col gap6">
         <h1>${o.nome}</h1>
@@ -449,6 +488,7 @@ function viewOspedale(id) {
       ${!sede
         ? html`<div class="pad"><div class="empty"><b>Nessuna sede</b><span>Un ospedale ha almeno una sede (plesso, padiglione…) con i suoi ingressi.</span>${S.me.canEdit && html`<a class="btn primary" href="#/ospedale/${encodeURIComponent(o.id)}/nuova-sede">Aggiungi sede</a>`}</div></div>`
         : html`
+      <div class="sched-grid"><div class="col">
       <section class="sec">
         <div class="sec-head"><h2>Ingressi</h2><span class="muted strong">${ingressi.length} in questa sede</span></div>
         ${ingressi.map((g) => html`<div class="icard">
@@ -473,6 +513,12 @@ function viewOspedale(id) {
         ${S.me.canEdit && html`<a class="btn dashed" href="#/sede/${encodeURIComponent(sede.id)}/nuovo-ascensore?ritorno=${ritorno}">+ Nuovo ascensore</a>`}
       </section>
 
+      ${S.me.canEdit && html`<section class="sec"><div class="row gap8 wrap">
+        <a class="btn ghost small" href="#/sede/${encodeURIComponent(sede.id)}/modifica?ritorno=${ritorno}">${ICON.edit(16)}Modifica sede</a>
+        <a class="btn ghost small" href="#/ospedale/${encodeURIComponent(o.id)}/nuova-sede">${ICON.plus(16)}Nuova sede</a>
+      </div></section>`}
+      </div><div class="col">
+
       <section class="sec">
         <div class="sec-head"><h2>${o.uso_livelli ? 'Livelli' : 'Piani'}</h2><span class="muted strong">${sede.nome}</span></div>
         ${floorKeys.length ? html`<div class="panel floors">${floorKeys.map((k) => {
@@ -488,11 +534,7 @@ function viewOspedale(id) {
         })}</div>` : html`<p class="muted">Nessun reparto in questa sede.</p>`}
         ${S.me.canEdit && html`<a class="btn dashed" href="#/aggiungi?sede=${encodeURIComponent(sede.id)}">+ Nuovo reparto</a>`}
       </section>
-
-      ${S.me.canEdit && html`<section class="sec"><div class="row gap8 wrap">
-        <a class="btn ghost small" href="#/sede/${encodeURIComponent(sede.id)}/modifica?ritorno=${ritorno}">${ICON.edit(16)}Modifica sede</a>
-        <a class="btn ghost small" href="#/ospedale/${encodeURIComponent(o.id)}/nuova-sede">${ICON.plus(16)}Nuova sede</a>
-      </div></section>`}
+      </div></div>
       ${o.fonte && html`<p class="fonte pad">${o.fonte}</p>`}
       `}
     </main>
@@ -511,10 +553,37 @@ function mapState(o, query) {
   return st;
 }
 
-function mapStage(o, st) {
-  const width = Math.min($app.clientWidth || 390, 560);
-  return renderMap({ mappa: o.mappa, reparti: X.repByOsp[o.id] || [], sel: st.sel, lvl: st.lvl, rot: st.rot, exp: st.exp, width });
+// A stage is an empty `.map-stage` element in the page; it's drawn after rendering so the
+// drawing can use the element's real size. With `data-rep` it shows one ward (ward page).
+function stageState(el) {
+  const o = X.osp[el.dataset.osp];
+  if (!o?.mappa) return null;
+  if (el.dataset.rep) {
+    const r = X.rep[el.dataset.rep];
+    const st = (S.mapDetail[o.id] ||= { rot: o.mappa.rot ?? -28, exp: false });
+    st.sel = r?.id || null;
+    st.lvl = r?.piano ?? 'all';
+    return st;
+  }
+  return S.map[o.id] || null;
 }
+
+function drawStage(el) {
+  const o = X.osp[el.dataset.osp];
+  const st = stageState(el);
+  if (!st) return;
+  el.innerHTML = String(renderMap({
+    mappa: o.mappa, reparti: X.repByOsp[o.id] || [], sel: st.sel, lvl: st.lvl, rot: st.rot, exp: st.exp,
+    width: el.clientWidth || 390, height: el.clientHeight || 300
+  }));
+}
+
+function drawStages() {
+  $app.querySelectorAll('.map-stage').forEach(drawStage);
+}
+
+const stageHtml = (o, r) =>
+  html`<div class="map-stage ${r ? 'small' : ''}" data-osp="${o.id}" data-rep="${r?.id || ''}"></div>`;
 
 function mapList(o, st) {
   const corpi = o.mappa.corpi || {};
@@ -552,6 +621,7 @@ function mapList(o, st) {
 function viewMappa(id, query) {
   const o = X.osp[id];
   if (!o || !o.mappa) return viewNotFound();
+  const enc = encodeURIComponent(o.id);
   const st = mapState(o, query);
   const corpi = o.mappa.corpi || {};
   const levels = o.mappa.livelli || [];
@@ -588,11 +658,17 @@ function viewMappa(id, query) {
   return html`
     ${banner()}
     <header class="hero compact">
-      <div class="row gap10">
-        <a class="hbtn icon" href="#/ospedale/${encodeURIComponent(o.id)}" aria-label="Torna alla scheda ospedale">${ICON.back()}</a>
-        <div class="col minw0">
-          <span class="brand">${o.nome}</span>
-          <span class="brand-sub">${[o.citta, `${nCorpi} corpi`, levels.length ? `livelli ${levels[0]}–${levels[levels.length - 1]}` : '', `${(X.repByOsp[o.id] || []).length} reparti`].filter(Boolean).join(' · ')}</span>
+      <div class="row between gap10">
+        <div class="row gap10 minw0">
+          <a class="hbtn icon" href="#/ospedali" aria-label="Torna agli ospedali">${ICON.back()}</a>
+          <div class="col minw0">
+            <span class="brand">${o.nome}</span>
+            <span class="brand-sub">${[o.citta, `${nCorpi} corpi`, levels.length ? `livelli ${levels[0]}–${levels[levels.length - 1]}` : '', `${(X.repByOsp[o.id] || []).length} reparti`].filter(Boolean).join(' · ')}</span>
+          </div>
+        </div>
+        <div class="row gap6 flexnone">
+          <a class="hbtn" href="#/ospedale/${enc}/scheda">${ICON.door(18)}<span class="hide-sm">Ingressi e piani</span><span class="show-sm">Scheda</span></a>
+          ${S.me.canEdit && html`<a class="hbtn icon" href="#/ospedale/${enc}/gestisci" aria-label="Gestisci ospedale" title="Gestisci">${ICON.edit()}</a>`}
         </div>
       </div>
       <label class="search">
@@ -602,15 +678,189 @@ function viewMappa(id, query) {
         <button type="button" class="clear ${st.q ? '' : 'hide'}" data-act="mapClear" data-osp="${o.id}" aria-label="Cancella ricerca">${ICON.close(16)}</button>
       </label>
     </header>
-    <div class="map-stage" id="stage" data-osp="${o.id}">${mapStage(o, st)}</div>
-    <div class="levelbar">
-      <span class="lbl">Livello</span>
-      ${['all', ...levels].map((k) => html`<button type="button" class="lvl ${k === st.lvl ? 'on' : ''}" data-act="mapLvl" data-osp="${o.id}" data-lvl="${k}">${k === 'all' ? 'Tutti' : k}</button>`)}
+    <div class="map-layout">
+      <div class="map-col">
+        ${stageHtml(o)}
+        <div class="levelbar">
+          <span class="lbl">Livello</span>
+          ${['all', ...levels].map((k) => html`<button type="button" class="lvl ${k === st.lvl ? 'on' : ''}" data-act="mapLvl" data-osp="${o.id}" data-lvl="${k}">${k === 'all' ? 'Tutti' : k}</button>`)}
+        </div>
+      </div>
+      <main class="scroll pad col gap12 side-col">
+        ${card}
+        <div id="maplist" class="col gap8">${mapList(o, st)}</div>
+      </main>
     </div>
-    <main class="scroll pad col gap12">
-      ${card}
-      <div id="maplist" class="col gap8">${mapList(o, st)}</div>
-    </main>`;
+    ${tabbar('ospedali')}`;
+}
+
+// ---------------------------------------------------------------- views: manage a hospital
+// Quick editing of everything that changes over time: where each ward is (floor, body,
+// entrance, lift), entrance and lift names, floor names. Every field saves on change.
+// The 3D map geometry is deliberately not editable here.
+
+const qid = (entity, id, field) => `q-${entity}-${id}-${field}`;
+
+function quickInput(entity, row, field, { label, placeholder = '', cls = '' } = {}) {
+  return html`<label class="gcell ${cls}"><span class="gl">${label}</span><input type="text" id="${qid(entity, row.id, field)}" data-change="quick" data-entity="${entity}" data-id="${row.id}" data-field="${field}" value="${row[field] ?? ''}" placeholder="${placeholder}"></label>`;
+}
+
+function quickSelect(entity, row, field, options, { label, type = '', cls = '' } = {}) {
+  const cur = row[field] == null ? '' : String(row[field]);
+  return html`<label class="gcell ${cls}"><span class="gl">${label}</span><select id="${qid(entity, row.id, field)}" data-change="quick" data-entity="${entity}" data-id="${row.id}" data-field="${field}" data-type="${type}">
+    ${options.map(([v, l]) => html`<option value="${v}" ${String(v) === cur ? raw('selected') : ''}>${l}</option>`)}
+  </select></label>`;
+}
+
+function gestReparti(o, sede, g) {
+  const corpi = o.mappa?.corpi ? Object.entries(o.mappa.corpi) : [];
+  const ingressi = X.ingBySede[sede.id] || [];
+  const ascensori = X.ascBySede[sede.id] || [];
+  const words = norm(g.q).split(/\s+/).filter(Boolean);
+  const reps = (X.repBySede[sede.id] || [])
+    .filter((r) => words.every((w) => r._hay.includes(w)))
+    .sort((a, b) => (a.piano ?? 99) - (b.piano ?? 99) || a.nome.localeCompare(b.nome));
+  const floors = floorOptions(o);
+  for (const r of reps) if (r.piano != null && !floors.includes(r.piano)) floors.push(r.piano);
+  floors.sort((a, b) => a - b);
+  const floorOpts = [['', '—'], ...floors.map((p) => [p, pianoInfo(o, p).short + (o.piani?.nomi?.[p] ? ' · ' + o.piani.nomi[p] : '')])];
+  // Two bodies can share a label (e.g. "centrale"): add the short code to tell them apart.
+  const labelCount = {};
+  for (const [, c] of corpi) labelCount[c.label] = (labelCount[c.label] || 0) + 1;
+  const corpoOpts = [['', '—'], ...corpi.map(([k, c]) => [k, labelCount[c.label] > 1 ? `${c.label} (${k})` : c.label])];
+  const ingOpts = [['', 'Nessuno'], ...ingressi.map((x) => [x.id, x.nome])];
+  const ascOpts = [['', 'Nessuno (a piedi)'], ...ascensori.map((x) => [x.id, x.sigla + (x.tipo ? ' · ' + x.tipo : '')])];
+  return html`
+    <p class="hint">Ogni modifica si salva da sola appena cambi un campo.${corpi.length > 0 ? ' Se sposti un reparto in un altro corpo, ascensore e indicazioni standard si aggiornano di conseguenza.' : ''}</p>
+    <div class="row gap8">
+      <label class="search light grow">${ICON.search(18)}<span class="sr">Filtra reparti</span><input type="search" data-input="gestQ" data-osp="${o.id}" value="${g.q}" placeholder="Filtra reparti…" autocomplete="off"></label>
+      <a class="btn primary small" href="#/aggiungi?sede=${encodeURIComponent(sede.id)}">${ICON.plus(16)}Reparto</a>
+    </div>
+    <div class="gtable reps ${corpi.length ? 'withc' : ''}">
+      <div class="ghead"><span>Reparto</span><span>${o.uso_livelli ? 'Livello' : 'Piano'}</span>${corpi.length > 0 && html`<span>Corpo</span>`}<span>Ingresso</span><span>Ascensore</span><span></span></div>
+      ${reps.map((r) => html`<div class="grow-r">
+        ${quickInput('reparti', r, 'nome', { label: 'Reparto', cls: 'name' })}
+        ${quickSelect('reparti', r, 'piano', floorOpts, { label: o.uso_livelli ? 'Livello' : 'Piano', type: 'int' })}
+        ${corpi.length > 0 && quickSelect('reparti', r, 'corpo', corpoOpts, { label: 'Corpo' })}
+        ${quickSelect('reparti', r, 'ingresso_id', ingOpts, { label: 'Ingresso' })}
+        ${quickSelect('reparti', r, 'ascensore_id', ascOpts, { label: 'Ascensore' })}
+        <a class="sqbtn gopen" href="#/reparto/${encodeURIComponent(r.id)}/modifica" aria-label="Tutti i campi di ${r.nome}" title="Tutti i campi (note, telefono, indicazioni…)">${ICON.edit(18)}</a>
+      </div>`)}
+      ${!reps.length && html`<div class="pad muted center">Nessun reparto${words.length ? ' corrisponde al filtro' : ' in questa sede'}.</div>`}
+    </div>`;
+}
+
+function usage(field, id) {
+  return S.data.reparti.filter((r) => r[field] === id).length;
+}
+
+function gestIngressi(o, sede) {
+  const rows = X.ingBySede[sede.id] || [];
+  const badgeOpts = [['', 'Nessuna indicazione'], ['ambulanze', 'Consigliato ambulanze'], ['no_barelle', 'Non adatto a barelle']];
+  return html`
+    <p class="hint">Rinominare un ingresso aggiorna subito tutti i reparti che lo usano.</p>
+    <div class="gtable ings">
+      <div class="ghead"><span>Sigla</span><span>Nome</span><span>Nota</span><span>Indicazione</span><span></span></div>
+      ${rows.map((x) => {
+        const n = usage('ingresso_id', x.id);
+        return html`<div class="grow-r">
+          ${quickInput('ingressi', x, 'sigla', { label: 'Sigla', placeholder: '16, PS…' })}
+          ${quickInput('ingressi', x, 'nome', { label: 'Nome', cls: 'name' })}
+          ${quickInput('ingressi', x, 'nota', { label: 'Nota', placeholder: 'Rampa, sosta…' })}
+          ${quickSelect('ingressi', x, 'badge', badgeOpts, { label: 'Indicazione' })}
+          <div class="row gap6 gact">
+            <span class="usage" title="Reparti che usano questo ingresso">${n} rep.</span>
+            <a class="sqbtn" href="#/ingresso/${encodeURIComponent(x.id)}/modifica?ritorno=${encodeURIComponent(location.hash)}" aria-label="Posizione e altri campi di ${x.nome}" title="Posizione GPS e altri campi">${ICON.pin()}</a>
+            <button type="button" class="sqbtn danger" data-act="gestDel" data-entity="ingressi" data-id="${x.id}" data-n="${n}" aria-label="Elimina ${x.nome}">${ICON.close(16)}</button>
+          </div>
+        </div>`;
+      })}
+      ${!rows.length && html`<div class="pad muted center">Nessun ingresso in questa sede.</div>`}
+    </div>
+    <button type="button" class="btn dashed" data-act="gestAdd" data-entity="ingressi" data-sede="${sede.id}">+ Aggiungi ingresso</button>`;
+}
+
+function gestAscensori(o, sede) {
+  const rows = X.ascBySede[sede.id] || [];
+  return html`
+    <p class="hint">Rinominare un ascensore aggiorna subito tutti i reparti che lo usano.</p>
+    <div class="gtable ascs">
+      <div class="ghead"><span>Sigla</span><span>Tipo</span><span>Dove si trova</span><span></span></div>
+      ${rows.map((x) => {
+        const n = usage('ascensore_id', x.id);
+        return html`<div class="grow-r">
+          ${quickInput('ascensori', x, 'sigla', { label: 'Sigla', placeholder: 'C, A–B…' })}
+          ${quickInput('ascensori', x, 'tipo', { label: 'Tipo', placeholder: 'Montalettighe…' })}
+          ${quickInput('ascensori', x, 'nota', { label: 'Dove si trova', cls: 'name' })}
+          <div class="row gap6 gact">
+            <span class="usage" title="Reparti che usano questo ascensore">${n} rep.</span>
+            <button type="button" class="sqbtn danger" data-act="gestDel" data-entity="ascensori" data-id="${x.id}" data-n="${n}" aria-label="Elimina ascensore ${x.sigla}">${ICON.close(16)}</button>
+          </div>
+        </div>`;
+      })}
+      ${!rows.length && html`<div class="pad muted center">Nessun ascensore in questa sede.</div>`}
+    </div>
+    <button type="button" class="btn dashed" data-act="gestAdd" data-entity="ascensori" data-sede="${sede.id}">+ Aggiungi ascensore</button>`;
+}
+
+function gestPiani(o) {
+  const floors = floorOptions(o);
+  const count = {};
+  for (const r of X.repByOsp[o.id] || []) if (r.piano != null) count[r.piano] = (count[r.piano] || 0) + 1;
+  const outside = Object.keys(count).map(Number).filter((p) => !floors.includes(p));
+  const word = o.uso_livelli ? 'livello' : 'piano';
+  const mapLv = o.mappa?.livelli;
+  return html`
+    <div class="panel col gap14">
+      <span class="panel-title">${o.uso_livelli ? 'Livelli' : 'Piani'} dell'ospedale</span>
+      <div class="row gap10">
+        <label class="field grow"><span>Dal ${word}</span><input type="number" id="q-piani-min" data-change="pianiRange" data-osp="${o.id}" data-k="min" value="${floors[0]}" step="1"></label>
+        <label class="field grow"><span>Al ${word}</span><input type="number" id="q-piani-max" data-change="pianiRange" data-osp="${o.id}" data-k="max" value="${floors[floors.length - 1]}" step="1"></label>
+      </div>
+      <small class="muted">Sono i ${o.uso_livelli ? 'livelli' : 'piani'} proposti quando aggiungi o sposti un reparto. Per la numerazione (piani o livelli) usa “Dati ospedale”.</small>
+      ${mapLv && html`<small class="muted">La mappa 3D disegna i livelli ${mapLv[0]}–${mapLv[mapLv.length - 1]}: un reparto su un livello diverso resta nell'elenco ma non compare sulla piantina.</small>`}
+      ${outside.length > 0 && html`<small class="warn">Ci sono reparti fuori da questo intervallo (${outside.join(', ')}): restano dove sono finché non li sposti.</small>`}
+    </div>
+    <div class="panel list">
+      ${floors.slice().reverse().map((p) => {
+        const def = pianoDefault(o, p);
+        return html`<div class="prow">
+          <span class="floor-n ${p <= 0 ? 'grey' : ''}">${def.short}</span>
+          <label class="grow"><span class="sr">Nome del ${word} ${p}</span><input type="text" id="q-piani-${p}" data-change="pianoNome" data-osp="${o.id}" data-p="${p}" value="${o.piani?.nomi?.[p] || ''}" placeholder="${def.long}"></label>
+          <span class="usage">${count[p] || 0} rep.</span>
+        </div>`;
+      })}
+    </div>
+    <p class="hint">Lascia vuoto il nome per usare quello standard (es. “${pianoDefault(o, 0).long}”).</p>`;
+}
+
+function viewGestisci(id) {
+  if (!S.me.canEdit) return viewForbidden();
+  const o = X.osp[id];
+  if (!o) return viewNotFound();
+  const g = (S.gest[o.id] ||= { tab: 'reparti', q: '' });
+  const sedi = X.sediByOsp[o.id] || [];
+  const sede = sedi.find((s) => s.id === S.sedeTab[o.id]) || sedi[0];
+  const enc = encodeURIComponent(o.id);
+  const tabs = [['reparti', 'Reparti'], ['ingressi', 'Ingressi'], ['ascensori', 'Ascensori'], ['piani', o.uso_livelli ? 'Livelli' : 'Piani']];
+  let body;
+  if (g.tab === 'piani') body = gestPiani(o);
+  else if (!sede) body = html`<div class="empty"><b>Nessuna sede</b><span>Aggiungi prima una sede (plesso, padiglione…).</span><a class="btn primary" href="#/ospedale/${enc}/nuova-sede">Aggiungi sede</a></div>`;
+  else body = { reparti: gestReparti, ingressi: gestIngressi, ascensori: gestAscensori }[g.tab](o, sede, g);
+  return html`
+    ${banner()}
+    <div class="topbar">
+      <a href="#/ospedale/${enc}" class="tlink">${ICON.back(18)}Fine</a>
+      <span class="ttitle">Gestisci</span>
+      <a href="#/ospedale/${enc}/modifica?ritorno=${encodeURIComponent(location.hash)}" class="tlink">Dati ospedale</a>
+    </div>
+    <div class="gest-head">
+      <div class="col gap2"><b class="gest-title">${o.nome}</b><span class="muted">${[o.citta, sede && sedi.length > 1 ? sede.nome : ''].filter(Boolean).join(' · ')}</span></div>
+      ${sedi.length > 1 && g.tab !== 'piani' && html`<label class="field"><span class="sr">Sede</span><select class="sedesel" data-change="gestSede" data-osp="${o.id}">${sedi.map((s) => html`<option value="${s.id}" ${s.id === sede.id ? raw('selected') : ''}>${s.nome}</option>`)}</select></label>`}
+      <div class="seg light" role="tablist">${tabs.map(([k, l]) => html`<button type="button" role="tab" aria-selected="${k === g.tab}" class="${k === g.tab ? 'on' : ''}" data-act="gestTab" data-osp="${o.id}" data-tab="${k}">${l}</button>`)}</div>
+    </div>
+    <main class="scroll pad col gap12 gest">${body}</main>
+    ${tabbar('ospedali')}`;
 }
 
 // ---------------------------------------------------------------- views: favourites
@@ -676,7 +926,8 @@ function viewRepForm(id, query) {
   const sede = X.sede[d.sede_id];
   const ingressi = sede ? X.ingBySede[sede.id] || [] : [];
   const ascensori = sede ? X.ascBySede[sede.id] || [] : [];
-  const piani = osp?.mappa?.livelli || [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8];
+  const piani = floorOptions(osp).slice();
+  if (d.piano != null && !piani.includes(d.piano)) piani.push(d.piano), piani.sort((a, b) => a - b);
   const corpi = osp?.mappa?.corpi ? Object.entries(osp.mappa.corpi) : [];
   const ritorno = encodeURIComponent(location.hash);
   const cancel = id ? `#/reparto/${encodeURIComponent(id)}` : '#/';
@@ -719,7 +970,7 @@ function viewRepForm(id, query) {
           ${piani.map((p) => chip('piano', p, pianoInfo(osp, p).short, 'fbtn'))}
         </div></div>
         ${corpi.length > 0 && html`<div class="field"><span>Corpo (per la mappa 3D)</span><div class="chips wrap">
-          ${corpi.map(([k, c]) => chip('corpo', k, c.short, 'chip sq'))}
+          ${corpi.map(([k, c]) => chip('corpo', k, corpi.filter(([, x]) => x.short === c.short).length > 1 ? `${c.short} (${k})` : c.short, 'chip sq'))}
         </div></div>`}
         <div class="field"><span>Ascensore</span><div class="chips wrap">
           ${ascensori.map((a) => chip('ascensore_id', a.id, a.sigla, 'chip sq blue'))}
@@ -848,10 +1099,13 @@ function route() {
     case 'preferiti': return viewPreferiti();
     case 'ospedali': return b === 'nuovo' ? viewEntityForm('ospedali', null, null, query) : viewOspedali();
     case 'ospedale':
-      if (c === 'mappa') return viewMappa(b, query);
+      // Hospitals with a 3D map open straight on the map; the sheet is one tap away.
+      if (c === 'mappa' || (!c && X.osp[b]?.mappa)) return viewMappa(b, query);
+      if (c === 'scheda' || !c) return viewOspedale(b);
+      if (c === 'gestisci') return viewGestisci(b);
       if (c === 'modifica') return viewEntityForm('ospedali', b, null, query);
       if (c === 'nuova-sede') return viewEntityForm('sedi', null, b, query);
-      return viewOspedale(b);
+      break;
     case 'sede':
       if (c === 'modifica') return viewEntityForm('sedi', b, null, query);
       if (c === 'nuovo-ingresso') return viewEntityForm('ingressi', null, b, query);
@@ -870,12 +1124,18 @@ function render() {
     return;
   }
   const active = document.activeElement;
-  const keep = active?.dataset?.input && { input: active.dataset.input, field: active.dataset.field, start: active.selectionStart, end: active.selectionEnd };
+  const keep = active && active !== document.body && {
+    id: active.id, input: active.dataset?.input, field: active.dataset?.field,
+    start: active.selectionStart, end: active.selectionEnd
+  };
   $app.innerHTML = String(route()) + String(toast());
-  // Re-renders triggered by a toast or data reload shouldn't steal the caret from a text field.
-  if (keep) {
-    const sel = `[data-input="${keep.input}"]` + (keep.field ? `[data-field="${keep.field}"]` : '');
-    const el = $app.querySelector(sel);
+  drawStages();
+  // Re-renders triggered by a save, a toast or a data reload shouldn't steal the caret from a
+  // field (e.g. tabbing to the next field in "Gestisci" while the previous one is saving).
+  if (keep && (keep.id || keep.input)) {
+    const el = keep.id
+      ? document.getElementById(keep.id)
+      : $app.querySelector(`[data-input="${keep.input}"]` + (keep.field ? `[data-field="${keep.field}"]` : ''));
     if (el) {
       el.focus();
       try { el.setSelectionRange(keep.start, keep.end); } catch { /* not a text input */ }
@@ -906,7 +1166,12 @@ const ACT = {
   sedeTab: ({ osp, id }) => { S.sedeTab[osp] = id; render(); },
   verify: async ({ id }) => { await mutate(() => api('POST', `reparti/${encodeURIComponent(id)}/verifica`), 'Grazie, verifica registrata'); },
 
-  mapPick: ({ id, liv }) => {
+  mapPick: ({ id, liv }, el) => {
+    // On a ward page the small map just links to the ward that was tapped.
+    if (el.closest('.map-stage').dataset.rep) {
+      location.hash = `#/reparto/${encodeURIComponent(id)}`;
+      return;
+    }
     const st = S.map[X.rep[id]._osp.id];
     st.sel = id;
     st.lvl = Number(liv);
@@ -914,8 +1179,8 @@ const ACT = {
   },
   mapSel: ({ id }) => {
     const r = X.rep[id];
-    const { parts } = parseHash();
-    const st = S.map[parts[1]];
+    const stage = $app.querySelector('.map-stage');
+    const st = S.map[stage.dataset.osp];
     st.sel = r ? r.id : null;
     if (r && r.piano != null) st.lvl = r.piano;
     render();
@@ -927,14 +1192,15 @@ const ACT = {
     st.sel = null;
     render();
   },
-  mapExp: () => {
-    const { parts } = parseHash();
-    S.map[parts[1]].exp = !S.map[parts[1]].exp;
-    redrawStage();
+  mapExp: (_, el) => {
+    const stage = el.closest('.map-stage');
+    const st = stageState(stage);
+    st.exp = !st.exp;
+    drawStage(stage);
   },
-  mapRot: ({ d }) => {
-    const { parts } = parseHash();
-    const st = S.map[parts[1]];
+  mapRot: ({ d }, el) => {
+    const stage = el.closest('.map-stage');
+    const st = stageState(stage);
     const from = st.rot, to = st.rot + Number(d), t0 = performance.now();
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     cancelAnimationFrame(ACT.mapRot.raf);
@@ -942,10 +1208,27 @@ const ACT = {
       const t = reduce ? 1 : Math.min(1, (now - t0) / 340);
       const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
       st.rot = from + (to - from) * e;
-      redrawStage();
-      if (t < 1) ACT.mapRot.raf = requestAnimationFrame(step);
+      if (stage.isConnected) drawStage(stage);
+      if (t < 1 && stage.isConnected) ACT.mapRot.raf = requestAnimationFrame(step);
     };
     ACT.mapRot.raf = requestAnimationFrame(step);
+  },
+
+  gestTab: ({ osp, tab }) => { S.gest[osp].tab = tab; render(); },
+  gestAdd: async ({ entity, sede }) => {
+    const body = entity === 'ingressi' ? { sede_id: sede, nome: 'Nuovo ingresso' } : { sede_id: sede, sigla: 'Nuovo' };
+    const row = await mutate(() => api('POST', entity, body), entity === 'ingressi' ? 'Ingresso aggiunto: scrivi il nome' : 'Ascensore aggiunto: scrivi la sigla');
+    if (row?.id) {
+      const el = document.getElementById(qid(entity, row.id, entity === 'ingressi' ? 'nome' : 'sigla'));
+      el?.focus();
+      el?.select();
+    }
+  },
+  gestDel: async ({ entity, id, n }) => {
+    const what = entity === 'ingressi' ? 'questo ingresso' : 'questo ascensore';
+    const msg = Number(n) > 0 ? `Eliminare ${what}? ${n} reparti lo usano e resteranno senza.` : `Eliminare ${what}?`;
+    if (!confirm(msg)) return;
+    await mutate(() => api('DELETE', `${entity}/${encodeURIComponent(id)}`), 'Eliminato');
   },
   mapClear: ({ osp }) => {
     S.map[osp].q = '';
@@ -956,7 +1239,8 @@ const ACT = {
     const d = S.draft;
     let v = value === '' ? null : value;
     if (field === 'piano') v = v == null ? null : Number(v);
-    d[field] = d[field] === v && field !== 'ascensore_id' ? null : v;
+    if (field === 'corpo' && v != null && v !== d.corpo) Object.assign(d, corpoPatch(X.osp[d.osp], d, v));
+    else d[field] = d[field] === v && field !== 'ascensore_id' ? null : v;
     draftChanged();
     render();
   },
@@ -1014,13 +1298,6 @@ const ACT = {
   }
 };
 
-function redrawStage() {
-  const el = document.getElementById('stage');
-  if (!el) return;
-  const o = X.osp[el.dataset.osp];
-  el.innerHTML = String(mapStage(o, S.map[o.id]));
-}
-
 function addKw() {
   const d = S.draft;
   const words = norm(d.kwInput).split(/[\s,]+/).filter(Boolean);
@@ -1030,6 +1307,10 @@ function addKw() {
 }
 
 const INPUT = {
+  gestQ: (el) => {
+    S.gest[el.dataset.osp].q = el.value;
+    render();
+  },
   searchQ: (el) => {
     S.search.q = el.value;
     document.getElementById('results').innerHTML = String(searchList());
@@ -1055,6 +1336,49 @@ const INPUT = {
 };
 
 const CHANGE = {
+  // Inline edits in "Gestisci": one field, saved immediately.
+  quick: async (el) => {
+    const { entity, id, field, type } = el.dataset;
+    let v = el.value.trim();
+    if (type === 'int') v = v === '' ? null : Number(v);
+    else if (field.endsWith('_id') || field === 'corpo' || field === 'badge') v = v || null;
+    if ((field === 'nome' || field === 'sigla') && !v) {
+      flash('Questo campo non può restare vuoto', 'err');
+      return;
+    }
+    let patch = { [field]: v };
+    let msg = 'Salvato';
+    if (entity === 'reparti' && field === 'corpo' && v) {
+      const r = X.rep[id];
+      patch = corpoPatch(r._osp, r, v);
+      if (patch.ascensore_id || patch.dove) msg = 'Salvato: aggiornati anche ascensore e indicazioni';
+    }
+    await mutate(() => api('PUT', `${entity}/${encodeURIComponent(id)}`, patch), msg);
+  },
+  gestSede: (el) => {
+    S.sedeTab[el.dataset.osp] = el.value;
+    render();
+  },
+  pianiRange: async (el) => {
+    const o = X.osp[el.dataset.osp];
+    const floors = floorOptions(o);
+    const range = { min: floors[0], max: floors[floors.length - 1], [el.dataset.k]: Number(el.value) };
+    if (!Number.isInteger(range.min) || !Number.isInteger(range.max) || range.min > range.max || range.max - range.min > 60) {
+      flash('Intervallo non valido', 'err');
+      render();
+      return;
+    }
+    await mutate(() => api('PUT', `ospedali/${encodeURIComponent(o.id)}`, { piani: { ...(o.piani || {}), ...range } }), 'Salvato');
+  },
+  pianoNome: async (el) => {
+    const o = X.osp[el.dataset.osp];
+    const floors = floorOptions(o);
+    const nomi = { ...(o.piani?.nomi || {}) };
+    if (el.value.trim()) nomi[el.dataset.p] = el.value.trim();
+    else delete nomi[el.dataset.p];
+    const piani = { min: floors[0], max: floors[floors.length - 1], ...(o.piani || {}), nomi };
+    await mutate(() => api('PUT', `ospedali/${encodeURIComponent(o.id)}`, { piani }), 'Salvato');
+  },
   draftOsp: (el) => {
     const d = S.draft;
     d.osp = el.value;
@@ -1135,7 +1459,10 @@ window.addEventListener('hashchange', () => {
 });
 window.addEventListener('online', async () => { await loadData(); render(); });
 window.addEventListener('offline', () => { S.offline = true; render(); });
-window.addEventListener('resize', () => redrawStage());
+window.addEventListener('resize', () => {
+  clearTimeout(drawStages.t);
+  drawStages.t = setTimeout(() => S.data && drawStages(), 100);
+});
 // Refresh when the app comes back to the foreground (crews leave it open for hours).
 document.addEventListener('visibilitychange', async () => {
   if (document.visibilityState === 'visible' && navigator.onLine && !S.busy && !S.draft) {

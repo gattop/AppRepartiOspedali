@@ -6,6 +6,7 @@ import path from 'node:path';
 import { createApp, configFromEnv } from '../server/index.js';
 import { snapshot } from '../server/backup.js';
 import { openDb } from '../server/db.js';
+import { updateSeededMaps } from '../server/seed.js';
 
 let server, store, base, dir;
 const EDITOR = { 'x-forwarded-preferred-username': 'mario', 'x-forwarded-groups': 'role:reparti-editor,altro' };
@@ -92,6 +93,36 @@ test('deleting a hospital cascades to its sites and wards', async () => {
   const data = await (await req('GET', '/api/data')).json();
   assert.ok(!data.sedi.some((x) => x.id === s.id));
   assert.ok(!data.reparti.some((x) => x.sede_id === s.id));
+});
+
+test('saves floor range and names, and keeps the 3D map when editing a hospital', async () => {
+  const piani = { min: 0, max: 5, nomi: { 2: 'Livello ingresso' } };
+  const res = await req('PUT', '/api/ospedali/jesi', { headers: EDITOR, body: { piani } });
+  assert.equal(res.status, 200);
+  const data = await (await req('GET', '/api/data')).json();
+  const jesi = data.ospedali.find((o) => o.id === 'jesi');
+  assert.deepEqual(jesi.piani, piani);
+  assert.ok(jesi.mappa.blocks.length > 0);
+  assert.equal(jesi.mappa.corpi.B.ascensore, 'asc-ab');
+});
+
+test('moves a ward to another body with a single field change', async () => {
+  const res = await req('PUT', '/api/reparti/jesi-orto-deg', { headers: EDITOR, body: { corpo: 'D', ascensore_id: 'asc-cd' } });
+  const r = await res.json();
+  assert.equal(r.corpo, 'D');
+  assert.equal(r.ascensore_id, 'asc-cd');
+  assert.equal(r.piano, 3);
+});
+
+test('adds the new per-body fields to maps seeded by an older release', () => {
+  const mappa = JSON.parse(store.get('ospedali', 'jesi').mappa);
+  for (const c of Object.values(mappa.corpi)) { delete c.ascensore; delete c.dove; }
+  store.db.prepare('UPDATE ospedali SET mappa = ? WHERE id = ?').run(JSON.stringify(mappa), 'jesi');
+  updateSeededMaps(store);
+  const after = JSON.parse(store.get('ospedali', 'jesi').mappa);
+  assert.equal(after.corpi.DX.ascensore, 'asc-cd');
+  assert.match(after.corpi.A.dove, /corridoio verso i corpi A-B/);
+  assert.equal(after.blocks.length, mappa.blocks.length);
 });
 
 test('writes one consistent backup per day and keeps the last N', () => {

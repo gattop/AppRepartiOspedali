@@ -172,35 +172,51 @@
         "corpi": {
           "A": {
             "label": "A",
-            "short": "A"
+            "short": "A",
+            "ascensore": "asc-ab",
+            "dove": "Corpo A – dalla portineria segui il corridoio verso i corpi A-B"
           },
           "B": {
             "label": "B",
-            "short": "B"
+            "short": "B",
+            "ascensore": "asc-ab",
+            "dove": "Corpo B – dalla portineria segui il corridoio verso i corpi A-B"
           },
           "SX": {
             "label": "Sinistro centrale",
-            "short": "SX"
+            "short": "SX",
+            "ascensore": "asc-ab",
+            "dove": "Corpo Sinistro centrale – dalla portineria segui il corridoio verso i corpi A-B"
           },
           "C": {
             "label": "C",
-            "short": "C"
+            "short": "C",
+            "ascensore": "asc-cd",
+            "dove": "Corpo C – dalla portineria segui il corridoio verso i corpi C-D"
           },
           "D": {
             "label": "D",
-            "short": "D"
+            "short": "D",
+            "ascensore": "asc-cd",
+            "dove": "Corpo D – dalla portineria segui il corridoio verso i corpi C-D"
           },
           "DX": {
             "label": "Destro centrale",
-            "short": "DX"
+            "short": "DX",
+            "ascensore": "asc-cd",
+            "dove": "Corpo Destro centrale – dalla portineria segui il corridoio verso i corpi C-D"
           },
           "CEN": {
             "label": "centrale",
-            "short": "Centr."
+            "short": "Centr.",
+            "ascensore": "asc-centrale",
+            "dove": "Corpo centrale (resta nel corpo centrale)"
           },
           "nC": {
             "label": "centrale",
-            "short": "Centr."
+            "short": "Centr.",
+            "ascensore": "asc-centrale",
+            "dove": "Corpo centrale (resta nel corpo centrale)"
           }
         },
         "markers": [

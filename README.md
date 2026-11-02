@@ -5,9 +5,11 @@ PWA per gli equipaggi: cerchi un reparto e vedi **ingresso, ascensore e piano**,
 - **Cerca**: ricerca su tutti gli ospedali (nome, sigla, parole chiave), filtro per ospedale
 - **Scheda reparto**: ingresso / ascensore / piano, percorso, note per l'equipaggio, "Naviga", "Chiama", verifica dei dati
 - **Ospedali**: sedi (plessi/padiglioni), ingressi (con indicazione "consigliato ambulanze" / "non adatto a barelle"), ascensori, reparti piano per piano
-- **Mappa 3D** per gli ospedali che la hanno (oggi l'Ospedale Carlo Urbani di Jesi)
+- **Mappa 3D** per gli ospedali che la hanno (oggi l'Ospedale Carlo Urbani di Jesi): l'ospedale si apre direttamente sulla mappa, e la scheda di ogni reparto la mostra con il reparto evidenziato
 - **Preferiti** salvati sul dispositivo
 - **Aggiungi / modifica** reparti, ingressi, ascensori, sedi e ospedali (solo per chi ha i permessi)
+- **Gestisci** (matita nella pagina dell'ospedale, solo per chi ha i permessi): tabella per spostare velocemente i reparti (piano, corpo, ingresso, ascensore), rinominare ingressi e ascensori e dare un nome ai piani. Ogni campo si salva appena lo cambi. Se sposti un reparto in un altro corpo della mappa 3D, ascensore e indicazioni standard si aggiornano da soli. La piantina 3D non si modifica da qui.
+- Layout ottimizzato per telefono e per PC (su schermi larghi: mappa grande a sinistra ed elenco a destra, tabelle per la gestione)
 
 I mockup originali di Claude Design sono in [claude/](claude/).
 

@@ -83,7 +83,7 @@ CREATE INDEX IF NOT EXISTS idx_reparti_sede ON reparti(sede_id);
 // `parent` is the foreign key that must point to an existing row.
 export const ENTITIES = {
   ospedali: {
-    fields: { nome: 'text!', citta: 'text', indirizzo: 'text', uso_livelli: 'bool', prefisso_tel: 'text', fonte: 'text', mappa: 'json' },
+    fields: { nome: 'text!', citta: 'text', indirizzo: 'text', uso_livelli: 'bool', prefisso_tel: 'text', fonte: 'text', mappa: 'json', piani: 'json' },
     order: 'nome'
   },
   sedi: {
@@ -162,7 +162,21 @@ export function openDb(file) {
   const db = new DatabaseSync(file);
   db.exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000;');
   db.exec(SCHEMA);
+  migrate(db);
   return new Store(db);
+}
+
+// Columns added after the first release; existing databases get them on startup.
+const ADDED_COLUMNS = [
+  // { min, max, nomi: { "<piano>": "nome" } }: floors offered in the editor and custom floor names
+  ['ospedali', 'piani', 'TEXT']
+];
+
+function migrate(db) {
+  for (const [table, column, type] of ADDED_COLUMNS) {
+    const cols = db.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
+    if (!cols.includes(column)) db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`);
+  }
 }
 
 class Store {
@@ -199,7 +213,10 @@ class Store {
     for (const [name, cfg] of Object.entries(ENTITIES)) {
       out[name] = this.db.prepare(`SELECT * FROM ${name} ORDER BY ${cfg.order}`).all();
     }
-    for (const o of out.ospedali) o.mappa = o.mappa ? JSON.parse(o.mappa) : null;
+    for (const o of out.ospedali) {
+      o.mappa = o.mappa ? JSON.parse(o.mappa) : null;
+      o.piani = o.piani ? JSON.parse(o.piani) : null;
+    }
     // Last change across all tables, so clients can tell whether their copy is current.
     const row = this.db.prepare('SELECT MAX(ts) AS ts FROM modifiche').get();
     out.aggiornato = row.ts || null;

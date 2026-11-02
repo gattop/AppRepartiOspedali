@@ -32,6 +32,28 @@ export function loadSeed(store, data, user = 'seed') {
   });
 }
 
+// Hospitals seeded by an older release keep their map, but get the per-body fields added
+// later (default lift and directions, used when a ward moves to another body).
+export function updateSeededMaps(store) {
+  for (const f of fs.readdirSync(DIR).filter((x) => x.endsWith('.json'))) {
+    for (const o of JSON.parse(fs.readFileSync(path.join(DIR, f), 'utf8')).ospedali) {
+      if (!o.mappa?.corpi) continue;
+      const row = store.get('ospedali', o.id);
+      if (!row?.mappa) continue;
+      const mappa = JSON.parse(row.mappa);
+      let changed = false;
+      for (const [k, extra] of Object.entries(o.mappa.corpi)) {
+        const cur = mappa.corpi?.[k];
+        if (!cur) continue;
+        for (const [field, value] of Object.entries(extra)) {
+          if (!(field in cur)) { cur[field] = value; changed = true; }
+        }
+      }
+      if (changed) store.db.prepare('UPDATE ospedali SET mappa = ? WHERE id = ?').run(JSON.stringify(mappa), o.id);
+    }
+  }
+}
+
 export function seed(store, { demo = false } = {}) {
   const files = ['jesi.json', ...(demo ? ['demo.json'] : [])];
   for (const f of files) {
