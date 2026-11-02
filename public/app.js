@@ -1602,7 +1602,59 @@ const SUBMIT = {
   }
 };
 
+// Drag a 3D map sideways (finger or mouse) to rotate it. Movement under a few pixels stays a tap,
+// so blocks remain clickable; the click that ends a real drag is swallowed.
+const DRAG_START = 6;
+const DEG_PER_PX = 0.45;
+let drag = null;
+let swallowClick = false;
+
+document.addEventListener('pointerdown', (e) => {
+  const stage = e.target.closest('.map-stage');
+  if (!stage || e.target.closest('.map-ctrl') || (e.pointerType === 'mouse' && e.button !== 0)) return;
+  const st = stageState(stage);
+  if (st) drag = { stage, st, id: e.pointerId, x: e.clientX, rot: st.rot, moved: false, raf: 0 };
+});
+
+document.addEventListener('pointermove', (e) => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.x;
+  if (!drag.moved) {
+    if (Math.abs(dx) < DRAG_START) return;
+    drag.moved = true;
+    cancelAnimationFrame(ACT.mapRot.raf);
+    drag.stage.classList.add('dragging');
+    try { drag.stage.setPointerCapture(e.pointerId); } catch { /* pointer already gone */ }
+  }
+  drag.st.rot = drag.rot + dx * DEG_PER_PX;
+  if (!drag.raf) {
+    const d = drag;
+    d.raf = requestAnimationFrame(() => {
+      d.raf = 0;
+      if (d.stage.isConnected) drawStage(d.stage);
+    });
+  }
+});
+
+function endDrag(e) {
+  if (!drag || e.pointerId !== drag.id) return;
+  if (drag.moved) {
+    drag.stage.classList.remove('dragging');
+    swallowClick = true;
+    setTimeout(() => { swallowClick = false; }, 0);
+  }
+  drag = null;
+}
+document.addEventListener('pointerup', endDrag);
+document.addEventListener('pointercancel', endDrag);
+
 document.addEventListener('click', (e) => {
+  if (swallowClick) {
+    swallowClick = false;
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
   const el = e.target.closest('[data-act]');
   if (!el || !ACT[el.dataset.act]) return;
   e.preventDefault();

@@ -208,6 +208,7 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
       <button type="button" class="map-cbtn" data-act="mapRot" data-d="45" aria-label="Ruota a destra">${raw(ICON_ROT_R)}</button>
       <button type="button" class="map-cbtn${exp ? ' on' : ''}" data-act="mapExp" aria-label="${exp ? 'Unisci i piani' : 'Separa i piani'}" aria-pressed="${exp}">${raw(ICON_LAYERS)}</button>
     </div>
+    <span class="map-hint" aria-hidden="true">↔ Trascina per ruotare</span>
     <div class="map-legend" aria-hidden="true">
       <span><span class="sw" style="background: #3B82F6"></span>Scale / ascensori</span>
       <span><span class="sw" style="background: #F43F5E"></span>${pick ? 'Posizione scelta' : 'Reparto'}</span>
