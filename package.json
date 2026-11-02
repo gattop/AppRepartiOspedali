@@ -1,0 +1,16 @@
+{
+  "name": "reparti-ospedali",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dove si trovano i reparti degli ospedali: ingresso, ascensore e piano. PWA offline per gli equipaggi.",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "icons": "node tools/make-icons.mjs",
+    "dev": "node tools/make-icons.mjs && node --disable-warning=ExperimentalWarning --watch server/index.js",
+    "start": "node --disable-warning=ExperimentalWarning server/index.js",
+    "test": "node --disable-warning=ExperimentalWarning --test"
+  }
+}

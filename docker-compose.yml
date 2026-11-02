@@ -1,0 +1,69 @@
+# Reparti Ospedali: app + oauth2-proxy (Keycloak) dietro Traefik.
+#
+#   Internet -> Traefik (rete "proxy") -> oauth2-proxy :4180 -> app :3000 (rete interna)
+#
+# L'app non è mai sulla rete di Traefik: ogni richiesta passa da oauth2-proxy, che gestisce
+# il login e passa l'utente all'app negli header X-Forwarded-*.
+# Configurazione: .env (vedi .env.example) e oauth2-proxy.env (vedi oauth2-proxy.env.example).
+
+services:
+  app:
+    image: ${IMAGE:-ghcr.io/owner/apprepartiospedali}:${TAG:-latest}
+    restart: unless-stopped
+    environment:
+      EDITOR_GROUPS: ${EDITOR_GROUPS:-}
+      SEED_DEMO: ${SEED_DEMO:-false}
+    volumes:
+      - data:/data
+    networks:
+      internal:
+        aliases:
+          - reparti-app
+
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.8.1
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    env_file:
+      - oauth2-proxy.env
+    environment:
+      OAUTH2_PROXY_PROVIDER: keycloak-oidc
+      OAUTH2_PROXY_HTTP_ADDRESS: 0.0.0.0:4180
+      OAUTH2_PROXY_UPSTREAMS: http://reparti-app:3000/
+      OAUTH2_PROXY_REDIRECT_URL: https://${APP_HOST}/oauth2/callback
+      OAUTH2_PROXY_REVERSE_PROXY: "true"
+      OAUTH2_PROXY_PASS_USER_HEADERS: "true"
+      OAUTH2_PROXY_SKIP_PROVIDER_BUTTON: "true"
+      OAUTH2_PROXY_CODE_CHALLENGE_METHOD: S256
+      OAUTH2_PROXY_EMAIL_DOMAINS: "*"
+      OAUTH2_PROXY_COOKIE_NAME: _reparti
+      OAUTH2_PROXY_COOKIE_SECURE: "true"
+      OAUTH2_PROXY_COOKIE_SAMESITE: lax
+      # Gli equipaggi tengono l'app aperta per tutto il turno: sessione lunga, rinnovata in silenzio.
+      OAUTH2_PROXY_COOKIE_EXPIRE: 168h
+      OAUTH2_PROXY_COOKIE_REFRESH: 1h
+      # Manifest e icone della PWA vengono scaricati dal browser senza passare dal login.
+      OAUTH2_PROXY_SKIP_AUTH_ROUTES: '^/(manifest\.webmanifest|icons/.+)$$'
+      OAUTH2_PROXY_SILENCE_PING_LOGGING: "true"
+    networks:
+      - internal
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=${TRAEFIK_NETWORK:-proxy}
+      - traefik.http.routers.reparti-ospedali.rule=Host(`${APP_HOST}`)
+      - traefik.http.routers.reparti-ospedali.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}
+      - traefik.http.routers.reparti-ospedali.tls=true
+      - traefik.http.routers.reparti-ospedali.tls.certresolver=${TRAEFIK_CERTRESOLVER:-le}
+      - traefik.http.services.reparti-ospedali.loadbalancer.server.port=4180
+
+networks:
+  internal:
+  proxy:
+    external: true
+    name: ${TRAEFIK_NETWORK:-proxy}
+
+volumes:
+  data:

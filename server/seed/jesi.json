@@ -1,0 +1,750 @@
+{
+  "ospedali": [
+    {
+      "id": "jesi",
+      "nome": "Ospedale Carlo Urbani",
+      "citta": "Jesi",
+      "indirizzo": "Via Aldo Moro 25",
+      "uso_livelli": true,
+      "prefisso_tel": "",
+      "fonte": "Dati dal Piano di emergenza P.O. Carlo Urbani (rev. 2015): da verificare sul posto.",
+      "mappa": {
+        "rot": -28,
+        "livelli": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "blocks": [
+          {
+            "id": "A",
+            "x0": 0,
+            "y0": 0,
+            "x1": 6,
+            "y1": 2,
+            "lv": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "label": "A"
+          },
+          {
+            "id": "B",
+            "x0": 0,
+            "y0": 3.2,
+            "x1": 6,
+            "y1": 5.2,
+            "lv": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "label": "B"
+          },
+          {
+            "id": "nAB",
+            "x0": 6,
+            "y0": 0,
+            "x1": 7.4,
+            "y1": 5.2,
+            "lv": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "label": "",
+            "node": true
+          },
+          {
+            "id": "SX",
+            "x0": 7.4,
+            "y0": 0,
+            "x1": 13.8,
+            "y1": 2,
+            "lv": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "label": "SX"
+          },
+          {
+            "id": "nC",
+            "x0": 13.8,
+            "y0": 0,
+            "x1": 15.2,
+            "y1": 2,
+            "lv": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "label": "",
+            "node": true
+          },
+          {
+            "id": "DX",
+            "x0": 15.2,
+            "y0": 0,
+            "x1": 21.6,
+            "y1": 2,
+            "lv": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "label": "DX"
+          },
+          {
+            "id": "nCD",
+            "x0": 21.6,
+            "y0": 0,
+            "x1": 23,
+            "y1": 5.2,
+            "lv": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "label": "",
+            "node": true
+          },
+          {
+            "id": "C",
+            "x0": 23,
+            "y0": 0,
+            "x1": 29,
+            "y1": 2,
+            "lv": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "label": "C"
+          },
+          {
+            "id": "D",
+            "x0": 23,
+            "y0": 3.2,
+            "x1": 29,
+            "y1": 5.2,
+            "lv": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "label": "D"
+          },
+          {
+            "id": "CEN",
+            "x0": 9,
+            "y0": 2,
+            "x1": 20,
+            "y1": 5,
+            "lv": [
+              1
+            ],
+            "label": "PS · CUP"
+          }
+        ],
+        "corpi": {
+          "A": {
+            "label": "A",
+            "short": "A"
+          },
+          "B": {
+            "label": "B",
+            "short": "B"
+          },
+          "SX": {
+            "label": "Sinistro centrale",
+            "short": "SX"
+          },
+          "C": {
+            "label": "C",
+            "short": "C"
+          },
+          "D": {
+            "label": "D",
+            "short": "D"
+          },
+          "DX": {
+            "label": "Destro centrale",
+            "short": "DX"
+          },
+          "CEN": {
+            "label": "centrale",
+            "short": "Centr."
+          },
+          "nC": {
+            "label": "centrale",
+            "short": "Centr."
+          }
+        },
+        "markers": [
+          {
+            "corpo": "nC",
+            "liv": 2,
+            "text": "Ingresso principale",
+            "dot": "#22C55E",
+            "dy": -14
+          },
+          {
+            "corpo": "CEN",
+            "liv": 1,
+            "text": "Pronto Soccorso",
+            "dot": "#F97316",
+            "dy": 6
+          }
+        ]
+      },
+      "sedi": [
+        {
+          "id": "jesi-sede",
+          "nome": "Sede unica",
+          "indirizzo": "Via Aldo Moro 25",
+          "ingressi": [
+            {
+              "id": "ing-principale",
+              "nome": "Ingresso principale – Portineria",
+              "sigla": "P",
+              "nota": "Dal piazzale, livello 2, corpo centrale"
+            },
+            {
+              "id": "ing-ps",
+              "nome": "Pronto Soccorso – corsia ambulanze",
+              "sigla": "PS",
+              "nota": "Livello 1, accesso diretto al PS nel corpo centrale",
+              "badge": "ambulanze"
+            }
+          ],
+          "ascensori": [
+            {
+              "id": "asc-ab",
+              "sigla": "A-B",
+              "tipo": "Nodo A-B",
+              "nota": "Corpi A, B e Sinistro centrale"
+            },
+            {
+              "id": "asc-centrale",
+              "sigla": "Centr.",
+              "tipo": "Nodo centrale",
+              "nota": "Corpo centrale (PS, CUP)"
+            },
+            {
+              "id": "asc-cd",
+              "sigla": "C-D",
+              "tipo": "Nodo C-D",
+              "nota": "Corpi C, D e Destro centrale; unico che scende al livello 0"
+            }
+          ],
+          "reparti": [
+            {
+              "id": "jesi-farmacia",
+              "nome": "Farmacia ospedaliera",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "D",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo D – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2281",
+              "kw": "farmacia seminterrato"
+            },
+            {
+              "id": "jesi-mensa",
+              "nome": "Mensa e cucina",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "A",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-ab",
+              "dove": "Corpo A – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "",
+              "tel": "",
+              "kw": "mensa cucina bar"
+            },
+            {
+              "id": "jesi-psichiatria",
+              "nome": "Psichiatria",
+              "tipo": "Degenza",
+              "piano": 1,
+              "corpo": "B",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-ab",
+              "dove": "Corpo B – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "",
+              "tel": "2040",
+              "kw": "psichiatria spdc salute mentale"
+            },
+            {
+              "id": "jesi-dietiste",
+              "nome": "Direzione medica – Dietiste",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "B",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-ab",
+              "dove": "Corpo B – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "",
+              "tel": "2304",
+              "kw": "dietiste dietologia"
+            },
+            {
+              "id": "jesi-blocco-op",
+              "nome": "Blocco operatorio",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "SX",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-ab",
+              "dove": "Corpo Sinistro centrale – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "",
+              "tel": "2020",
+              "kw": "blocco operatorio sale operatorie chirurgia intervento"
+            },
+            {
+              "id": "jesi-rianimazione",
+              "nome": "Anestesia e Rianimazione",
+              "tipo": "Degenza",
+              "piano": 1,
+              "corpo": "SX",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-ab",
+              "dove": "Corpo Sinistro centrale – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "",
+              "tel": "2297",
+              "kw": "rianimazione terapia intensiva anestesia"
+            },
+            {
+              "id": "jesi-ps",
+              "nome": "Pronto Soccorso",
+              "tipo": "Emergenza",
+              "piano": 1,
+              "corpo": "CEN",
+              "ingresso": "ing-ps",
+              "ascensore": null,
+              "dove": "Accesso diretto al PS nel corpo centrale",
+              "note": "",
+              "tel": "2240",
+              "kw": "pronto soccorso ps emergenza obi"
+            },
+            {
+              "id": "jesi-cup",
+              "nome": "CUP – Accettazione",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "CEN",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-centrale",
+              "dove": "Corpo centrale (resta nel corpo centrale)",
+              "note": "",
+              "tel": "2031",
+              "kw": "cup prenotazioni accettazione cassa"
+            },
+            {
+              "id": "jesi-sterilizzazione",
+              "nome": "Sterilizzazione",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "CEN",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-centrale",
+              "dove": "Corpo centrale (resta nel corpo centrale)",
+              "note": "",
+              "tel": "2546",
+              "kw": "sterilizzazione"
+            },
+            {
+              "id": "jesi-sale-parto",
+              "nome": "Area travaglio e parto",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "DX",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo Destro centrale – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2483",
+              "kw": "sale parto travaglio ostetricia"
+            },
+            {
+              "id": "jesi-senologia",
+              "nome": "Diagnostica per immagini – Senologia e RM",
+              "tipo": "Ambulatorio",
+              "piano": 1,
+              "corpo": "DX",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo Destro centrale – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2053",
+              "kw": "senologia mammografia rm rmn risonanza radiologia"
+            },
+            {
+              "id": "jesi-anatomia",
+              "nome": "Anatomia patologica",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "C",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo C – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2292",
+              "kw": "anatomia patologica"
+            },
+            {
+              "id": "jesi-obitorio",
+              "nome": "Obitorio",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "C",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo C – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2001",
+              "kw": "obitorio camera mortuaria salme"
+            },
+            {
+              "id": "jesi-prelievi",
+              "nome": "Punto prelievi",
+              "tipo": "Ambulatorio",
+              "piano": 1,
+              "corpo": "D",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo D – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "",
+              "kw": "prelievi sangue analisi laboratorio"
+            },
+            {
+              "id": "jesi-dialisi",
+              "nome": "Nefrologia e Dialisi",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "D",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo D – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2016",
+              "kw": "dialisi nefrologia emodialisi rene"
+            },
+            {
+              "id": "jesi-endoscopia",
+              "nome": "Polo endoscopico",
+              "tipo": "Ambulatorio",
+              "piano": 2,
+              "corpo": "A",
+              "ingresso": "ing-principale",
+              "ascensore": null,
+              "dove": "Corpo A – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "",
+              "tel": "2390",
+              "kw": "endoscopia gastroscopia colonscopia gastroenterologia"
+            },
+            {
+              "id": "jesi-gessi",
+              "nome": "Sala gessi",
+              "tipo": "Ambulatorio",
+              "piano": 2,
+              "corpo": "B",
+              "ingresso": "ing-principale",
+              "ascensore": null,
+              "dove": "Corpo B – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "",
+              "tel": "",
+              "kw": "gessi gesso ortopedia orto fratture"
+            },
+            {
+              "id": "jesi-portineria",
+              "nome": "Portineria – Informazioni (ingresso principale)",
+              "tipo": "Ingresso",
+              "piano": 2,
+              "corpo": "nC",
+              "ingresso": "ing-principale",
+              "ascensore": null,
+              "dove": "Subito all'ingresso, nel corpo centrale. Da qui partono i corridoi verso i corpi A-B e C-D",
+              "note": "",
+              "tel": "2181",
+              "kw": "portineria informazioni ingresso principale centralino"
+            },
+            {
+              "id": "jesi-amb-med",
+              "nome": "Ambulatori Medicina, Neurologia, Oncologia",
+              "tipo": "Ambulatorio",
+              "piano": 2,
+              "corpo": "C",
+              "ingresso": "ing-principale",
+              "ascensore": null,
+              "dove": "Corpo C – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2515",
+              "kw": "ambulatori medicina neurologia oncologia dh day hospital chemio"
+            },
+            {
+              "id": "jesi-amb-orto",
+              "nome": "Ambulatori Ortopedia e Reumatologia",
+              "tipo": "Ambulatorio",
+              "piano": 2,
+              "corpo": "D",
+              "ingresso": "ing-principale",
+              "ascensore": null,
+              "dove": "Corpo D – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2440",
+              "kw": "ambulatori ortopedia orto reumatologia visita controllo"
+            },
+            {
+              "id": "jesi-amb-cardio",
+              "nome": "Ambulatori Cardiologia, Chirurgia, Dermatologia",
+              "tipo": "Ambulatorio",
+              "piano": 3,
+              "corpo": "A",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-ab",
+              "dove": "Corpo A – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "",
+              "tel": "2273",
+              "kw": "ambulatori cardiologia cardio chirurgia dermatologia ecg"
+            },
+            {
+              "id": "jesi-orto-deg",
+              "nome": "Ortopedia e Traumatologia – Degenze",
+              "tipo": "Degenza",
+              "piano": 3,
+              "corpo": "B",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-ab",
+              "dove": "Corpo B – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "",
+              "tel": "2459",
+              "kw": "ortopedia orto traumatologia trauma degenza ricovero"
+            },
+            {
+              "id": "jesi-radiologia",
+              "nome": "Diagnostica per immagini – Radiologia, TAC, Ecografia",
+              "tipo": "Servizio",
+              "piano": 3,
+              "corpo": "SX",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-ab",
+              "dove": "Corpo Sinistro centrale – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "",
+              "tel": "2038",
+              "kw": "radiologia tac rx raggi ecografia eco diagnostica"
+            },
+            {
+              "id": "jesi-laboratorio",
+              "nome": "Patologia clinica – Laboratorio analisi",
+              "tipo": "Servizio",
+              "piano": 3,
+              "corpo": "DX",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo Destro centrale – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2209",
+              "kw": "laboratorio analisi patologia clinica"
+            },
+            {
+              "id": "jesi-trasfusionale",
+              "nome": "Medicina trasfusionale",
+              "tipo": "Servizio",
+              "piano": 3,
+              "corpo": "DX",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo Destro centrale – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2228",
+              "kw": "trasfusionale centro trasfusionale sangue donatori"
+            },
+            {
+              "id": "jesi-neurologia",
+              "nome": "Neurologia – Degenze",
+              "tipo": "Degenza",
+              "piano": 3,
+              "corpo": "C",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo C – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2508",
+              "kw": "neurologia neuro riabilitazione stroke ictus degenza"
+            },
+            {
+              "id": "jesi-reumatologia",
+              "nome": "Clinica reumatologica – Degenze",
+              "tipo": "Degenza",
+              "piano": 3,
+              "corpo": "D",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo D – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2132",
+              "kw": "reumatologia clinica reumatologica degenza"
+            },
+            {
+              "id": "jesi-preosp",
+              "nome": "Preospedalizzazione – Chirurgia breve",
+              "tipo": "Ambulatorio",
+              "piano": 4,
+              "corpo": "A",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-ab",
+              "dove": "Corpo A – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "",
+              "tel": "2460",
+              "kw": "preospedalizzazione prericovero chirurgia breve day surgery"
+            },
+            {
+              "id": "jesi-amb-oculi",
+              "nome": "Ambulatori Oculistica, Odontostomatologia, Otorino",
+              "tipo": "Ambulatorio",
+              "piano": 4,
+              "corpo": "B",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-ab",
+              "dove": "Corpo B – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "",
+              "tel": "2360",
+              "kw": "oculistica occhi odontostomatologia dentista otorino orl"
+            },
+            {
+              "id": "jesi-chirurgia",
+              "nome": "Chirurgia – Degenze",
+              "tipo": "Degenza",
+              "piano": 4,
+              "corpo": "SX",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-ab",
+              "dove": "Corpo Sinistro centrale – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "",
+              "tel": "2478",
+              "kw": "chirurgia generale degenza ricovero"
+            },
+            {
+              "id": "jesi-medicina-c",
+              "nome": "Medicina C – Degenze",
+              "tipo": "Degenza",
+              "piano": 4,
+              "corpo": "DX",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo Destro centrale – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2392",
+              "kw": "medicina c area medica degenza"
+            },
+            {
+              "id": "jesi-pediatria",
+              "nome": "Pediatria – Degenze",
+              "tipo": "Degenza",
+              "piano": 4,
+              "corpo": "C",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo C – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2384",
+              "kw": "pediatria bambini degenza"
+            },
+            {
+              "id": "jesi-amb-gine",
+              "nome": "Ambulatori Ostetricia-Ginecologia e Pediatria",
+              "tipo": "Ambulatorio",
+              "piano": 4,
+              "corpo": "D",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo D – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "",
+              "kw": "ambulatori ostetricia ginecologia pediatria gine"
+            },
+            {
+              "id": "jesi-cardio",
+              "nome": "Cardiologia – UTIC",
+              "tipo": "Degenza",
+              "piano": 5,
+              "corpo": "A",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-ab",
+              "dove": "Corpo A – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "",
+              "tel": "2416",
+              "kw": "cardiologia cardio utic unita coronarica degenza"
+            },
+            {
+              "id": "jesi-bpn",
+              "nome": "Broncopneumologia",
+              "tipo": "Degenza",
+              "piano": 5,
+              "corpo": "SX",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-ab",
+              "dove": "Corpo Sinistro centrale – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "",
+              "tel": "2160",
+              "kw": "broncopneumologia bpn pneumologia polmoni area medica a"
+            },
+            {
+              "id": "jesi-medicina-b",
+              "nome": "Medicina B – Degenze",
+              "tipo": "Degenza",
+              "piano": 5,
+              "corpo": "DX",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo Destro centrale – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2393",
+              "kw": "medicina b area medica degenza"
+            },
+            {
+              "id": "jesi-ostetricia",
+              "nome": "Ostetricia e Ginecologia – Degenze e PS ostetrico",
+              "tipo": "Degenza",
+              "piano": 5,
+              "corpo": "C",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo C – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2480",
+              "kw": "ostetricia ginecologia gine maternita ps ostetrico degenza"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

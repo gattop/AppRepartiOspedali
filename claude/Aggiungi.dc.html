@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Cerca reparto</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#C8102E}a:hover{color:#A50E26}
+input::placeholder{color:#98A2B3}
+input:focus{outline:none}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #F2F4F7; font-family: 'Manrope', system-ui, sans-serif; color: #0F172A">
+
+<sc-if value="{{showList}}" hint-placeholder-val="{{true}}">
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column">
+
+<div style="background: #0F172A; color: #FFFFFF; padding: 22px 20px 20px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: center; gap: 10px">
+<div style="width: 36px; height: 36px; border-radius: 10px; background: #C8102E; display: flex; align-items: center; justify-content: center; color: #FFFFFF">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"></path><path d="M3 13l9 5 9-5"></path></svg>
+</div>
+<div style="display: flex; flex-direction: column">
+<span style="font-size: 17px; font-weight: 800; letter-spacing: -0.01em">Reparti</span>
+<span style="font-size: 12px; font-weight: 500; color: #CBD5E1">3 ospedali · 8 reparti</span>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; background: rgba(255,255,255,0.1); font-size: 12px; font-weight: 700; color: #E2E8F0">
+<span style="width: 8px; height: 8px; border-radius: 999px; background: #4ADE80"></span>
+Disponibile offline
+</div>
+</div>
+<h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15">Dove devi portare il paziente?</h1>
+<label style="position: relative; display: flex; align-items: center; gap: 10px; background: #FFFFFF; border-radius: 14px; padding: 0 6px 0 14px; height: 54px; color: #475467">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Cerca reparto, sigla o ospedale</span>
+<input type="search" value="{{q}}" onChange="{{onQ}}" placeholder="Reparto, sigla, ospedale…" style="flex: 1; min-width: 0; border: 0; background: transparent; font-size: 17px; font-weight: 700; color: #0F172A; font-family: inherit">
+<sc-if value="{{hasQ}}" hint-placeholder-val="{{true}}">
+<button type="button" aria-label="Cancella ricerca" onClick="{{clearQ}}" style="width: 44px; height: 44px; border: 0; border-radius: 10px; background: #F2F4F7; color: #475467; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+</button>
+</sc-if>
+</label>
+</div>
+
+<div style="display: flex; gap: 8px; padding: 14px 16px 2px; overflow-x: auto; flex: none">
+<sc-for list="{{chips}}" as="c" hint-placeholder-count="4">
+<sc-if value="{{c.on}}" hint-placeholder-val="{{false}}">
+<button type="button" onClick="{{c.pick}}" style="flex: none; height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #0F172A; background: #0F172A; color: #FFFFFF; font-size: 14px; font-weight: 700; cursor: pointer">{{c.label}}</button>
+</sc-if>
+<sc-if value="{{c.off}}" hint-placeholder-val="{{true}}">
+<button type="button" onClick="{{c.pick}}" style="flex: none; height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 14px; font-weight: 700; cursor: pointer">{{c.label}}</button>
+</sc-if>
+</sc-for>
+</div>
+
+<div style="padding: 12px 20px 8px; font-size: 13px; font-weight: 700; color: #475467; flex: none">{{countText}}</div>
+
+<div style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 16px 16px; display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{results}}" as="r" hint-placeholder-count="3">
+<button type="button" onClick="{{r.pick}}" style="text-align: left; width: 100%; background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 16px; padding: 14px; display: flex; gap: 14px; align-items: flex-start; cursor: pointer; color: #0F172A; font-family: inherit; box-sizing: border-box; flex: none">
+<div style="flex: none; width: 58px; height: 66px; border-radius: 12px; background: #0F172A; color: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px">
+<span style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: #CBD5E1">PIANO</span>
+<span style="font-size: 26px; font-weight: 800; line-height: 1">{{r.pianoShort}}</span>
+</div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 16px; font-weight: 800; line-height: 1.25">{{r.nome}}</span>
+<span style="font-size: 13px; font-weight: 600; color: #475467">{{r.tipo}} · {{r.osp}}</span>
+<span style="font-size: 13px; font-weight: 500; color: #475467">{{r.sede}}</span>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px">
+<span style="display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 10px; border-radius: 8px; background: #FDECEE; color: #A50E26; font-size: 13px; font-weight: 800">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4a1 1 0 0 1 1-1h9l4 2v16"></path><path d="M3 21h18"></path><path d="M12 12h.01"></path></svg>
+{{r.ingPill}}
+</span>
+<span style="display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 10px; border-radius: 8px; background: #E8F0FE; color: #1D4ED8; font-size: 13px; font-weight: 800">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M9 9l3-3 3 3"></path><path d="M9 15l3 3 3-3"></path></svg>
+{{r.ascPill}}
+</span>
+</div>
+</div>
+<div style="flex: none; align-self: center; color: #98A2B3">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+</div>
+</button>
+</sc-for>
+<sc-if value="{{noResults}}" hint-placeholder-val="{{false}}">
+<div style="background: #FFFFFF; border: 1px dashed #D0D5DD; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+<span style="font-size: 16px; font-weight: 800">Nessun reparto trovato</span>
+<span style="font-size: 14px; color: #475467">Prova con una sigla (DH, UTIC, TAC) o aggiungilo tu.</span>
+<button type="button" style="height: 48px; padding: 0 18px; border-radius: 12px; border: 0; background: #C8102E; color: #FFFFFF; font-size: 15px; font-weight: 800; cursor: pointer">Aggiungi reparto</button>
+</div>
+</sc-if>
+</div>
+
+<nav style="flex: none; height: 68px; background: #FFFFFF; border-top: 1px solid #E4E7EC; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr))">
+<button type="button" style="border: 0; background: transparent; color: #C8102E; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 12px; font-weight: 800">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+Cerca
+</button>
+<a href="Ospedale.dc.html" style="text-decoration: none; color: #475467; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 12px; font-weight: 700">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"></path><path d="M16 9h2a2 2 0 0 1 2 2v10"></path><path d="M3 21h18"></path><path d="M8 7h4M8 11h4M8 15h4"></path></svg>
+Ospedali
+</a>
+<button type="button" style="border: 0; background: transparent; color: #475467; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 12px; font-weight: 700">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"></path></svg>
+Preferiti
+</button>
+<a href="Aggiungi.dc.html" style="text-decoration: none; color: #475467; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 12px; font-weight: 700">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+Aggiungi
+</a>
+</nav>
+</div>
+</sc-if>
+
+<sc-if value="{{showDetail}}" hint-placeholder-val="{{false}}">
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column">
+
+<div style="background: #0F172A; color: #FFFFFF; padding: 14px 16px 22px; display: flex; flex-direction: column; gap: 14px; flex: none">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<button type="button" onClick="{{back}}" style="height: 44px; padding: 0 14px 0 8px; border-radius: 12px; border: 0; background: rgba(255,255,255,0.1); color: #FFFFFF; display: flex; align-items: center; gap: 4px; font-size: 15px; font-weight: 700; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+Risultati
+</button>
+<button type="button" aria-label="Aggiungi ai preferiti" style="width: 44px; height: 44px; border-radius: 12px; border: 0; background: rgba(255,255,255,0.1); color: #FDE68A; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"></path></svg>
+</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #FDA4AF">{{d.tipo}}</span>
+<h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15">{{d.nome}}</h1>
+<span style="font-size: 14px; font-weight: 600; color: #CBD5E1">{{d.osp}} · {{d.sede}}</span>
+</div>
+</div>
+
+<div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; flex: none">
+<div style="background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 6px; min-height: 92px; box-sizing: border-box">
+<span style="font-size: 11px; font-weight: 800; letter-spacing: 0.08em; color: #475467">INGRESSO</span>
+<span style="font-size: 24px; font-weight: 800; line-height: 1.05; color: #C8102E; overflow-wrap: anywhere">{{d.ingShort}}</span>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 6px; min-height: 92px; box-sizing: border-box">
+<span style="font-size: 11px; font-weight: 800; letter-spacing: 0.08em; color: #475467">ASCENSORE</span>
+<span style="font-size: 24px; font-weight: 800; line-height: 1.05; color: #1D4ED8; overflow-wrap: anywhere">{{d.ascShort}}</span>
+</div>
+<div style="background: #0F172A; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 6px; min-height: 92px; box-sizing: border-box">
+<span style="font-size: 11px; font-weight: 800; letter-spacing: 0.08em; color: #CBD5E1">PIANO</span>
+<span style="font-size: 24px; font-weight: 800; line-height: 1.05; color: #FFFFFF">{{d.pianoShort}}</span>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px; flex: none">
+<span style="font-size: 13px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #475467">Percorso</span>
+<div style="display: flex; gap: 12px; align-items: flex-start">
+<span style="flex: none; width: 28px; height: 28px; border-radius: 999px; background: #F2F4F7; color: #0F172A; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center">1</span>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; font-weight: 700; color: #475467">Vai a</span><span style="font-size: 16px; font-weight: 800">{{d.sede}}</span><span style="font-size: 13px; color: #475467">{{d.indirizzo}}</span></div>
+</div>
+<div style="display: flex; gap: 12px; align-items: flex-start">
+<span style="flex: none; width: 28px; height: 28px; border-radius: 999px; background: #FDECEE; color: #A50E26; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center">2</span>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; font-weight: 700; color: #475467">Entra da</span><span style="font-size: 16px; font-weight: 800">{{d.ingresso}}</span><span style="font-size: 13px; color: #475467">{{d.ingNota}}</span></div>
+</div>
+<div style="display: flex; gap: 12px; align-items: flex-start">
+<span style="flex: none; width: 28px; height: 28px; border-radius: 999px; background: #E8F0FE; color: #1D4ED8; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center">3</span>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; font-weight: 700; color: #475467">Prendi</span><span style="font-size: 16px; font-weight: 800">{{d.asc}}</span></div>
+</div>
+<div style="display: flex; gap: 12px; align-items: flex-start">
+<span style="flex: none; width: 28px; height: 28px; border-radius: 999px; background: #0F172A; color: #FFFFFF; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center">4</span>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; font-weight: 700; color: #475467">Sali al</span><span style="font-size: 16px; font-weight: 800">{{d.piano}}</span><span style="font-size: 13px; color: #475467">{{d.dove}}</span></div>
+</div>
+</div>
+
+<div style="background: #FFF7E6; border: 1px solid #F5D9A8; border-radius: 16px; padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; flex: none">
+<span style="flex: none; color: #7A4B00; margin-top: 1px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 8h.01M11 12h1v5h1"></path></svg>
+</span>
+<div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px; font-weight: 800; color: #7A4B00">Da sapere</span><span style="font-size: 14px; line-height: 1.45; color: #5C3900">{{d.note}}</span></div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px; flex: none">
+<button type="button" style="height: 54px; border-radius: 14px; border: 0; background: #C8102E; color: #FFFFFF; font-size: 16px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8z"></path></svg>
+Naviga fino all'ingresso
+</button>
+<button type="button" style="height: 50px; border-radius: 14px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #0F172A; font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"></path></svg>
+Chiama il reparto
+</button>
+</div>
+
+<span style="font-size: 12px; font-weight: 600; color: #475467; text-align: center; padding-bottom: 8px">Verificato il {{d.verif}} · <a href="Aggiungi.dc.html">Modifica</a></span>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  data() {
+    return [
+      { id: "orto-deg", nome: "Ortopedia e Traumatologia", tipo: "Degenza", osp: "Policlinico Riviera", sede: "Plesso Centrale", indirizzo: "Via del Mare 12", ingresso: "Ingresso 16", ingShort: "16", ingNota: "Rampa barellati, sosta ambulanze 15 min", asc: "Ascensore C (montalettighe)", ascShort: "C", piano: "3° piano", pianoShort: "3", dove: "Uscita ascensore a destra, citofono sulla porta a vetri", note: "Per le dimissioni chiedere in medicheria: la lettera si ritira al banco infermieri.", verif: "28 ott 2026", kw: "orto ortopedia traumatologia trauma degenza ricovero" },
+      { id: "orto-amb", nome: "Ambulatori Ortopedia", tipo: "Ambulatorio", osp: "Policlinico Riviera", sede: "Plesso Centrale", indirizzo: "Via del Mare 12", ingresso: "Ingresso Dialisi", ingShort: "Dialisi", ingNota: "Lato parcheggio interno, seguire i cartelli Nefrologia", asc: "Ascensore D", ascShort: "D", piano: "2° piano", pianoShort: "2", dove: "Sala d'attesa B, ambulatori 4–9", note: "Prima di salire passare dall'accettazione al piano terra con l'impegnativa.", verif: "21 ott 2026", kw: "orto ortopedia ambulatori ambulatorio visita controllo gesso gessi" },
+      { id: "orto-ds", nome: "Ortopedia – Day Surgery", tipo: "Day Hospital", osp: "Ospedale Valle Verde", sede: "Sede Nord", indirizzo: "Viale dei Tigli 3", ingresso: "Ingresso A – principale", ingShort: "A", ingNota: "Sosta solo per carico e scarico", asc: "Ascensori 1 o 2", ascShort: "1 / 2", piano: "1° piano", pianoShort: "1", dove: "Corridoio blu, in fondo a sinistra", note: "Accesso pazienti dalle 7:30.", verif: "15 ott 2026", kw: "orto ortopedia day surgery dh chirurgia" },
+      { id: "cardio", nome: "Cardiologia – UTIC", tipo: "Degenza", osp: "Policlinico Riviera", sede: "Padiglione Monoblocco", indirizzo: "Via del Mare 20", ingresso: "Ingresso 4 – Pronto Soccorso", ingShort: "4", ingNota: "Corsia ambulanze, poi corridoio interno a sinistra", asc: "Ascensore B", ascShort: "B", piano: "5° piano", pianoShort: "5", dove: "Porta con citofono di fronte all'ascensore", note: "Reparto chiuso: suonare e attendere l'infermiere.", verif: "30 ott 2026", kw: "cardio cardiologia utic unita coronarica cuore" },
+      { id: "dialisi", nome: "Dialisi", tipo: "Servizio", osp: "Policlinico Riviera", sede: "Plesso Centrale", indirizzo: "Via del Mare 12", ingresso: "Ingresso Dialisi", ingShort: "Dialisi", ingNota: "Lato parcheggio interno", asc: "Nessun ascensore (piano terra)", ascShort: "—", piano: "Piano terra", pianoShort: "T", dove: "Subito a destra dopo l'ingresso", note: "Turni mattino e pomeriggio: confermare l'orario con il centro.", verif: "27 ott 2026", kw: "dialisi nefrologia rene emodialisi" },
+      { id: "tac", nome: "Radiologia – TAC", tipo: "Servizio", osp: "Ospedale Valle Verde", sede: "Sede Sud", indirizzo: "Via Roma 140", ingresso: "Ingresso 2", ingShort: "2", ingNota: "Ingresso laterale, rampa a sinistra", asc: "Ascensore 1", ascShort: "1", piano: "Piano -1", pianoShort: "-1", dove: "Seguire la linea gialla a terra", note: "Portare impegnativa e referti precedenti; attesa in sala 2.", verif: "12 ott 2026", kw: "radiologia tac rx raggi risonanza diagnostica" },
+      { id: "medicina", nome: "Medicina Interna", tipo: "Degenza", osp: "Presidio Colle Alto", sede: "Sede unica", indirizzo: "Via Belvedere 1", ingresso: "Ingresso unico", ingShort: "Unico", ingNota: "Davanti alla portineria", asc: "Ascensori A o B", ascShort: "A / B", piano: "4° piano", pianoShort: "4", dove: "Ala est", note: "Le dimissioni di solito sono dopo le 11:00.", verif: "02 ott 2026", kw: "medicina interna degenza ricovero" },
+      { id: "onco", nome: "Oncologia – Day Hospital", tipo: "Day Hospital", osp: "Ospedale Valle Verde", sede: "Sede Nord", indirizzo: "Viale dei Tigli 3", ingresso: "Ingresso C", ingShort: "C", ingNota: "Pensilina coperta, sosta breve", asc: "Ascensore 3", ascShort: "3", piano: "2° piano", pianoShort: "2", dove: "Accettazione DH di fronte all'ascensore", note: "Prenotare il trasporto di ritorno al banco accettazione.", verif: "19 ott 2026", kw: "oncologia dh day hospital chemio terapia" }
+    ];
+  }
+  norm(s) {
+    return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var q = st.q != null ? st.q : "orto";
+    var h = st.h || "all";
+    var all = this.data();
+    var words = this.norm(q).split(/\s+/).filter(Boolean);
+    var results = all.filter(function (r) {
+      if (h !== "all" && r.osp !== h) return false;
+      var hay = self.norm([r.nome, r.tipo, r.osp, r.sede, r.ingresso, r.kw].join(" "));
+      return words.every(function (w) { return hay.indexOf(w) !== -1; });
+    }).map(function (r) {
+      var ingPill = r.ingShort === "Unico" ? "Ingresso unico" : "Ingresso " + r.ingShort;
+      var ascPill = r.ascShort === "—" ? "Nessun ascensore" : "Ascensore " + r.ascShort;
+      return Object.assign({}, r, { ingPill: ingPill, ascPill: ascPill, pick: function () { self.setState({ sel: r.id }); } });
+    });
+    var hosp = [{ key: "all", label: "Tutti" }, { key: "Policlinico Riviera", label: "Policlinico Riviera" }, { key: "Ospedale Valle Verde", label: "Valle Verde" }, { key: "Presidio Colle Alto", label: "Colle Alto" }];
+    var chips = hosp.map(function (c) {
+      return { label: c.label, on: c.key === h, off: c.key !== h, pick: function () { self.setState({ h: c.key }); } };
+    });
+    var n = results.length;
+    var countText = words.length ? (n + (n === 1 ? " risultato" : " risultati") + " per “" + q + "”") : (n + " reparti");
+    var found = null;
+    for (var i = 0; i < all.length; i++) { if (all[i].id === st.sel) found = all[i]; }
+    return {
+      q: q,
+      hasQ: q.length > 0,
+      onQ: function (e) { self.setState({ q: e.target.value }); },
+      clearQ: function () { self.setState({ q: "" }); },
+      chips: chips,
+      results: results,
+      noResults: n === 0,
+      countText: countText,
+      showList: !found,
+      showDetail: !!found,
+      d: found || all[0],
+      back: function () { self.setState({ sel: null }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

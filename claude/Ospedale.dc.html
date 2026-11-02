@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Ospedale Carlo Urbani – Jesi</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#C8102E}a:hover{color:#A50E26}
+input::placeholder{color:#98A2B3}
+input:focus{outline:none}
+button{font-family:inherit}
+@keyframes jpulse{0%,100%{opacity:1}50%{opacity:.55}}
+.jpulse{animation:jpulse 1.4s ease-in-out infinite}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #F2F4F7; font-family: 'Manrope', system-ui, sans-serif; color: #0F172A; overflow: hidden">
+
+<div style="background: #0F172A; color: #FFFFFF; padding: 12px 14px 12px; display: flex; flex-direction: column; gap: 10px; flex: none">
+<div style="display: flex; align-items: center; gap: 10px">
+<a href="Ospedale.dc.html" aria-label="Torna agli ospedali" style="flex: none; width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.1); color: #FFFFFF; display: flex; align-items: center; justify-content: center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+</a>
+<div style="display: flex; flex-direction: column; min-width: 0">
+<span style="font-size: 17px; font-weight: 800; letter-spacing: -0.01em">Ospedale Carlo Urbani</span>
+<span style="font-size: 12px; font-weight: 600; color: #CBD5E1">Jesi · 7 corpi · livelli 0–5 · 36 reparti</span>
+</div>
+</div>
+<label style="position: relative; display: flex; align-items: center; gap: 10px; background: #FFFFFF; border-radius: 12px; padding: 0 6px 0 12px; height: 48px; color: #475467">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Cerca un reparto a Jesi</span>
+<input type="search" value="{{q}}" onChange="{{onQ}}" placeholder="Cerca: orto, TAC, dialisi, UTIC…" style="flex: 1; min-width: 0; border: 0; background: transparent; font-size: 16px; font-weight: 700; color: #0F172A; font-family: inherit">
+<sc-if value="{{hasQ}}" hint-placeholder-val="{{false}}">
+<button type="button" aria-label="Cancella ricerca" onClick="{{clearQ}}" style="width: 40px; height: 40px; border: 0; border-radius: 10px; background: #F2F4F7; color: #475467; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+</button>
+</sc-if>
+</label>
+</div>
+
+<div style="position: relative; width: 390px; height: 300px; flex: none; background: #0B1220; overflow: hidden">
+<sc-for list="{{faces}}" as="f" hint-placeholder-count="1">
+<sc-if value="{{f.btn}}" hint-placeholder-val="{{false}}">
+<button type="button" aria-label="{{f.aria}}" onClick="{{f.pick}}" class="{{f.cls}}" style="position: absolute; left: 0; top: 0; width: 390px; height: 300px; border: 0; padding: 0; margin: 0; cursor: pointer; {{f.css}}"></button>
+</sc-if>
+<sc-if value="{{f.div}}" hint-placeholder-val="{{true}}">
+<div aria-hidden="true" class="{{f.cls}}" style="position: absolute; left: 0; top: 0; width: 390px; height: 300px; pointer-events: none; {{f.css}}"></div>
+</sc-if>
+</sc-for>
+
+<sc-for list="{{floorLabels}}" as="l" hint-placeholder-count="6">
+<span aria-hidden="true" style="position: absolute; left: {{l.x}}px; top: {{l.y}}px; transform: translate(-100%, -50%); padding: 2px 6px; border-radius: 6px; font-size: 11px; font-weight: 800; pointer-events: none; {{l.css}}">L{{l.n}}</span>
+</sc-for>
+
+<sc-for list="{{blockLabels}}" as="t" hint-placeholder-count="0">
+<span aria-hidden="true" style="position: absolute; left: {{t.x}}px; top: {{t.y}}px; transform: translate(-50%, -50%); font-size: 11px; font-weight: 800; pointer-events: none; white-space: nowrap; {{t.css}}">{{t.text}}</span>
+</sc-for>
+
+<sc-for list="{{markers}}" as="m" hint-placeholder-count="0">
+<span aria-hidden="true" style="position: absolute; left: {{m.x}}px; top: {{m.y}}px; transform: translate(-50%, -50%); height: 20px; padding: 0 7px; border-radius: 999px; background: #FFFFFF; color: #0F172A; font-size: 10px; font-weight: 800; display: flex; align-items: center; gap: 4px; pointer-events: none; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.4)">
+<span style="width: 7px; height: 7px; border-radius: 999px; background: {{m.dot}}"></span>{{m.text}}
+</span>
+</sc-for>
+
+<sc-if value="{{hasPin}}" hint-placeholder-val="{{false}}">
+<div aria-hidden="true" style="position: absolute; left: {{pin.x}}px; top: {{pin.y}}px; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; pointer-events: none">
+<span style="max-width: 200px; padding: 5px 9px; border-radius: 8px; background: #FFFFFF; color: #0F172A; font-size: 12px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 4px 12px rgba(0,0,0,0.45)">{{pin.text}}</span>
+<span style="width: 2px; height: 22px; background: #FFFFFF"></span>
+<span style="width: 8px; height: 8px; border-radius: 999px; background: #F43F5E; border: 2px solid #FFFFFF; margin-top: -2px"></span>
+</div>
+</sc-if>
+
+<div style="position: absolute; right: 10px; top: 10px; display: flex; flex-direction: column; gap: 6px">
+<button type="button" aria-label="Ruota a sinistra" onClick="{{rotL}}" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.18); background: rgba(15,23,42,0.85); color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8"></path><path d="M4 4v5h5"></path></svg>
+</button>
+<button type="button" aria-label="Ruota a destra" onClick="{{rotR}}" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.18); background: rgba(15,23,42,0.85); color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.5-5.8"></path><path d="M20 4v5h-5"></path></svg>
+</button>
+<sc-if value="{{expOff}}" hint-placeholder-val="{{true}}">
+<button type="button" aria-label="Separa i piani" onClick="{{toggleExp}}" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.18); background: rgba(15,23,42,0.85); color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"></path><path d="M3 16l9 5 9-5"></path></svg>
+</button>
+</sc-if>
+<sc-if value="{{expOn}}" hint-placeholder-val="{{false}}">
+<button type="button" aria-label="Unisci i piani" onClick="{{toggleExp}}" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #FFFFFF; background: #FFFFFF; color: #0F172A; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5z"></path><path d="M3 16l9 5 9-5"></path></svg>
+</button>
+</sc-if>
+</div>
+
+<div style="position: absolute; left: 10px; bottom: 8px; display: flex; gap: 10px; font-size: 11px; font-weight: 700; color: #CBD5E1; pointer-events: none">
+<span style="display: flex; align-items: center; gap: 5px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #3B82F6"></span>Scale / ascensori</span>
+<span style="display: flex; align-items: center; gap: 5px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #F43F5E"></span>Reparto</span>
+</div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: #FFFFFF; border-bottom: 1px solid #E4E7EC; flex: none; overflow-x: auto">
+<span style="flex: none; font-size: 12px; font-weight: 800; color: #475467; padding: 0 4px">Livello</span>
+<sc-for list="{{levels}}" as="c" hint-placeholder-count="7">
+<sc-if value="{{c.on}}" hint-placeholder-val="{{false}}">
+<button type="button" onClick="{{c.pick}}" style="flex: none; min-width: 44px; height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid #0F172A; background: #0F172A; color: #FFFFFF; font-size: 15px; font-weight: 800; cursor: pointer">{{c.label}}</button>
+</sc-if>
+<sc-if value="{{c.off}}" hint-placeholder-val="{{true}}">
+<button type="button" onClick="{{c.pick}}" style="flex: none; min-width: 44px; height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 15px; font-weight: 800; cursor: pointer">{{c.label}}</button>
+</sc-if>
+</sc-for>
+</div>
+
+<div style="flex: 1; min-height: 0; overflow-y: auto; padding: 12px 14px 16px; display: flex; flex-direction: column; gap: 12px">
+
+<sc-if value="{{hasSel}}" hint-placeholder-val="{{true}}">
+<div style="background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 12px; flex: none">
+<div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 3px; min-width: 0">
+<span style="font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: #C8102E">{{d.tipo}}</span>
+<span style="font-size: 19px; font-weight: 800; line-height: 1.2">{{d.nome}}</span>
+</div>
+<button type="button" aria-label="Chiudi scheda" onClick="{{closeSel}}" style="flex: none; width: 44px; height: 44px; border-radius: 12px; border: 1px solid #E4E7EC; background: #FFFFFF; color: #475467; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+</button>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+<div style="background: #0F172A; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 10px; font-weight: 800; letter-spacing: 0.08em; color: #CBD5E1">LIVELLO</span>
+<span style="font-size: 24px; font-weight: 800; line-height: 1; color: #FFFFFF">{{d.liv}}</span>
+</div>
+<div style="background: #FDECEE; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 10px; font-weight: 800; letter-spacing: 0.08em; color: #A50E26">CORPO</span>
+<span style="font-size: 24px; font-weight: 800; line-height: 1; color: #A50E26">{{d.corpoShort}}</span>
+</div>
+<div style="background: #E8F0FE; border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 10px; font-weight: 800; letter-spacing: 0.08em; color: #1D4ED8">ASCENSORI</span>
+<span style="font-size: 20px; font-weight: 800; line-height: 1.1; color: #1D4ED8">{{d.ascShort}}</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; gap: 10px; align-items: flex-start"><span style="flex: none; width: 24px; height: 24px; border-radius: 999px; background: #F2F4F7; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center">1</span><span style="font-size: 14px; font-weight: 600; line-height: 1.4">{{d.s1}}</span></div>
+<div style="display: flex; gap: 10px; align-items: flex-start"><span style="flex: none; width: 24px; height: 24px; border-radius: 999px; background: #FDECEE; color: #A50E26; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center">2</span><span style="font-size: 14px; font-weight: 600; line-height: 1.4">{{d.s2}}</span></div>
+<div style="display: flex; gap: 10px; align-items: flex-start"><span style="flex: none; width: 24px; height: 24px; border-radius: 999px; background: #E8F0FE; color: #1D4ED8; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center">3</span><span style="font-size: 14px; font-weight: 600; line-height: 1.4">{{d.s3}}</span></div>
+<div style="display: flex; gap: 10px; align-items: flex-start"><span style="flex: none; width: 24px; height: 24px; border-radius: 999px; background: #0F172A; color: #FFFFFF; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center">4</span><span style="font-size: 14px; font-weight: 800; line-height: 1.4">{{d.s4}}</span></div>
+</div>
+
+<div style="display: flex; gap: 8px">
+<button type="button" style="flex: 1; height: 48px; border-radius: 12px; border: 0; background: #C8102E; color: #FFFFFF; font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8z"></path></svg>
+Naviga all'ingresso
+</button>
+<button type="button" style="flex: none; height: 48px; padding: 0 12px; border-radius: 12px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #0F172A; font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 6px; cursor: pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"></path></svg>
+{{d.telLabel}}
+</button>
+</div>
+<span style="font-size: 11px; font-weight: 600; color: #475467; line-height: 1.4">Dati dal Piano di emergenza P.O. Carlo Urbani (rev. 2015): da verificare sul posto.</span>
+</div>
+</sc-if>
+
+<div style="display: flex; align-items: baseline; justify-content: space-between; padding: 0 2px; flex: none">
+<span style="font-size: 14px; font-weight: 800">{{listTitle}}</span>
+<span style="font-size: 12px; font-weight: 700; color: #475467">{{listCount}}</span>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 16px; overflow: hidden; flex: none">
+<sc-for list="{{results}}" as="r" hint-placeholder-count="5">
+<sc-if value="{{r.off}}" hint-placeholder-val="{{true}}">
+<button type="button" onClick="{{r.pick}}" style="width: 100%; min-height: 60px; text-align: left; border: 0; border-bottom: 1px solid #F2F4F7; background: #FFFFFF; padding: 8px 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; color: #0F172A; font-family: inherit">
+<span style="flex: none; width: 40px; height: 40px; border-radius: 10px; background: #0F172A; color: #FFFFFF; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center">L{{r.liv}}</span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 14px; font-weight: 800; line-height: 1.25">{{r.nome}}</span>
+<span style="font-size: 12px; font-weight: 600; color: #475467">{{r.sub}}</span>
+</span>
+</button>
+</sc-if>
+<sc-if value="{{r.on}}" hint-placeholder-val="{{false}}">
+<button type="button" onClick="{{r.pick}}" style="width: 100%; min-height: 60px; text-align: left; border: 0; border-bottom: 1px solid #F2F4F7; background: #FFF1F3; padding: 8px 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; color: #0F172A; font-family: inherit">
+<span style="flex: none; width: 40px; height: 40px; border-radius: 10px; background: #C8102E; color: #FFFFFF; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center">L{{r.liv}}</span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 14px; font-weight: 800; line-height: 1.25">{{r.nome}}</span>
+<span style="font-size: 12px; font-weight: 600; color: #A50E26">{{r.sub}}</span>
+</span>
+</button>
+</sc-if>
+</sc-for>
+<sc-if value="{{noResults}}" hint-placeholder-val="{{false}}">
+<div style="padding: 18px; font-size: 14px; color: #475467; text-align: center">Nessun reparto trovato a Jesi.</div>
+</sc-if>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  reparti() {
+    return [
+      { id: "farmacia", nome: "Farmacia ospedaliera", tipo: "Servizio", liv: 0, corpo: "D", tel: "2281", kw: "farmacia seminterrato" },
+      { id: "mensa", nome: "Mensa e cucina", tipo: "Servizio", liv: 1, corpo: "A", tel: "", kw: "mensa cucina bar" },
+      { id: "psichiatria", nome: "Psichiatria", tipo: "Degenza", liv: 1, corpo: "B", tel: "2040", kw: "psichiatria spdc salute mentale" },
+      { id: "dietiste", nome: "Direzione medica – Dietiste", tipo: "Servizio", liv: 1, corpo: "B", tel: "2304", kw: "dietiste dietologia" },
+      { id: "blocco-op", nome: "Blocco operatorio", tipo: "Servizio", liv: 1, corpo: "SX", tel: "2020", kw: "blocco operatorio sale operatorie chirurgia intervento" },
+      { id: "rianimazione", nome: "Anestesia e Rianimazione", tipo: "Degenza", liv: 1, corpo: "SX", tel: "2297", kw: "rianimazione terapia intensiva anestesia" },
+      { id: "ps", nome: "Pronto Soccorso", tipo: "Emergenza", liv: 1, corpo: "CEN", tel: "2240", kw: "pronto soccorso ps emergenza obi", ps: true },
+      { id: "cup", nome: "CUP – Accettazione", tipo: "Servizio", liv: 1, corpo: "CEN", tel: "2031", kw: "cup prenotazioni accettazione cassa" },
+      { id: "sterilizzazione", nome: "Sterilizzazione", tipo: "Servizio", liv: 1, corpo: "CEN", tel: "2546", kw: "sterilizzazione" },
+      { id: "sale-parto", nome: "Area travaglio e parto", tipo: "Servizio", liv: 1, corpo: "DX", tel: "2483", kw: "sale parto travaglio ostetricia" },
+      { id: "senologia", nome: "Diagnostica per immagini – Senologia e RM", tipo: "Ambulatorio", liv: 1, corpo: "DX", tel: "2053", kw: "senologia mammografia rm rmn risonanza radiologia" },
+      { id: "anatomia", nome: "Anatomia patologica", tipo: "Servizio", liv: 1, corpo: "C", tel: "2292", kw: "anatomia patologica" },
+      { id: "obitorio", nome: "Obitorio", tipo: "Servizio", liv: 1, corpo: "C", tel: "2001", kw: "obitorio camera mortuaria salme" },
+      { id: "prelievi", nome: "Punto prelievi", tipo: "Ambulatorio", liv: 1, corpo: "D", tel: "", kw: "prelievi sangue analisi laboratorio" },
+      { id: "dialisi", nome: "Nefrologia e Dialisi", tipo: "Servizio", liv: 1, corpo: "D", tel: "2016", kw: "dialisi nefrologia emodialisi rene" },
+      { id: "endoscopia", nome: "Polo endoscopico", tipo: "Ambulatorio", liv: 2, corpo: "A", tel: "2390", kw: "endoscopia gastroscopia colonscopia gastroenterologia" },
+      { id: "gessi", nome: "Sala gessi", tipo: "Ambulatorio", liv: 2, corpo: "B", tel: "", kw: "gessi gesso ortopedia orto fratture" },
+      { id: "portineria", nome: "Portineria – Informazioni (ingresso principale)", tipo: "Ingresso", liv: 2, corpo: "nC", tel: "2181", kw: "portineria informazioni ingresso principale centralino" },
+      { id: "amb-med", nome: "Ambulatori Medicina, Neurologia, Oncologia", tipo: "Ambulatorio", liv: 2, corpo: "C", tel: "2515", kw: "ambulatori medicina neurologia oncologia dh day hospital chemio" },
+      { id: "amb-orto", nome: "Ambulatori Ortopedia e Reumatologia", tipo: "Ambulatorio", liv: 2, corpo: "D", tel: "2440", kw: "ambulatori ortopedia orto reumatologia visita controllo" },
+      { id: "amb-cardio", nome: "Ambulatori Cardiologia, Chirurgia, Dermatologia", tipo: "Ambulatorio", liv: 3, corpo: "A", tel: "2273", kw: "ambulatori cardiologia cardio chirurgia dermatologia ecg" },
+      { id: "orto-deg", nome: "Ortopedia e Traumatologia – Degenze", tipo: "Degenza", liv: 3, corpo: "B", tel: "2459", kw: "ortopedia orto traumatologia trauma degenza ricovero" },
+      { id: "radiologia", nome: "Diagnostica per immagini – Radiologia, TAC, Ecografia", tipo: "Servizio", liv: 3, corpo: "SX", tel: "2038", kw: "radiologia tac rx raggi ecografia eco diagnostica" },
+      { id: "laboratorio", nome: "Patologia clinica – Laboratorio analisi", tipo: "Servizio", liv: 3, corpo: "DX", tel: "2209", kw: "laboratorio analisi patologia clinica" },
+      { id: "trasfusionale", nome: "Medicina trasfusionale", tipo: "Servizio", liv: 3, corpo: "DX", tel: "2228", kw: "trasfusionale centro trasfusionale sangue donatori" },
+      { id: "neurologia", nome: "Neurologia – Degenze", tipo: "Degenza", liv: 3, corpo: "C", tel: "2508", kw: "neurologia neuro riabilitazione stroke ictus degenza" },
+      { id: "reumatologia", nome: "Clinica reumatologica – Degenze", tipo: "Degenza", liv: 3, corpo: "D", tel: "2132", kw: "reumatologia clinica reumatologica degenza" },
+      { id: "preosp", nome: "Preospedalizzazione – Chirurgia breve", tipo: "Ambulatorio", liv: 4, corpo: "A", tel: "2460", kw: "preospedalizzazione prericovero chirurgia breve day surgery" },
+      { id: "amb-oculi", nome: "Ambulatori Oculistica, Odontostomatologia, Otorino", tipo: "Ambulatorio", liv: 4, corpo: "B", tel: "2360", kw: "oculistica occhi odontostomatologia dentista otorino orl" },
+      { id: "chirurgia", nome: "Chirurgia – Degenze", tipo: "Degenza", liv: 4, corpo: "SX", tel: "2478", kw: "chirurgia generale degenza ricovero" },
+      { id: "medicina-c", nome: "Medicina C – Degenze", tipo: "Degenza", liv: 4, corpo: "DX", tel: "2392", kw: "medicina c area medica degenza" },
+      { id: "pediatria", nome: "Pediatria – Degenze", tipo: "Degenza", liv: 4, corpo: "C", tel: "2384", kw: "pediatria bambini degenza" },
+      { id: "amb-gine", nome: "Ambulatori Ostetricia-Ginecologia e Pediatria", tipo: "Ambulatorio", liv: 4, corpo: "D", tel: "", kw: "ambulatori ostetricia ginecologia pediatria gine" },
+      { id: "cardio", nome: "Cardiologia – UTIC", tipo: "Degenza", liv: 5, corpo: "A", tel: "2416", kw: "cardiologia cardio utic unita coronarica degenza" },
+      { id: "bpn", nome: "Broncopneumologia", tipo: "Degenza", liv: 5, corpo: "SX", tel: "2160", kw: "broncopneumologia bpn pneumologia polmoni area medica a" },
+      { id: "medicina-b", nome: "Medicina B – Degenze", tipo: "Degenza", liv: 5, corpo: "DX", tel: "2393", kw: "medicina b area medica degenza" },
+      { id: "ostetricia", nome: "Ostetricia e Ginecologia – Degenze e PS ostetrico", tipo: "Degenza", liv: 5, corpo: "C", tel: "2480", kw: "ostetricia ginecologia gine maternita ps ostetrico degenza" }
+    ];
+  }
+  blocks() {
+    var all = [1, 2, 3, 4, 5];
+    return [
+      { id: "A", x0: 0, y0: 0, x1: 6, y1: 2, lv: all, label: "A" },
+      { id: "B", x0: 0, y0: 3.2, x1: 6, y1: 5.2, lv: [1, 2, 3, 4], label: "B" },
+      { id: "nAB", x0: 6, y0: 0, x1: 7.4, y1: 5.2, lv: all, node: true, label: "" },
+      { id: "SX", x0: 7.4, y0: 0, x1: 13.8, y1: 2, lv: all, label: "SX" },
+      { id: "nC", x0: 13.8, y0: 0, x1: 15.2, y1: 2, lv: all, node: true, label: "" },
+      { id: "DX", x0: 15.2, y0: 0, x1: 21.6, y1: 2, lv: all, label: "DX" },
+      { id: "nCD", x0: 21.6, y0: 0, x1: 23, y1: 5.2, lv: [0, 1, 2, 3, 4, 5], node: true, label: "" },
+      { id: "C", x0: 23, y0: 0, x1: 29, y1: 2, lv: all, label: "C" },
+      { id: "D", x0: 23, y0: 3.2, x1: 29, y1: 5.2, lv: [0, 1, 2, 3, 4], label: "D" },
+      { id: "CEN", x0: 9, y0: 2, x1: 20, y1: 5, lv: [1], label: "PS · CUP" }
+    ];
+  }
+  corpoInfo(k) {
+    var ab = { side: "AB", short: "A-B", lato: "i corpi A-B" };
+    var cd = { side: "CD", short: "C-D", lato: "i corpi C-D" };
+    var ce = { side: "CE", short: "Centrale", lato: "" };
+    var m = {
+      A: { label: "A", short: "A", g: ab }, B: { label: "B", short: "B", g: ab }, SX: { label: "Sinistro centrale", short: "SX", g: ab },
+      C: { label: "C", short: "C", g: cd }, D: { label: "D", short: "D", g: cd }, DX: { label: "Destro centrale", short: "DX", g: cd },
+      CEN: { label: "centrale", short: "Centr.", g: ce }, nC: { label: "centrale", short: "Centr.", g: ce }
+    };
+    return m[k];
+  }
+  norm(s) {
+    return String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  }
+  spin(d) {
+    var self = this;
+    var start = (this.state && this.state.rot != null) ? this.state.rot : -28;
+    var target = start + d;
+    var i = 0;
+    clearInterval(this._t);
+    this._t = setInterval(function () {
+      i++;
+      var t = i / 12;
+      var e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      self.setState({ rot: start + (target - start) * e });
+      if (i >= 12) clearInterval(self._t);
+    }, 28);
+  }
+  componentWillUnmount() {
+    clearInterval(this._t);
+  }
+  renderVals() {
+    var self = this;
+    var st = this.state || {};
+    var q = st.q != null ? st.q : "";
+    var sel = st.sel !== undefined ? st.sel : "orto-deg";
+    var R = this.reparti();
+    var B = this.blocks();
+    var selR = null;
+    R.forEach(function (r) { if (r.id === sel) selR = r; });
+    var lvl = st.lvl !== undefined ? st.lvl : (selR ? selR.liv : "all");
+    var rot = st.rot != null ? st.rot : -28;
+    var exp = !!st.exp;
+
+    var th = rot * Math.PI / 180, c = Math.cos(th), s = Math.sin(th);
+    var SP = exp ? 46 : 26, TH = 7, T = 0.55, K = 10;
+    function P(x, y, z) {
+      var xc = x - 14.5, yc = y - 2.6;
+      var xr = xc * c - yc * s, yr = xc * s + yc * c;
+      return [xr * K, yr * K * T - z, yr];
+    }
+    var byBlockLevel = {};
+    R.forEach(function (r) {
+      var k = r.corpo + "|" + r.liv;
+      (byBlockLevel[k] = byBlockLevel[k] || []).push(r);
+    });
+
+    var items = [];
+    B.forEach(function (b) {
+      b.lv.forEach(function (L) {
+        var mode;
+        if (lvl === "all") mode = "norm";
+        else if (L === lvl) mode = "act";
+        else if (L < lvl) mode = "fade";
+        else mode = "ghost";
+        var isSel = !!(selR && selR.corpo === b.id && selR.liv === L);
+        var zb = L * SP, zt = zb + TH;
+        var cen = P((b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2, zt);
+        items.push({ b: b, L: L, mode: mode, isSel: isSel, zb: zb, zt: zt, depth: L * 1000 + cen[2] });
+      });
+    });
+    items.sort(function (a, b) { return a.depth - b.depth; });
+
+    var raw = [];
+    var pts = [];
+    function add(p) { pts.push(p); return p; }
+    var edges = [
+      { a: [0, 0], b: [1, 0], n: [0, -1] },
+      { a: [1, 0], b: [1, 1], n: [1, 0] },
+      { a: [1, 1], b: [0, 1], n: [0, 1] },
+      { a: [0, 1], b: [0, 0], n: [-1, 0] }
+    ];
+    items.forEach(function (it) {
+      var b = it.b;
+      function X(f) { return f ? b.x1 : b.x0; }
+      function Y(f) { return f ? b.y1 : b.y0; }
+      var sides = [];
+      edges.forEach(function (e) {
+        var ny = e.n[0] * s + e.n[1] * c;
+        if (ny > 0.001) {
+          sides.push({
+            poly: [add(P(X(e.a[0]), Y(e.a[1]), it.zt)), add(P(X(e.b[0]), Y(e.b[1]), it.zt)), add(P(X(e.b[0]), Y(e.b[1]), it.zb)), add(P(X(e.a[0]), Y(e.a[1]), it.zb))],
+            light: Math.abs(e.n[1]) > 0.5
+          });
+        }
+      });
+      var top = [add(P(b.x0, b.y0, it.zt)), add(P(b.x1, b.y0, it.zt)), add(P(b.x1, b.y1, it.zt)), add(P(b.x0, b.y1, it.zt))];
+      raw.push({ it: it, sides: sides, top: top, cen: P((b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2, it.zt) });
+    });
+    var levelsPresent = [0, 1, 2, 3, 4, 5];
+    var labelRaw = levelsPresent.map(function (L) {
+      return { L: L, p: add(P(-0.8, 1, L * SP + TH / 2)) };
+    });
+
+    var W = 390, H = 300;
+    var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    pts.forEach(function (p) {
+      if (p[0] < minX) minX = p[0]; if (p[0] > maxX) maxX = p[0];
+      if (p[1] < minY) minY = p[1]; if (p[1] > maxY) maxY = p[1];
+    });
+    var bx0 = 40, bx1 = W - 62, by0 = 46, by1 = H - 34;
+    var f = Math.min((bx1 - bx0) / (maxX - minX), (by1 - by0) / (maxY - minY));
+    var ox = bx0 + ((bx1 - bx0) - (maxX - minX) * f) / 2 - minX * f;
+    var oy = by0 + ((by1 - by0) - (maxY - minY) * f) / 2 - minY * f;
+    function sx(p) { return p[0] * f + ox; }
+    function sy(p) { return p[1] * f + oy; }
+    function poly(arr) {
+      return "polygon(" + arr.map(function (p) { return sx(p).toFixed(1) + "px " + sy(p).toFixed(1) + "px"; }).join(", ") + ")";
+    }
+    function colors(it) {
+      if (it.isSel) return { top: "#F43F5E", a: "#E11D48", b: "#9F1239" };
+      if (it.b.node) return it.mode === "act" ? { top: "#60A5FA", a: "#2563EB", b: "#1E40AF" } : { top: "#3B82F6", a: "#1D4ED8", b: "#1E3A8A" };
+      if (it.mode === "act") return { top: "#E2E8F0", a: "#94A3B8", b: "#64748B" };
+      return { top: "#64748B", a: "#475569", b: "#334155" };
+    }
+    function opacity(it) {
+      if (it.isSel) return 1;
+      if (it.mode === "fade") return 0.2;
+      if (it.mode === "ghost") return 0.06;
+      return 1;
+    }
+
+    var faces = [];
+    var blockLabels = [];
+    var markers = [];
+    var pin = { x: 0, y: 0, text: "" };
+    var hasPin = false;
+    raw.forEach(function (r) {
+      var it = r.it, col = colors(it), op = opacity(it);
+      var dim = "; opacity: " + op;
+      r.sides.forEach(function (sd) {
+        faces.push({ btn: false, div: true, cls: it.isSel ? "jpulse" : "", css: "clip-path: " + poly(sd.poly) + "; background: " + (sd.light ? col.a : col.b) + dim, aria: "", pick: null });
+      });
+      var list = byBlockLevel[it.b.id + "|" + it.L] || [];
+      var clickable = (it.mode === "act" || it.mode === "norm") && list.length > 0;
+      var corpo = self.corpoInfo(it.b.id);
+      faces.push({
+        btn: clickable, div: !clickable, cls: it.isSel ? "jpulse" : "",
+        css: "clip-path: " + poly(r.top) + "; background: " + col.top + dim,
+        aria: "Livello " + it.L + ", corpo " + (corpo ? corpo.label : "") + ": " + list.map(function (x) { return x.nome; }).join(", "),
+        pick: clickable ? function () { self.setState({ sel: list[0].id, lvl: it.L }); } : null
+      });
+      if (it.mode === "act" && it.b.label) {
+        blockLabels.push({ x: sx(r.cen).toFixed(1), y: sy(r.cen).toFixed(1), text: it.b.label, css: it.isSel ? "color: #FFFFFF" : "color: #0F172A" });
+      }
+      var visible = it.mode === "act" || it.mode === "norm";
+      if (visible && it.b.id === "nC" && it.L === 2) markers.push({ x: sx(r.cen).toFixed(1), y: (sy(r.cen) - 14).toFixed(1), text: "Ingresso principale", dot: "#22C55E" });
+      if (visible && it.b.id === "CEN" && it.L === 1) markers.push({ x: sx(r.cen).toFixed(1), y: (sy(r.cen) + 6).toFixed(1), text: "Pronto Soccorso", dot: "#F97316" });
+      if (it.isSel) { pin = { x: sx(r.cen).toFixed(1), y: (sy(r.cen) - 4).toFixed(1), text: selR.nome }; hasPin = true; }
+    });
+    var floorLabels = labelRaw.map(function (l) {
+      var active = lvl === l.L;
+      var hidden = lvl !== "all" && l.L > lvl;
+      return {
+        n: l.L, x: Math.max(sx(l.p), 34).toFixed(1), y: sy(l.p).toFixed(1),
+        css: active ? "background: #FFFFFF; color: #0F172A" : (hidden ? "color: rgba(203,213,225,0.35)" : "color: #CBD5E1")
+      };
+    });
+
+    var levelKeys = ["all", 0, 1, 2, 3, 4, 5];
+    var levels = levelKeys.map(function (k) {
+      return { label: k === "all" ? "Tutti" : String(k), on: k === lvl, off: k !== lvl, pick: function () { self.setState({ lvl: k, sel: null }); } };
+    });
+
+    var words = this.norm(q).split(/\s+/).filter(Boolean);
+    var res;
+    if (words.length) {
+      res = R.filter(function (r) {
+        var ci = self.corpoInfo(r.corpo);
+        var hay = self.norm([r.nome, r.tipo, r.kw, "corpo " + ci.short, "livello " + r.liv].join(" "));
+        return words.every(function (w) { return hay.indexOf(w) !== -1; });
+      });
+    } else if (lvl !== "all") {
+      res = R.filter(function (r) { return r.liv === lvl; });
+    } else {
+      res = R.slice();
+    }
+    res.sort(function (a, b) { return a.liv - b.liv; });
+    var results = res.map(function (r) {
+      var ci = self.corpoInfo(r.corpo);
+      var on = !!(selR && selR.id === r.id);
+      return {
+        nome: r.nome, liv: r.liv, on: on, off: !on,
+        sub: "Corpo " + ci.label + " · ascensori " + ci.g.short,
+        pick: function () { self.setState({ sel: r.id, lvl: r.liv }); }
+      };
+    });
+    var listTitle = words.length ? "Risultati" : (lvl === "all" ? "Tutti i reparti" : "Reparti al livello " + lvl);
+
+    var d = { nome: "", tipo: "", liv: "", corpoShort: "", ascShort: "", s1: "", s2: "", s3: "", s4: "", telLabel: "" };
+    if (selR) {
+      var ci = this.corpoInfo(selR.corpo);
+      var L = selR.liv;
+      var s1, s2, s3, s4;
+      if (selR.ps) {
+        s1 = "Corsia ambulanze del Pronto Soccorso, livello 1";
+        s2 = "Accesso diretto al PS nel corpo centrale";
+        s3 = "Nessun ascensore: il PS è al livello 1";
+        s4 = "Livello 1, corpo centrale – Pronto Soccorso";
+      } else if (selR.id === "portineria") {
+        s1 = "Ingresso principale dal piazzale (livello 2)";
+        s2 = "La Portineria è subito all'ingresso, nel corpo centrale";
+        s3 = "Da qui partono i corridoi verso i corpi A-B e C-D";
+        s4 = "Livello 2, corpo centrale – Informazioni";
+      } else {
+        s1 = "Ingresso principale – Portineria (livello 2, corpo centrale)";
+        s2 = ci.g.side === "CE" ? "Resta nel corpo centrale" : "Segui il corridoio verso " + ci.g.lato;
+        if (L === 2) s3 = "Nessun ascensore: sei già al livello 2";
+        else s3 = "Ascensori " + (ci.g.side === "CE" ? "del nodo centrale" : "del nodo " + ci.g.short) + ": " + (L > 2 ? "sali" : "scendi") + " al livello " + L;
+        s4 = "Livello " + L + ", corpo " + ci.label + " – " + selR.nome;
+      }
+      d = {
+        nome: selR.nome, tipo: selR.tipo, liv: String(L), corpoShort: ci.short,
+        ascShort: (selR.ps || L === 2) ? "—" : ci.g.short,
+        s1: s1, s2: s2, s3: s3, s4: s4,
+        telLabel: selR.tel ? "Int. " + selR.tel : "Chiama"
+      };
+    }
+
+    return {
+      q: q,
+      hasQ: q.length > 0,
+      onQ: function (e) { self.setState({ q: e.target.value }); },
+      clearQ: function () { self.setState({ q: "" }); },
+      faces: faces,
+      floorLabels: floorLabels,
+      blockLabels: blockLabels,
+      markers: markers,
+      pin: pin,
+      hasPin: hasPin,
+      rotL: function () { self.spin(-45); },
+      rotR: function () { self.spin(45); },
+      toggleExp: function () { self.setState({ exp: !exp }); },
+      expOn: exp,
+      expOff: !exp,
+      levels: levels,
+      hasSel: !!selR,
+      closeSel: function () { self.setState({ sel: null }); },
+      d: d,
+      results: results,
+      noResults: results.length === 0,
+      listTitle: listTitle,
+      listCount: results.length + (results.length === 1 ? " reparto" : " reparti")
+    };
+  }
+}
+</script>
+</body>
+</html>

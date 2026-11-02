@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Aggiungi reparto</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#C8102E}a:hover{color:#A50E26}
+button,input,textarea{font-family:inherit}
+input:focus,textarea:focus{outline:2px solid #1D4ED8;outline-offset:1px}
+</style>
+</helmet>
+<div style="width: 390px; height: 1460px; display: flex; flex-direction: column; background: #F2F4F7; font-family: 'Manrope', system-ui, sans-serif; color: #0F172A; overflow: hidden">
+
+<div style="background: #FFFFFF; border-bottom: 1px solid #E4E7EC; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between">
+<a href="Main.dc.html" style="height: 44px; padding: 0 10px; display: flex; align-items: center; font-size: 15px; font-weight: 700; color: #475467; text-decoration: none">Annulla</a>
+<span style="font-size: 17px; font-weight: 800">Nuovo reparto</span>
+<button type="button" style="height: 44px; padding: 0 16px; border-radius: 12px; border: 0; background: #C8102E; color: #FFFFFF; font-size: 15px; font-weight: 800">Salva</button>
+</div>
+
+<div style="padding: 18px 16px 24px; display: flex; flex-direction: column; gap: 18px">
+
+<div style="background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-size: 12px; font-weight: 800; letter-spacing: 0.08em; color: #475467">DOVE SI TROVA</span>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 700; color: #344054">Ospedale</span>
+<button type="button" style="height: 50px; border-radius: 12px; border: 1px solid #D0D5DD; background: #FFFFFF; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; font-size: 16px; font-weight: 700; color: #0F172A">Policlinico Riviera
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#475467" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 700; color: #344054">Sede / plesso / padiglione</span>
+<button type="button" style="height: 50px; border-radius: 12px; border: 1px solid #D0D5DD; background: #FFFFFF; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; font-size: 16px; font-weight: 700; color: #0F172A">Plesso Centrale
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#475467" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+</button>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 700; color: #344054">Nome reparto</span>
+<input type="text" value="Ambulatori Ortopedia" style="height: 50px; border-radius: 12px; border: 1px solid #D0D5DD; padding: 0 14px; font-size: 16px; font-weight: 700; color: #0F172A; box-sizing: border-box">
+</label>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 700; color: #344054">Tipo</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 14px; font-weight: 700">Degenza</button>
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid #0F172A; background: #0F172A; color: #FFFFFF; font-size: 14px; font-weight: 800">Ambulatorio</button>
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 14px; font-weight: 700">Day Hospital</button>
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 14px; font-weight: 700">Servizio</button>
+</div>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 16px">
+<span style="font-size: 12px; font-weight: 800; letter-spacing: 0.08em; color: #475467">COME ARRIVARCI</span>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 700; color: #344054">Ingresso da usare</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 14px; font-weight: 700">Ingresso 16</button>
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 12px; border: 2px solid #C8102E; background: #FDECEE; color: #A50E26; font-size: 14px; font-weight: 800">Ingresso Dialisi</button>
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 14px; font-weight: 700">Ingresso 1</button>
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 12px; border: 1px dashed #98A2B3; background: #FFFFFF; color: #475467; font-size: 14px; font-weight: 700">+ Nuovo ingresso</button>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 700; color: #344054">Piano</span>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px">
+<button type="button" style="height: 48px; border-radius: 10px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 16px; font-weight: 800">-1</button>
+<button type="button" style="height: 48px; border-radius: 10px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 16px; font-weight: 800">T</button>
+<button type="button" style="height: 48px; border-radius: 10px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 16px; font-weight: 800">1</button>
+<button type="button" style="height: 48px; border-radius: 10px; border: 1px solid #0F172A; background: #0F172A; color: #FFFFFF; font-size: 16px; font-weight: 800">2</button>
+<button type="button" style="height: 48px; border-radius: 10px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 16px; font-weight: 800">3</button>
+<button type="button" style="height: 48px; border-radius: 10px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 16px; font-weight: 800">4</button>
+<button type="button" style="height: 48px; border-radius: 10px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 16px; font-weight: 800">5</button>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 700; color: #344054">Ascensore</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="height: 44px; min-width: 56px; padding: 0 14px; border-radius: 12px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 14px; font-weight: 700">A–B</button>
+<button type="button" style="height: 44px; min-width: 56px; padding: 0 14px; border-radius: 12px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 14px; font-weight: 700">C</button>
+<button type="button" style="height: 44px; min-width: 56px; padding: 0 14px; border-radius: 12px; border: 2px solid #1D4ED8; background: #E8F0FE; color: #1D4ED8; font-size: 14px; font-weight: 800">D</button>
+<button type="button" style="height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid #D0D5DD; background: #FFFFFF; color: #344054; font-size: 14px; font-weight: 700">Nessuno</button>
+</div>
+</div>
+
+<label style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 700; color: #344054">Indicazioni all'uscita dall'ascensore</span>
+<textarea rows="2" style="border-radius: 12px; border: 1px solid #D0D5DD; padding: 12px 14px; font-size: 15px; font-weight: 600; color: #0F172A; resize: none; box-sizing: border-box">Sala d'attesa B, ambulatori 4–9</textarea>
+</label>
+</div>
+
+<div style="background: #FFFFFF; border: 1px solid #E4E7EC; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 16px">
+<span style="font-size: 12px; font-weight: 800; letter-spacing: 0.08em; color: #475467">PER L'EQUIPAGGIO</span>
+<label style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 700; color: #344054">Note pratiche</span>
+<textarea rows="3" style="border-radius: 12px; border: 1px solid #D0D5DD; padding: 12px 14px; font-size: 15px; font-weight: 600; color: #0F172A; resize: none; box-sizing: border-box">Prima di salire passare dall'accettazione al piano terra con l'impegnativa.</textarea>
+</label>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 700; color: #344054">Parole chiave per la ricerca</span>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<span style="height: 32px; padding: 0 10px; border-radius: 8px; background: #F2F4F7; color: #344054; font-size: 13px; font-weight: 700; display: flex; align-items: center">orto</span>
+<span style="height: 32px; padding: 0 10px; border-radius: 8px; background: #F2F4F7; color: #344054; font-size: 13px; font-weight: 700; display: flex; align-items: center">gessi</span>
+<span style="height: 32px; padding: 0 10px; border-radius: 8px; background: #F2F4F7; color: #344054; font-size: 13px; font-weight: 700; display: flex; align-items: center">visita</span>
+<span style="height: 32px; padding: 0 10px; border-radius: 8px; background: #F2F4F7; color: #344054; font-size: 13px; font-weight: 700; display: flex; align-items: center">controllo</span>
+<button type="button" style="height: 32px; padding: 0 10px; border-radius: 8px; border: 1px dashed #98A2B3; background: #FFFFFF; color: #475467; font-size: 13px; font-weight: 700">+ aggiungi</button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 700; color: #344054">Foto utili</span>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button type="button" style="height: 104px; border-radius: 12px; border: 1px dashed #98A2B3; background: #F9FAFB; color: #475467; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 700">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>
+Foto dell'ingresso
+</button>
+<button type="button" style="height: 104px; border-radius: 12px; border: 1px dashed #98A2B3; background: #F9FAFB; color: #475467; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 700">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>
+Foto del cartello
+</button>
+</div>
+</div>
+</div>
+
+<div style="background: #0F172A; color: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 800; letter-spacing: 0.08em; color: #CBD5E1">ANTEPRIMA</span>
+<span style="font-size: 18px; font-weight: 800; line-height: 1.3">Ingresso Dialisi → Ascensore D → 2° piano</span>
+<span style="font-size: 13px; color: #CBD5E1">Così lo vedrà chi cerca “orto” o “gessi”.</span>
+</div>
+
+<button type="button" style="height: 56px; border-radius: 14px; border: 0; background: #C8102E; color: #FFFFFF; font-size: 17px; font-weight: 800">Salva reparto</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1460}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

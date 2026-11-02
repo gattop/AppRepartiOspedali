@@ -1,0 +1,12 @@
+.git
+.github
+.env
+*.env
+!.env.example
+data
+node_modules
+claude
+test
+public/icons/*.png
+docker-compose*.yml
+README.md
