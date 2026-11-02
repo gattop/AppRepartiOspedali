@@ -50,6 +50,14 @@ export function updateSeededMaps(store) {
         }
       }
       if (changed) store.db.prepare('UPDATE ospedali SET mappa = ? WHERE id = ?').run(JSON.stringify(mappa), o.id);
+      // Entrances seeded before they had a floor and a position: fill them in once.
+      for (const s of o.sedi || []) {
+        for (const ing of s.ingressi || []) {
+          if (ing.piano == null && !ing.corpo) continue;
+          store.db.prepare('UPDATE ingressi SET piano = ?, corpo = ? WHERE id = ? AND piano IS NULL AND corpo IS NULL')
+            .run(ing.piano ?? null, ing.corpo ?? null, ing.id);
+        }
+      }
     }
   }
 }

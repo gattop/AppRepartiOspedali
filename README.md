@@ -1,9 +1,9 @@
 # Reparti Ospedali
 
-PWA per gli equipaggi: cerchi un reparto e vedi **ingresso, ascensore e piano**, con il percorso in 4 passi, il navigatore fino all'ingresso giusto e il numero del reparto. Funziona offline con l'ultima copia dei dati scaricata.
+PWA per gli equipaggi: cerchi un reparto e vedi **ingresso, ascensore e piano**, con il percorso in 4 passi e il numero del reparto. Funziona offline con l'ultima copia dei dati scaricata.
 
 - **Cerca**: ricerca su tutti gli ospedali (nome, sigla, parole chiave), filtro per ospedale
-- **Scheda reparto**: ingresso / ascensore / piano, percorso, note per l'equipaggio, "Naviga", "Chiama", verifica dei dati
+- **Scheda reparto**: ingresso / ascensore / piano, percorso, note per l'equipaggio, "Chiama", verifica dei dati
 - **Ospedali**: sedi (plessi/padiglioni), ingressi (con indicazione "consigliato ambulanze" / "non adatto a barelle"), ascensori, reparti piano per piano
 - **Mappa 3D** per gli ospedali che la hanno (oggi l'Ospedale Carlo Urbani di Jesi): l'ospedale si apre direttamente sulla mappa, e la scheda di ogni reparto la mostra con il reparto evidenziato
 - **Preferiti** salvati sul dispositivo
@@ -118,4 +118,4 @@ Per ripristinare: `docker compose stop app`, copia lo snapshot in `./data/repart
 
 - I dati di Jesi vengono dal Piano di emergenza P.O. Carlo Urbani (rev. 2015) e sono marcati "mai verificato". Il pulsante **"Ho controllato: i dati sono corretti"** registra chi li ha verificati e quando.
 - I numeri interni (4 cifre) diventano chiamabili solo se nella scheda dell'ospedale imposti il **prefisso per gli interni**.
-- Per un navigatore preciso fino all'ingresso, nella scheda dell'ingresso usa **"Usa la mia posizione attuale"** stando davanti all'ingresso. Senza coordinate si usa l'indirizzo della sede.
+- Ogni ingresso ha il suo **piano d'ingresso**: il percorso dice quanti piani salire o scendere. Negli ospedali con mappa 3D, ingressi e reparti si posizionano toccando il modello (intera ala o punto preciso) dal modulo di modifica.

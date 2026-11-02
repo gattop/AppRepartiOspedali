@@ -218,23 +218,7 @@
             "ascensore": "asc-centrale",
             "dove": "Corpo centrale (resta nel corpo centrale)"
           }
-        },
-        "markers": [
-          {
-            "corpo": "nC",
-            "liv": 2,
-            "text": "Ingresso principale",
-            "dot": "#22C55E",
-            "dy": -14
-          },
-          {
-            "corpo": "CEN",
-            "liv": 1,
-            "text": "Pronto Soccorso",
-            "dot": "#F97316",
-            "dy": 6
-          }
-        ]
+        }
       },
       "sedi": [
         {
@@ -246,14 +230,18 @@
               "id": "ing-principale",
               "nome": "Ingresso principale – Portineria",
               "sigla": "P",
-              "nota": "Dal piazzale, livello 2, corpo centrale"
+              "nota": "Dal piazzale, livello 2, corpo centrale",
+              "piano": 2,
+              "corpo": "nC"
             },
             {
               "id": "ing-ps",
               "nome": "Pronto Soccorso – corsia ambulanze",
               "sigla": "PS",
               "nota": "Livello 1, accesso diretto al PS nel corpo centrale",
-              "badge": "ambulanze"
+              "badge": "ambulanze",
+              "piano": 1,
+              "corpo": "CEN"
             }
           ],
           "ascensori": [

@@ -119,6 +119,25 @@ test('moves a ward to another body with a single field change', async () => {
   assert.equal(r.piano, 3);
 });
 
+test('entrances have a floor and a position on the 3D map; wards can have a precise point', async () => {
+  let data = await (await req('GET', '/api/data')).json();
+  const main = data.ingressi.find((i) => i.id === 'ing-principale');
+  assert.equal(main.piano, 2);
+  assert.equal(main.corpo, 'nC');
+  assert.ok(!('lat' in main));
+
+  let res = await req('POST', '/api/ingressi', { headers: EDITOR, body: { sede_id: 'jesi-sede', nome: 'Ingresso C', piano: 3, corpo: 'C', punto: { x: 25.123, y: 1.5 } } });
+  assert.equal(res.status, 201);
+  res = await req('PUT', '/api/reparti/jesi-dialisi', { headers: EDITOR, body: { punto: { x: 26, y: 4 } } });
+  assert.equal(res.status, 200);
+  res = await req('PUT', '/api/reparti/jesi-dialisi', { headers: EDITOR, body: { punto: { x: 'a' } } });
+  assert.equal(res.status, 400);
+
+  data = await (await req('GET', '/api/data')).json();
+  assert.deepEqual(data.ingressi.find((i) => i.nome === 'Ingresso C').punto, { x: 25.12, y: 1.5 });
+  assert.deepEqual(data.reparti.find((r) => r.id === 'jesi-dialisi').punto, { x: 26, y: 4 });
+});
+
 test('adds the new per-body fields to maps seeded by an older release', () => {
   const mappa = JSON.parse(store.get('ospedali', 'jesi').mappa);
   for (const c of Object.values(mappa.corpi)) { delete c.ascensore; delete c.dove; }

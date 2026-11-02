@@ -218,6 +218,8 @@ function corpoPatch(osp, cur, corpo) {
   const corpi = osp?.mappa?.corpi || {};
   const was = corpi[cur.corpo] || {}, now = corpi[corpo] || {};
   const patch = { corpo };
+  // A precise point belongs to the old block: drop it.
+  if (corpo !== cur.corpo && cur.punto) patch.punto = null;
   if (now.ascensore && X.asc[now.ascensore] && cur.ascensore_id && cur.ascensore_id === was.ascensore) patch.ascensore_id = now.ascensore;
   if (now.dove && (!cur.dove || cur.dove === was.dove)) patch.dove = now.dove;
   return patch;
@@ -238,12 +240,29 @@ function telInfo(osp, tel) {
   return { href: 'tel:' + t, label: tel };
 }
 
-function mapsUrl(osp, sede, ing) {
-  const dest = ing && ing.lat != null && ing.lng != null
-    ? `${ing.lat},${ing.lng}`
-    : [sede?.indirizzo || osp?.indirizzo, osp?.citta].filter(Boolean).join(', ');
-  return 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' + encodeURIComponent(dest);
+// Entrances placed on the 3D map, drawn as markers.
+function entrancePoints(o) {
+  const out = [];
+  for (const s of X.sediByOsp[o.id] || []) {
+    for (const g of X.ingBySede[s.id] || []) {
+      if (!g.corpo || g.piano == null) continue;
+      out.push({ corpo: g.corpo, liv: g.piano, punto: g.punto, text: g.sigla || g.nome.split(' – ')[0], dot: g.badge === 'ambulanze' ? '#F97316' : '#22C55E' });
+    }
+  }
+  return out;
 }
+
+// "Sali di 2 livelli" / "stesso piano dell'ingresso", from the entrance floor to the ward floor.
+function movement(r) {
+  const from = r._ing?.piano, to = r.piano;
+  if (from == null || to == null) return '';
+  if (from === to) return `Stesso ${r._osp?.uso_livelli ? 'livello' : 'piano'} dell'ingresso`;
+  const n = Math.abs(to - from);
+  const word = r._osp?.uso_livelli ? (n === 1 ? 'livello' : 'livelli') : (n === 1 ? 'piano' : 'piani');
+  return `${to > from ? 'Sali' : 'Scendi'} di ${n} ${word}`;
+}
+
+const placeText = (o, corpo, punto) => (corpo ? `Corpo ${corpoName(o, corpo)}${punto ? ' · punto preciso' : ' · intera ala'}` : 'Non indicata');
 
 // ---------------------------------------------------------------- shared UI
 
@@ -355,8 +374,8 @@ function steps(r) {
   return html`<div class="panel steps">
     <span class="panel-title">Percorso</span>
     <div class="step"><span class="num">1</span><div class="col"><span class="lbl">Vai a</span><b>${multi ? r._sede.nome : r._osp.nome}</b><span class="muted">${[r._sede.indirizzo || r._osp.indirizzo, r._osp.citta].filter(Boolean).join(', ')}</span></div></div>
-    <div class="step"><span class="num red">2</span><div class="col"><span class="lbl">Entra da</span><b>${r._ing ? r._ing.nome : 'Ingresso non indicato'}</b>${r._ing?.nota && html`<span class="muted">${r._ing.nota}</span>`}</div></div>
-    <div class="step"><span class="num blue">3</span><div class="col"><span class="lbl">Prendi</span><b>${r._asc ? `Ascensore ${r._asc.sigla}${r._asc.tipo ? ' (' + r._asc.tipo + ')' : ''}` : 'Nessun ascensore'}</b>${r._asc?.nota && html`<span class="muted">${r._asc.nota}</span>`}</div></div>
+    <div class="step"><span class="num red">2</span><div class="col"><span class="lbl">Entra da</span><b>${r._ing ? r._ing.nome : 'Ingresso non indicato'}</b>${r._ing && html`<span class="muted">${[r._ing.piano != null ? pianoInfo(r._osp, r._ing.piano).long : '', r._ing.nota].filter(Boolean).join(' · ')}</span>`}</div></div>
+    <div class="step"><span class="num blue">3</span><div class="col"><span class="lbl">Prendi</span><b>${r._asc ? `Ascensore ${r._asc.sigla}${r._asc.tipo ? ' (' + r._asc.tipo + ')' : ''}` : 'Nessun ascensore'}</b>${(movement(r) || r._asc?.nota) && html`<span class="muted">${[movement(r), r._asc?.nota].filter(Boolean).join(' · ')}</span>`}</div></div>
     <div class="step"><span class="num dark">4</span><div class="col"><span class="lbl">Vai al</span><b>${pi.long}${r.corpo && r._osp.mappa ? ', corpo ' + corpoName(r._osp, r.corpo) : ''}</b>${r.dove && html`<span class="muted">${r.dove}</span>`}</div></div>
   </div>`;
 }
@@ -395,12 +414,9 @@ function viewReparto(id) {
         <div class="g-steps">${steps(r)}</div>
         <div class="col gap14 g-rest">
           ${r.note && html`<div class="note">${ICON.info()}<div class="col"><b>Da sapere</b><span>${r.note}</span></div></div>`}
-          <div class="col gap8">
-            <a class="btn primary big" href="${mapsUrl(r._osp, r._sede, r._ing)}" target="_blank" rel="noopener">${ICON.nav()}Naviga fino all'ingresso</a>
-            ${tel && (tel.href
-              ? html`<a class="btn secondary" href="${tel.href}">${ICON.phone()}Chiama il reparto · ${tel.label}</a>`
-              : html`<div class="btn secondary disabled">${ICON.phone()}Interno ${r.tel}</div>`)}
-          </div>
+          ${tel && (tel.href
+            ? html`<a class="btn primary big" href="${tel.href}">${ICON.phone()}Chiama il reparto · ${tel.label}</a>`
+            : html`<div class="btn secondary disabled">${ICON.phone()}Interno ${r.tel}</div>`)}
           ${r._osp.fonte && html`<p class="fonte">${r._osp.fonte}</p>`}
           <div class="verif">
             ${r.verificato_il ? `Verificato il ${fmtDate(r.verificato_il)}${r.verificato_da ? ' da ' + r.verificato_da : ''}` : 'Mai verificato sul posto'}
@@ -500,7 +516,7 @@ function viewOspedale(id) {
             ${g.badge === 'ambulanze' && html`<span class="badge ok">CONSIGLIATO AMBULANZE</span>`}
             ${g.badge === 'no_barelle' && html`<span class="badge bad">NON ADATTO A BARELLE</span>`}
           </${S.me.canEdit ? raw('a') : raw('div')}>
-          <a class="sqbtn" href="${mapsUrl(o, sede, g)}" target="_blank" rel="noopener" aria-label="Naviga a ${g.nome}">${ICON.nav(18)}</a>
+          ${g.piano != null && html`<span class="ing-floor" title="${pianoInfo(o, g.piano).long}"><small>${o.uso_livelli ? 'LIV.' : 'PIANO'}</small>${pianoInfo(o, g.piano).short}</span>`}
         </div>`)}
         ${S.me.canEdit && html`<a class="btn dashed" href="#/sede/${encodeURIComponent(sede.id)}/nuovo-ingresso?ritorno=${ritorno}">+ Nuovo ingresso</a>`}
       </section>
@@ -559,6 +575,16 @@ function mapState(o, query) {
 function stageState(el) {
   const o = X.osp[el.dataset.osp];
   if (!o?.mappa) return null;
+  if (el.dataset.pick) {
+    // Choosing a position in a form: highlight what's chosen, every visible block is clickable.
+    const p = S.pick;
+    if (!p) return null;
+    const v = pickValues();
+    return Object.assign(p, {
+      sel: null, lvl: v.piano ?? 'all', pick: true,
+      highlight: v.corpo ? { corpo: v.corpo, liv: v.piano, punto: v.punto, text: p.label } : null
+    });
+  }
   if (el.dataset.rep) {
     const r = X.rep[el.dataset.rep];
     const st = (S.mapDetail[o.id] ||= { rot: o.mappa.rot ?? -28, exp: false });
@@ -573,10 +599,13 @@ function drawStage(el) {
   const o = X.osp[el.dataset.osp];
   const st = stageState(el);
   if (!st) return;
-  el.innerHTML = String(renderMap({
+  const out = renderMap({
     mappa: o.mappa, reparti: X.repByOsp[o.id] || [], sel: st.sel, lvl: st.lvl, rot: st.rot, exp: st.exp,
+    target: st.pick ? st.highlight : undefined, pick: !!st.pick, points: entrancePoints(o),
     width: el.clientWidth || 390, height: el.clientHeight || 300
-  }));
+  });
+  el.innerHTML = String(out);
+  el._geo = out.geo;
 }
 
 function drawStages() {
@@ -585,6 +614,69 @@ function drawStages() {
 
 const stageHtml = (o, r) =>
   html`<div class="map-stage ${r ? 'small' : ''}" data-osp="${o.id}" data-rep="${r?.id || ''}"></div>`;
+
+// ---- choosing a position on the 3D map (ward form, entrance form)
+// S.pick = { key, target: 'draft' | 'form', mode: 'ala' | 'punto', rot, exp, label, corpo, piano, punto }
+// With target 'draft' the values live in the ward draft; with 'form' they live in S.pick and are
+// mirrored into the form's inputs, so the rest of the form keeps what was typed.
+
+function pickValues() {
+  const p = S.pick;
+  if (p?.target === 'draft' && S.draft) return { corpo: S.draft.corpo, piano: S.draft.piano, punto: S.draft.punto };
+  return { corpo: p?.corpo ?? null, piano: p?.piano ?? null, punto: p?.punto ?? null };
+}
+
+function initPick(key, o, target, values, label) {
+  if (S.pick?.key !== key) {
+    S.pick = { key, target, mode: values.punto ? 'punto' : 'ala', rot: o.mappa.rot ?? -28, exp: false, ...values };
+  }
+  S.pick.label = label;
+}
+
+function pickStatus(o, v) {
+  return [placeText(o, v.corpo, v.punto), v.corpo && v.piano != null ? pianoInfo(o, v.piano).long : ''].filter(Boolean).join(' · ');
+}
+
+function pickPanel(o, v, what) {
+  const mode = S.pick.mode;
+  return html`<div class="field pickfield">
+    <span>Posizione sulla mappa 3D</span>
+    <div class="seg light">
+      <button type="button" class="${mode === 'ala' ? 'on' : ''}" data-act="pickMode" data-mode="ala">Intera ala</button>
+      <button type="button" class="${mode === 'punto' ? 'on' : ''}" data-act="pickMode" data-mode="punto">Punto preciso</button>
+    </div>
+    <div class="map-stage pick" data-osp="${o.id}" data-pick="1"></div>
+    <div class="row between gap8">
+      <b class="pick-status" id="pick-status">${pickStatus(o, v)}</b>
+      <button type="button" class="btn ghost small ${v.corpo ? '' : 'hide'}" id="pick-clear" data-act="pickClear">Rimuovi</button>
+    </div>
+    <small class="muted">Scegli il ${o.uso_livelli ? 'livello' : 'piano'}, poi tocca il blocco dove si trova ${what}. Con “Punto preciso” tocca il punto esatto: comparirà un puntino.</small>
+  </div>`;
+}
+
+function setPick(v) {
+  const p = S.pick;
+  if (p.target === 'draft') {
+    const d = S.draft;
+    if (v.corpo && v.corpo !== d.corpo) Object.assign(d, corpoPatch(X.osp[d.osp], d, v.corpo));
+    d.corpo = v.corpo;
+    if (v.piano !== undefined) d.piano = v.piano;
+    d.punto = v.punto;
+    draftChanged();
+    render();
+    return;
+  }
+  Object.assign(p, v);
+  const form = document.getElementById('eform');
+  if (form?.elements.corpo) form.elements.corpo.value = p.corpo || '';
+  if (form?.elements.punto) form.elements.punto.value = p.punto ? JSON.stringify(p.punto) : '';
+  if (form?.elements.piano && v.piano !== undefined) form.elements.piano.value = v.piano ?? '';
+  const o = X.osp[$app.querySelector('.map-stage.pick')?.dataset.osp];
+  const st = document.getElementById('pick-status');
+  if (st && o) st.textContent = pickStatus(o, p);
+  document.getElementById('pick-clear')?.classList.toggle('hide', !p.corpo);
+  drawStages();
+}
 
 function mapList(o, st) {
   const corpi = o.mappa.corpi || {};
@@ -643,15 +735,14 @@ function viewMappa(id, query) {
         <div class="tile lblue"><span>ASCENSORI</span><b>${sel._asc ? sel._asc.sigla : '—'}</b></div>
       </div>
       <div class="col gap10 ministeps">
-        <div><span class="num">1</span><span>${sel._ing ? sel._ing.nome : 'Ingresso non indicato'}${sel._ing?.nota ? ' (' + sel._ing.nota + ')' : ''}</span></div>
+        <div><span class="num">1</span><span>${sel._ing ? sel._ing.nome : 'Ingresso non indicato'}${sel._ing?.piano != null ? ' · ' + pianoInfo(o, sel._ing.piano).long : ''}${sel._ing?.nota ? ' (' + sel._ing.nota + ')' : ''}</span></div>
         <div><span class="num red">2</span><span>${sel.dove || '—'}</span></div>
-        <div><span class="num blue">3</span><span>${sel._asc ? `Ascensori ${sel._asc.tipo || sel._asc.sigla}: vai al livello ${sel.piano}` : 'Nessun ascensore'}</span></div>
+        <div><span class="num blue">3</span><span>${[sel._asc ? `Ascensori ${sel._asc.tipo || sel._asc.sigla}` : 'Nessun ascensore', movement(sel)].filter(Boolean).join(': ')}</span></div>
         <div><span class="num dark">4</span><b>${pianoInfo(o, sel.piano).long}${ci ? ', corpo ' + ci.label : ''} – ${sel.nome}</b></div>
       </div>
       <div class="row gap8">
-        <a class="btn primary grow" href="${mapsUrl(o, sel._sede, sel._ing)}" target="_blank" rel="noopener">${ICON.nav(18)}Naviga all'ingresso</a>
+        <a class="btn primary grow" href="#/reparto/${encodeURIComponent(sel.id)}">Apri la scheda</a>
         ${tel && tel.href && html`<a class="btn secondary" href="${tel.href}">${ICON.phone(16)}${tel.label}</a>`}
-        <a class="btn secondary" href="#/reparto/${encodeURIComponent(sel.id)}">Scheda</a>
       </div>
       ${o.fonte && html`<span class="fonte">${o.fonte}</span>`}
     </div>`;
@@ -758,20 +849,28 @@ function usage(field, id) {
 function gestIngressi(o, sede) {
   const rows = X.ingBySede[sede.id] || [];
   const badgeOpts = [['', 'Nessuna indicazione'], ['ambulanze', 'Consigliato ambulanze'], ['no_barelle', 'Non adatto a barelle']];
+  const floors = floorOptions(o).slice();
+  for (const x of rows) if (x.piano != null && !floors.includes(x.piano)) floors.push(x.piano);
+  floors.sort((a, b) => a - b);
+  const floorOpts = [['', '—'], ...floors.map((p) => [p, pianoInfo(o, p).short])];
+  const corpi = o.mappa?.corpi ? Object.entries(o.mappa.corpi) : [];
+  const corpoOpts = [['', '—'], ...corpi.map(([k, c]) => [k, corpi.filter(([, y]) => y.label === c.label).length > 1 ? `${c.label} (${k})` : c.label])];
   return html`
-    <p class="hint">Rinominare un ingresso aggiorna subito tutti i reparti che lo usano.</p>
-    <div class="gtable ings">
-      <div class="ghead"><span>Sigla</span><span>Nome</span><span>Nota</span><span>Indicazione</span><span></span></div>
+    <p class="hint">Rinominare un ingresso aggiorna subito tutti i reparti che lo usano.${corpi.length > 0 ? ' Per mettere un puntino preciso sulla mappa 3D usa il pulsante con la mappa.' : ''}</p>
+    <div class="gtable ings ${corpi.length ? 'withc' : ''}">
+      <div class="ghead"><span>Sigla</span><span>Nome</span><span>${o.uso_livelli ? 'Livello' : 'Piano'}</span>${corpi.length > 0 && html`<span>Corpo</span>`}<span>Nota</span><span>Indicazione</span><span></span></div>
       ${rows.map((x) => {
         const n = usage('ingresso_id', x.id);
         return html`<div class="grow-r">
           ${quickInput('ingressi', x, 'sigla', { label: 'Sigla', placeholder: '16, PS…' })}
           ${quickInput('ingressi', x, 'nome', { label: 'Nome', cls: 'name' })}
+          ${quickSelect('ingressi', x, 'piano', floorOpts, { label: o.uso_livelli ? 'Livello' : 'Piano', type: 'int' })}
+          ${corpi.length > 0 && quickSelect('ingressi', x, 'corpo', corpoOpts, { label: 'Corpo' })}
           ${quickInput('ingressi', x, 'nota', { label: 'Nota', placeholder: 'Rampa, sosta…' })}
           ${quickSelect('ingressi', x, 'badge', badgeOpts, { label: 'Indicazione' })}
           <div class="row gap6 gact">
             <span class="usage" title="Reparti che usano questo ingresso">${n} rep.</span>
-            <a class="sqbtn" href="#/ingresso/${encodeURIComponent(x.id)}/modifica?ritorno=${encodeURIComponent(location.hash)}" aria-label="Posizione e altri campi di ${x.nome}" title="Posizione GPS e altri campi">${ICON.pin()}</a>
+            <a class="sqbtn" href="#/ingresso/${encodeURIComponent(x.id)}/modifica?ritorno=${encodeURIComponent(location.hash)}" aria-label="${corpi.length ? 'Posizione sulla mappa 3D' : 'Tutti i campi'} di ${x.nome}" title="${corpi.length ? 'Posizione sulla mappa 3D' : 'Tutti i campi'}">${corpi.length ? ICON.layers(18) : ICON.edit(18)}</a>
             <button type="button" class="sqbtn danger" data-act="gestDel" data-entity="ingressi" data-id="${x.id}" data-n="${n}" aria-label="Elimina ${x.nome}">${ICON.close(16)}</button>
           </div>
         </div>`;
@@ -897,14 +996,14 @@ function newDraft(r, query) {
     return {
       key: r.id, id: r.id, osp: r._osp.id, sede_id: r.sede_id, nome: r.nome, tipo: r.tipo,
       ingresso_id: r.ingresso_id, ascensore_id: r.ascensore_id, piano: r.piano, corpo: r.corpo,
-      dove: r.dove, note: r.note, tel: r.tel, kw: r.kw.split(/\s+/).filter(Boolean), kwInput: ''
+      dove: r.dove, note: r.note, tel: r.tel, kw: r.kw.split(/\s+/).filter(Boolean), kwInput: '', punto: r.punto
     };
   }
   const sede = X.sede[query.get('sede')] || null;
   const osp = sede ? X.osp[sede.ospedale_id] : S.data.ospedali[0];
   return {
     key: 'new', id: null, osp: osp?.id || null, sede_id: sede?.id || (osp && X.sediByOsp[osp.id]?.[0]?.id) || null,
-    nome: '', tipo: '', ingresso_id: null, ascensore_id: null, piano: null, corpo: null,
+    nome: '', tipo: '', ingresso_id: null, ascensore_id: null, piano: null, corpo: null, punto: null,
     dove: '', note: '', tel: '', kw: [], kwInput: ''
   };
 }
@@ -935,6 +1034,7 @@ function viewRepForm(id, query) {
   const ing = X.ing[d.ingresso_id];
   const asc = X.asc[d.ascensore_id];
   const preview = [ing ? ingPill(ing) : 'Ingresso ?', asc ? ascPill(asc) : 'Nessun ascensore', pianoInfo(osp, d.piano).long].join(' → ');
+  if (corpi.length) initPick('draft:' + d.key, osp, 'draft', {}, d.nome || 'Reparto');
 
   const chip = (field, value, label, cls = 'chip') =>
     html`<button type="button" class="${cls} ${d[field] === value ? 'on' : ''}" data-act="draftSet" data-field="${field}" data-value="${value ?? ''}" aria-pressed="${d[field] === value}">${label}</button>`;
@@ -970,9 +1070,7 @@ function viewRepForm(id, query) {
         <div class="field"><span>${osp.uso_livelli ? 'Livello' : 'Piano'}</span><div class="floorpick">
           ${piani.map((p) => chip('piano', p, pianoInfo(osp, p).short, 'fbtn'))}
         </div></div>
-        ${corpi.length > 0 && html`<div class="field"><span>Corpo (per la mappa 3D)</span><div class="chips wrap">
-          ${corpi.map(([k, c]) => chip('corpo', k, corpi.filter(([, x]) => x.short === c.short).length > 1 ? `${c.short} (${k})` : c.short, 'chip sq'))}
-        </div></div>`}
+        ${corpi.length > 0 && pickPanel(osp, pickValues(), 'il reparto')}
         <div class="field"><span>Ascensore</span><div class="chips wrap">
           ${ascensori.map((a) => chip('ascensore_id', a.id, a.sigla, 'chip sq blue'))}
           ${chip('ascensore_id', null, 'Nessuno', 'chip sq')}
@@ -1031,10 +1129,10 @@ const FORMS = {
     fields: [
       ['nome', 'Nome', 'text', { required: true, hint: 'Es. Ingresso 16, Ingresso Dialisi' }],
       ['sigla', 'Sigla breve', 'text', { hint: 'Es. 16, PS, DIAL. (max 5 caratteri)', maxlength: 5 }],
+      ['piano', 'Piano dell\'ingresso', 'floor', { hint: 'Il piano a cui si entra: da qui si calcola quanti piani salire o scendere.' }],
       ['nota', 'Nota', 'textarea', { hint: 'Es. Rampa barellati, sosta ambulanze 15 min' }],
       ['badge', 'Indicazione', 'select', { options: [['', 'Nessuna'], ['ambulanze', 'Consigliato ambulanze'], ['no_barelle', 'Non adatto a barelle']] }],
-      ['lat', 'Latitudine', 'number', { step: 'any' }],
-      ['lng', 'Longitudine', 'number', { step: 'any', geo: true }],
+      ['posizione', 'Posizione sulla mappa 3D', 'mappos'],
       ['ordine', 'Ordine', 'number']
     ],
     del: 'Eliminare l\'ingresso? I reparti che lo usano resteranno senza ingresso.'
@@ -1059,6 +1157,14 @@ function viewEntityForm(entity, id, parent, query) {
   if (id && !row) return viewNotFound();
   const back = query.get('ritorno') || (entity === 'ospedali' ? (id ? `#/ospedale/${encodeURIComponent(id)}` : '#/ospedali') : '#/ospedali');
   const values = row || {};
+  // Hospital of the entrance (for its floors and its 3D map).
+  const osp = entity === 'ingressi' ? X.osp[X.sede[parent || row?.sede_id]?.ospedale_id] : null;
+  if (osp?.mappa) {
+    const key = 'ing:' + (id || 'new:' + parent);
+    initPick(key, osp, 'form', { corpo: values.corpo ?? null, piano: values.piano ?? null, punto: values.punto ?? null }, values.nome || 'Ingresso');
+  }
+  // While choosing on the map, the form shows the floor chosen there (S.pick), not the saved one.
+  const pv = osp?.mappa ? pickValues() : null;
   return html`
     ${banner()}
     <div class="topbar">
@@ -1071,11 +1177,24 @@ function viewEntityForm(entity, id, parent, query) {
         ${cfg.fields.map(([name, label, type, opt = {}]) => {
           const v = values[name] ?? '';
           let input;
-          if (type === 'textarea') input = html`<textarea name="${name}" rows="3">${v}</textarea>`;
+          if (type === 'mappos') {
+            if (!osp?.mappa) return '';
+            return html`<input type="hidden" name="corpo" value="${pv.corpo || ''}"><input type="hidden" name="punto" value="${pv.punto ? JSON.stringify(pv.punto) : ''}">
+              ${pickPanel(osp, pv, 'l\'ingresso')}`;
+          }
+          if (type === 'floor') {
+            const cur = pv ? pv.piano : values.piano ?? null;
+            const floors = floorOptions(osp).slice();
+            if (cur != null && !floors.includes(cur)) floors.push(cur), floors.sort((a, b) => a - b);
+            input = html`<select name="${name}" data-change="pickPiano">
+              <option value="">—</option>
+              ${floors.map((p) => html`<option value="${p}" ${p === cur ? raw('selected') : ''}>${pianoInfo(osp, p).long}</option>`)}
+            </select>`;
+            label = osp?.uso_livelli ? 'Livello dell\'ingresso' : label;
+          } else if (type === 'textarea') input = html`<textarea name="${name}" rows="3">${v}</textarea>`;
           else if (type === 'select') input = html`<select name="${name}">${opt.options.map(([ov, ol]) => html`<option value="${ov}" ${String(v) === ov ? raw('selected') : ''}>${ol}</option>`)}</select>`;
           else input = html`<input type="${type}" name="${name}" value="${v}" ${opt.required ? raw('required') : ''} ${opt.step ? raw(`step="${opt.step}"`) : ''} ${opt.maxlength ? raw(`maxlength="${opt.maxlength}"`) : ''} ${opt.inputmode ? raw(`inputmode="${opt.inputmode}"`) : ''}>`;
-          return html`<label class="field"><span>${label}${opt.required ? ' *' : ''}</span>${input}${opt.hint && html`<small>${opt.hint}</small>`}</label>
-            ${opt.geo && html`<button type="button" class="btn ghost small" data-act="geo">${ICON.pin()}Usa la mia posizione attuale</button>`}`;
+          return html`<label class="field"><span>${label}${opt.required ? ' *' : ''}</span>${input}${opt.hint && html`<small>${opt.hint}</small>`}</label>`;
         })}
       </form>
       <button type="submit" form="eform" class="btn primary big" ${S.busy ? raw('disabled') : ''}>Salva</button>
@@ -1261,7 +1380,7 @@ const ACT = {
     if (!d.sede_id) return flash('Scegli una sede', 'err');
     const body = {
       sede_id: d.sede_id, nome: d.nome, tipo: d.tipo || '', ingresso_id: d.ingresso_id, ascensore_id: d.ascensore_id,
-      piano: d.piano, corpo: d.corpo, dove: d.dove, note: d.note, tel: d.tel, kw: d.kw.join(' ')
+      piano: d.piano, corpo: d.corpo, punto: d.corpo ? d.punto : null, dove: d.dove, note: d.note, tel: d.tel, kw: d.kw.join(' ')
     };
     const saved = await mutate(() => (d.id ? api('PUT', `reparti/${encodeURIComponent(d.id)}`, body) : api('POST', 'reparti', body)), 'Reparto salvato');
     if (saved) {
@@ -1284,19 +1403,28 @@ const ACT = {
       location.hash = '#/ospedali';
     }
   },
-  geo: () => {
-    if (!navigator.geolocation) return flash('Posizione non disponibile su questo dispositivo', 'err');
-    navigator.geolocation.getCurrentPosition(
-      (p) => {
-        const f = document.getElementById('eform');
-        f.lat.value = p.coords.latitude.toFixed(6);
-        f.lng.value = p.coords.longitude.toFixed(6);
-        flash(`Posizione acquisita (±${Math.round(p.coords.accuracy)} m)`);
-      },
-      () => flash('Impossibile ottenere la posizione', 'err'),
-      { enableHighAccuracy: true, timeout: 15000 }
-    );
-  }
+  // Click on a block while choosing a position: whole wing, or the exact spot clicked.
+  pickBlock: ({ corpo, liv }, el, e) => {
+    const stage = el.closest('.map-stage');
+    const L = Number(liv);
+    let punto = null;
+    // e.detail is 0 for keyboard activation: there's no click position, so use the whole block.
+    if (S.pick.mode === 'punto' && e.detail > 0 && stage._geo) {
+      const rect = stage.getBoundingClientRect();
+      const pt = stage._geo.unproject(e.clientX - rect.left, e.clientY - rect.top, L);
+      const b = stage._geo.block(corpo);
+      const clamp = (v, a, z) => Math.min(Math.max(v, a), z);
+      punto = { x: clamp(pt.x, b.x0, b.x1), y: clamp(pt.y, b.y0, b.y1) };
+    }
+    setPick({ corpo, piano: L, punto });
+  },
+  pickMode: ({ mode }) => {
+    S.pick.mode = mode;
+    $app.querySelectorAll('[data-act="pickMode"]').forEach((b) => b.classList.toggle('on', b.dataset.mode === mode));
+    // Switching to "whole wing" drops a point chosen earlier.
+    if (mode === 'ala' && pickValues().punto) setPick({ ...pickValues(), punto: null });
+  },
+  pickClear: () => setPick({ corpo: null, punto: null })
 };
 
 function addKw() {
@@ -1337,6 +1465,11 @@ const INPUT = {
 };
 
 const CHANGE = {
+  // Floor select of the entrance form: the 3D picker follows it.
+  pickPiano: (el) => {
+    if (!S.pick) return;
+    setPick({ ...pickValues(), piano: el.value === '' ? null : Number(el.value) });
+  },
   // Inline edits in "Gestisci": one field, saved immediately.
   quick: async (el) => {
     const { entity, id, field, type } = el.dataset;
@@ -1353,6 +1486,9 @@ const CHANGE = {
       const r = X.rep[id];
       patch = corpoPatch(r._osp, r, v);
       if (patch.ascensore_id || patch.dove) msg = 'Salvato: aggiornati anche ascensore e indicazioni';
+    } else if (field === 'corpo') {
+      // A precise point only makes sense inside its block.
+      patch.punto = null;
     }
     await mutate(() => api('PUT', `${entity}/${encodeURIComponent(id)}`, patch), msg);
   },
@@ -1402,8 +1538,16 @@ const SUBMIT = {
     const { entity, id, parent, back, scegli } = form.dataset;
     const body = {};
     for (const [name, , type] of FORMS[entity].fields) {
+      if (type === 'mappos') {
+        // Hidden inputs filled by the 3D picker (absent for hospitals without a map).
+        if (form.elements.corpo) {
+          body.corpo = form.elements.corpo.value || null;
+          body.punto = body.corpo && form.elements.punto.value ? JSON.parse(form.elements.punto.value) : null;
+        }
+        continue;
+      }
       const v = form.elements[name].value.trim();
-      body[name] = type === 'number' ? (v === '' ? null : Number(v)) : v;
+      body[name] = type === 'number' || type === 'floor' ? (v === '' ? null : Number(v)) : v;
     }
     if (entity === 'ospedali') body.uso_livelli = body.uso_livelli === '1';
     if (entity === 'sedi' && parent) body.ospedale_id = parent;
@@ -1450,8 +1594,10 @@ document.addEventListener('keydown', (e) => {
 
 let lastRoute = null;
 window.addEventListener('hashchange', () => {
-  render();
   const path = location.hash.split('?')[0];
+  // A position being chosen belongs to the form that was open; the ward draft keeps its own values.
+  if (path !== lastRoute) S.pick = null;
+  render();
   if (path !== lastRoute) {
     window.scrollTo(0, 0);
     $app.querySelector('.scroll')?.scrollTo(0, 0);

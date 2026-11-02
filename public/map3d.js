@@ -1,13 +1,21 @@
 import { html, raw } from './util.js';
 
 // Axonometric "exploded floors" view of a hospital, drawn with clip-path polygons.
-// `mappa` = { blocks: [{id, x0, y0, x1, y1, lv: [levels], label, node}], corpi, livelli, markers, rot }
-// `reparti` = wards of this hospital with `corpo` (block id) and `piano` (level).
-export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 300 }) {
+// `mappa`   = { blocks: [{id, x0, y0, x1, y1, lv: [levels], label, node}], corpi, livelli, rot }
+// `reparti` = wards of this hospital with `corpo` (block id), `piano` (level) and optional `punto` {x, y}.
+// `target`  = block/point to highlight: { corpo, liv, punto?, text } (defaults to the selected ward).
+// `points`  = extra markers (entrances): { corpo, liv, punto?, text, dot }.
+// `pick`    = every visible block top becomes a button (used to choose a position).
+// The returned markup carries `geo.unproject(sx, sy, liv)`, which turns a click on the stage
+// back into plan coordinates on that level.
+export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 300, target, points = [], pick = false }) {
   const B = mappa.blocks || [];
-  const selR = reparti.find((r) => r.id === sel) || null;
+  const byId = Object.fromEntries(B.map((b) => [b.id, b]));
+  const selR = sel ? reparti.find((r) => r.id === sel) || null : null;
+  const hi = target || (selR && selR.corpo != null ? { corpo: selR.corpo, liv: selR.piano, punto: selR.punto, text: selR.nome } : null);
   const th = (rot * Math.PI) / 180, c = Math.cos(th), s = Math.sin(th);
   const SP = exp ? 46 : 26, TH = 7, T = 0.55, K = 10;
+  const top = (L) => L * SP + TH;
 
   let bx0 = Infinity, bx1 = -Infinity, by0 = Infinity, by1 = -Infinity;
   for (const b of B) {
@@ -28,18 +36,14 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
     (byBlockLevel[r.corpo + '|' + r.piano] ||= []).push(r);
   }
 
+  const modeOf = (L) => (lvl === 'all' ? 'norm' : L === lvl ? 'act' : L < lvl ? 'fade' : 'ghost');
   const items = [];
   for (const b of B) {
     for (const L of b.lv) {
-      let mode;
-      if (lvl === 'all') mode = 'norm';
-      else if (L === lvl) mode = 'act';
-      else if (L < lvl) mode = 'fade';
-      else mode = 'ghost';
-      const isSel = !!(selR && selR.corpo === b.id && selR.piano === L);
+      const isSel = !!(hi && hi.corpo === b.id && hi.liv === L);
       const zb = L * SP, zt = zb + TH;
       const cen = P((b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2, zt);
-      items.push({ b, L, mode, isSel, zb, zt, depth: L * 1000 + cen[2] });
+      items.push({ b, L, mode: modeOf(L), isSel, zb, zt, depth: L * 1000 + cen[2] });
     }
   }
   items.sort((a, b) => a.depth - b.depth);
@@ -66,8 +70,8 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
         });
       }
     }
-    const top = [add(P(b.x0, b.y0, it.zt)), add(P(b.x1, b.y0, it.zt)), add(P(b.x1, b.y1, it.zt)), add(P(b.x0, b.y1, it.zt))];
-    return { it, sides, top, cen: P((b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2, it.zt) };
+    const topPoly = [add(P(b.x0, b.y0, it.zt)), add(P(b.x1, b.y0, it.zt)), add(P(b.x1, b.y1, it.zt)), add(P(b.x0, b.y1, it.zt))];
+    return { it, sides, top: topPoly, cen: P((b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2, it.zt) };
   });
   const levels = mappa.livelli || [...new Set(B.flatMap((b) => b.lv))].sort((a, b) => a - b);
   const labelRaw = levels.map((L) => ({ L, p: add(P(bx0 - 0.8, by0 + 1, L * SP + TH / 2)) }));
@@ -78,13 +82,24 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
     if (p[0] < minX) minX = p[0]; if (p[0] > maxX) maxX = p[0];
     if (p[1] < minY) minY = p[1]; if (p[1] > maxY) maxY = p[1];
   }
-  const fx0 = 40, fx1 = W - 62, fy0 = 46, fy1 = H - 34;
+  // Margins keep the drawing clear of the floor labels (left), controls (right) and legend (bottom).
+  const big = W > 600;
+  const fx0 = big ? 64 : 40, fx1 = W - (big ? 90 : 62), fy0 = big ? 56 : 46, fy1 = H - (big ? 64 : 34);
   const f = Math.min((fx1 - fx0) / (maxX - minX), (fy1 - fy0) / (maxY - minY));
   const ox = fx0 + ((fx1 - fx0) - (maxX - minX) * f) / 2 - minX * f;
   const oy = fy0 + ((fy1 - fy0) - (maxY - minY) * f) / 2 - minY * f;
   const sx = (p) => p[0] * f + ox;
   const sy = (p) => p[1] * f + oy;
   const poly = (arr) => 'polygon(' + arr.map((p) => sx(p).toFixed(1) + 'px ' + sy(p).toFixed(1) + 'px').join(', ') + ')';
+
+  // Screen position of a block (its centre) or of a precise point, on a level.
+  function spot(corpo, liv, punto) {
+    const b = byId[corpo];
+    if (!b || liv == null) return null;
+    const p = punto ? P(punto.x, punto.y, top(liv)) : P((b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2, top(liv));
+    return { x: sx(p), y: sy(p) };
+  }
+  const visible = (liv) => lvl === 'all' || liv === lvl;
 
   function colors(it) {
     if (it.isSel) return { top: '#F43F5E', a: '#E11D48', b: '#9F1239' };
@@ -93,26 +108,28 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
     return { top: '#64748B', a: '#475569', b: '#334155' };
   }
   function opacity(it) {
-    if (it.isSel) return 1;
+    if (it.isSel) return hi?.punto ? 0.85 : 1;
     if (it.mode === 'fade') return 0.2;
     if (it.mode === 'ghost') return 0.06;
     return 1;
   }
 
   const corpi = mappa.corpi || {};
-  const faces = [], blockLabels = [], markers = [];
-  let pin = null;
+  const faces = [], blockLabels = [];
   for (const r of rawFaces) {
     const it = r.it, col = colors(it), op = opacity(it);
-    const pulse = it.isSel ? ' jpulse' : '';
+    const pulse = it.isSel && !hi?.punto ? ' jpulse' : '';
     for (const sd of r.sides) {
       faces.push(html`<div class="mf${pulse}" aria-hidden="true" style="${`clip-path: ${poly(sd.poly)}; background: ${sd.light ? col.a : col.b}; opacity: ${op}`}"></div>`);
     }
     const list = byBlockLevel[it.b.id + '|' + it.L] || [];
-    const clickable = (it.mode === 'act' || it.mode === 'norm') && list.length > 0;
+    const reachable = it.mode === 'act' || it.mode === 'norm';
     const topStyle = `clip-path: ${poly(r.top)}; background: ${col.top}; opacity: ${op}`;
-    if (clickable) {
-      const label = `Livello ${it.L}, corpo ${corpi[it.b.id]?.label || it.b.id}: ${list.map((x) => x.nome).join(', ')}`;
+    const name = corpi[it.b.id]?.label || it.b.label || it.b.id;
+    if (pick && reachable) {
+      faces.push(html`<button type="button" class="mf mf-btn${pulse}" data-act="pickBlock" data-corpo="${it.b.id}" data-liv="${it.L}" aria-label="${`Livello ${it.L}, corpo ${name}`}" style="${topStyle}"></button>`);
+    } else if (!pick && reachable && list.length > 0) {
+      const label = `Livello ${it.L}, corpo ${name}: ${list.map((x) => x.nome).join(', ')}`;
       faces.push(html`<button type="button" class="mf mf-btn${pulse}" data-act="mapPick" data-id="${list[0].id}" data-liv="${it.L}" aria-label="${label}" style="${topStyle}"></button>`);
     } else {
       faces.push(html`<div class="mf${pulse}" aria-hidden="true" style="${topStyle}"></div>`);
@@ -120,14 +137,26 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
     if (it.mode === 'act' && it.b.label) {
       blockLabels.push(html`<span class="map-blabel" style="${`left: ${sx(r.cen).toFixed(1)}px; top: ${sy(r.cen).toFixed(1)}px; color: ${it.isSel ? '#FFFFFF' : '#0F172A'}`}">${it.b.label}</span>`);
     }
-    const visible = it.mode === 'act' || it.mode === 'norm';
-    for (const m of mappa.markers || []) {
-      if (visible && m.corpo === it.b.id && m.liv === it.L) {
-        markers.push(html`<span class="map-marker" style="${`left: ${sx(r.cen).toFixed(1)}px; top: ${(sy(r.cen) + (m.dy || 0)).toFixed(1)}px`}"><span class="dot" style="${`background: ${m.dot}`}"></span>${m.text}</span>`);
-      }
-    }
-    if (it.isSel) pin = { x: sx(r.cen).toFixed(1), y: (sy(r.cen) - 4).toFixed(1), text: selR.nome };
   }
+
+  const markers = points
+    .filter((m) => visible(m.liv))
+    .map((m) => {
+      const p = spot(m.corpo, m.liv, m.punto);
+      if (!p) return '';
+      return html`<span class="map-marker${m.punto ? ' exact' : ''}" style="${`left: ${p.x.toFixed(1)}px; top: ${p.y.toFixed(1)}px`}"><span class="dot" style="${`background: ${m.dot}`}"></span>${m.text}</span>`;
+    });
+
+  let pin = '';
+  if (hi && hi.liv != null) {
+    const p = spot(hi.corpo, hi.liv, hi.punto);
+    if (p) {
+      pin = html`<div class="map-pin${hi.punto ? ' exact' : ''}" aria-hidden="true" style="${`left: ${p.x.toFixed(1)}px; top: ${(p.y - (hi.punto ? 0 : 4)).toFixed(1)}px`}">
+        ${hi.text && html`<span class="t" style="${`transform: translateX(${pinShift(p.x, W)}px)`}">${hi.text}</span>`}<span class="stick"></span><span class="head"></span>
+      </div>`;
+    }
+  }
+
   const floorLabels = labelRaw.map((l) => {
     const active = lvl === l.L;
     const hidden = lvl !== 'all' && l.L > lvl;
@@ -135,9 +164,8 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
     return html`<span class="map-flabel" style="${`left: ${Math.max(sx(l.p), 34).toFixed(1)}px; top: ${sy(l.p).toFixed(1)}px; ${css}`}">L${l.L}</span>`;
   });
 
-  return html`
-    ${faces}${floorLabels}${blockLabels}${markers}
-    ${pin && html`<div class="map-pin" aria-hidden="true" style="${`left: ${pin.x}px; top: ${pin.y}px`}"><span class="t" style="${`transform: translateX(${pinShift(Number(pin.x), W)}px)`}">${pin.text}</span><span class="stick"></span><span class="head"></span></div>`}
+  const out = html`
+    ${faces}${floorLabels}${blockLabels}${markers}${pin}
     <div class="map-ctrl">
       <button type="button" class="map-cbtn" data-act="mapRot" data-d="-45" aria-label="Ruota a sinistra">${raw(ICON_ROT_L)}</button>
       <button type="button" class="map-cbtn" data-act="mapRot" data-d="45" aria-label="Ruota a destra">${raw(ICON_ROT_R)}</button>
@@ -145,13 +173,25 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
     </div>
     <div class="map-legend" aria-hidden="true">
       <span><span class="sw" style="background: #3B82F6"></span>Scale / ascensori</span>
-      <span><span class="sw" style="background: #F43F5E"></span>Reparto</span>
+      <span><span class="sw" style="background: #F43F5E"></span>${pick ? 'Posizione scelta' : 'Reparto'}</span>
+      ${points.length > 0 && html`<span><span class="sw round" style="background: #22C55E"></span>Ingressi</span>`}
     </div>`;
+
+  out.geo = {
+    // Inverse of P() on the top face of level `liv`: stage pixels -> plan coordinates.
+    unproject(px, py, liv) {
+      const xr = (px - ox) / f / K;
+      const yr = ((py - oy) / f + top(liv)) / (K * T);
+      return { x: xr * c + yr * s + cx, y: -xr * s + yr * c + cy };
+    },
+    block: (id) => byId[id]
+  };
+  return out;
 }
 
-// Keeps the pin's label (max 200px wide, centred on the pin) inside the stage.
+// Keeps the pin's label (max 260px wide on desktop, centred on the pin) inside the stage.
 function pinShift(x, W) {
-  const half = 106;
+  const half = W > 600 ? 136 : 106;
   return Math.max(0, half - x) - Math.max(0, x + half - W);
 }
 

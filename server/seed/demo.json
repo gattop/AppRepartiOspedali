@@ -12,23 +12,122 @@
           "nome": "Plesso Centrale",
           "indirizzo": "Via del Mare 12",
           "ingressi": [
-            { "id": "demo-r-ing16", "nome": "Ingresso 16", "sigla": "16", "nota": "Rampa barellati · sosta ambulanze 15 min", "badge": "ambulanze" },
-            { "id": "demo-r-ingdial", "nome": "Ingresso Dialisi", "sigla": "DIAL.", "nota": "Lato parcheggio interno · cartelli Nefrologia" },
-            { "id": "demo-r-ing1", "nome": "Ingresso 1 – Principale", "sigla": "1", "nota": "Solo pedonale, gradini: no barelle", "badge": "no_barelle" }
+            {
+              "id": "demo-r-ing16",
+              "nome": "Ingresso 16",
+              "sigla": "16",
+              "nota": "Rampa barellati · sosta ambulanze 15 min",
+              "badge": "ambulanze",
+              "piano": 0
+            },
+            {
+              "id": "demo-r-ingdial",
+              "nome": "Ingresso Dialisi",
+              "sigla": "DIAL.",
+              "nota": "Lato parcheggio interno · cartelli Nefrologia",
+              "piano": 0
+            },
+            {
+              "id": "demo-r-ing1",
+              "nome": "Ingresso 1 – Principale",
+              "sigla": "1",
+              "nota": "Solo pedonale, gradini: no barelle",
+              "badge": "no_barelle",
+              "piano": 0
+            }
           ],
           "ascensori": [
-            { "id": "demo-r-ascab", "sigla": "A–B", "tipo": "Pubblici", "nota": "Atrio Ingresso 1" },
-            { "id": "demo-r-ascc", "sigla": "C", "tipo": "Montalettighe", "nota": "Subito dopo Ingresso 16" },
-            { "id": "demo-r-ascd", "sigla": "D", "tipo": "Barelle e carrozzine", "nota": "Corridoio Dialisi" }
+            {
+              "id": "demo-r-ascab",
+              "sigla": "A–B",
+              "tipo": "Pubblici",
+              "nota": "Atrio Ingresso 1"
+            },
+            {
+              "id": "demo-r-ascc",
+              "sigla": "C",
+              "tipo": "Montalettighe",
+              "nota": "Subito dopo Ingresso 16"
+            },
+            {
+              "id": "demo-r-ascd",
+              "sigla": "D",
+              "tipo": "Barelle e carrozzine",
+              "nota": "Corridoio Dialisi"
+            }
           ],
           "reparti": [
-            { "id": "demo-orto-deg", "nome": "Ortopedia e Traumatologia", "tipo": "Degenza", "ingresso": "demo-r-ing16", "ascensore": "demo-r-ascc", "piano": 3, "dove": "Uscita ascensore a destra, citofono sulla porta a vetri", "note": "Per le dimissioni chiedere in medicheria: la lettera si ritira al banco infermieri.", "kw": "orto ortopedia traumatologia trauma degenza ricovero", "verificato_il": "2026-10-28" },
-            { "id": "demo-orto-amb", "nome": "Ambulatori Ortopedia", "tipo": "Ambulatorio", "ingresso": "demo-r-ingdial", "ascensore": "demo-r-ascd", "piano": 2, "dove": "Sala d'attesa B, ambulatori 4–9", "note": "Prima di salire passare dall'accettazione al piano terra con l'impegnativa.", "kw": "orto ortopedia ambulatori visita controllo gesso gessi", "verificato_il": "2026-10-21" },
-            { "id": "demo-dialisi", "nome": "Dialisi", "tipo": "Servizio", "ingresso": "demo-r-ingdial", "piano": 0, "dove": "Subito a destra dopo l'ingresso", "note": "Turni mattino e pomeriggio: confermare l'orario con il centro.", "kw": "dialisi nefrologia rene emodialisi", "verificato_il": "2026-10-27" },
-            { "id": "demo-chirurgia", "nome": "Chirurgia Generale", "tipo": "Degenza", "ingresso": "demo-r-ing16", "ascensore": "demo-r-ascc", "piano": 4, "kw": "chirurgia degenza" },
-            { "id": "demo-neuro", "nome": "Neurologia", "tipo": "Degenza", "ingresso": "demo-r-ing16", "ascensore": "demo-r-ascab", "piano": 3, "kw": "neurologia neuro ictus" },
-            { "id": "demo-prelievi", "nome": "Centro prelievi", "tipo": "Ambulatorio", "ingresso": "demo-r-ing1", "ascensore": "demo-r-ascab", "piano": 1, "kw": "prelievi sangue analisi" },
-            { "id": "demo-radiologia", "nome": "Radiologia", "tipo": "Servizio", "ingresso": "demo-r-ing16", "ascensore": "demo-r-ascc", "piano": -1, "kw": "radiologia rx tac" }
+            {
+              "id": "demo-orto-deg",
+              "nome": "Ortopedia e Traumatologia",
+              "tipo": "Degenza",
+              "ingresso": "demo-r-ing16",
+              "ascensore": "demo-r-ascc",
+              "piano": 3,
+              "dove": "Uscita ascensore a destra, citofono sulla porta a vetri",
+              "note": "Per le dimissioni chiedere in medicheria: la lettera si ritira al banco infermieri.",
+              "kw": "orto ortopedia traumatologia trauma degenza ricovero",
+              "verificato_il": "2026-10-28"
+            },
+            {
+              "id": "demo-orto-amb",
+              "nome": "Ambulatori Ortopedia",
+              "tipo": "Ambulatorio",
+              "ingresso": "demo-r-ingdial",
+              "ascensore": "demo-r-ascd",
+              "piano": 2,
+              "dove": "Sala d'attesa B, ambulatori 4–9",
+              "note": "Prima di salire passare dall'accettazione al piano terra con l'impegnativa.",
+              "kw": "orto ortopedia ambulatori visita controllo gesso gessi",
+              "verificato_il": "2026-10-21"
+            },
+            {
+              "id": "demo-dialisi",
+              "nome": "Dialisi",
+              "tipo": "Servizio",
+              "ingresso": "demo-r-ingdial",
+              "piano": 0,
+              "dove": "Subito a destra dopo l'ingresso",
+              "note": "Turni mattino e pomeriggio: confermare l'orario con il centro.",
+              "kw": "dialisi nefrologia rene emodialisi",
+              "verificato_il": "2026-10-27"
+            },
+            {
+              "id": "demo-chirurgia",
+              "nome": "Chirurgia Generale",
+              "tipo": "Degenza",
+              "ingresso": "demo-r-ing16",
+              "ascensore": "demo-r-ascc",
+              "piano": 4,
+              "kw": "chirurgia degenza"
+            },
+            {
+              "id": "demo-neuro",
+              "nome": "Neurologia",
+              "tipo": "Degenza",
+              "ingresso": "demo-r-ing16",
+              "ascensore": "demo-r-ascab",
+              "piano": 3,
+              "kw": "neurologia neuro ictus"
+            },
+            {
+              "id": "demo-prelievi",
+              "nome": "Centro prelievi",
+              "tipo": "Ambulatorio",
+              "ingresso": "demo-r-ing1",
+              "ascensore": "demo-r-ascab",
+              "piano": 1,
+              "kw": "prelievi sangue analisi"
+            },
+            {
+              "id": "demo-radiologia",
+              "nome": "Radiologia",
+              "tipo": "Servizio",
+              "ingresso": "demo-r-ing16",
+              "ascensore": "demo-r-ascc",
+              "piano": -1,
+              "kw": "radiologia rx tac"
+            }
           ]
         },
         {
@@ -36,13 +135,36 @@
           "nome": "Padiglione Monoblocco",
           "indirizzo": "Via del Mare 20",
           "ingressi": [
-            { "id": "demo-r-ing4", "nome": "Ingresso 4 – Pronto Soccorso", "sigla": "4", "nota": "Corsia ambulanze, poi corridoio interno a sinistra", "badge": "ambulanze" }
+            {
+              "id": "demo-r-ing4",
+              "nome": "Ingresso 4 – Pronto Soccorso",
+              "sigla": "4",
+              "nota": "Corsia ambulanze, poi corridoio interno a sinistra",
+              "badge": "ambulanze",
+              "piano": 0
+            }
           ],
           "ascensori": [
-            { "id": "demo-r-ascb", "sigla": "B", "tipo": "Montalettighe", "nota": "Corridoio interno" }
+            {
+              "id": "demo-r-ascb",
+              "sigla": "B",
+              "tipo": "Montalettighe",
+              "nota": "Corridoio interno"
+            }
           ],
           "reparti": [
-            { "id": "demo-cardio", "nome": "Cardiologia – UTIC", "tipo": "Degenza", "ingresso": "demo-r-ing4", "ascensore": "demo-r-ascb", "piano": 5, "dove": "Porta con citofono di fronte all'ascensore", "note": "Reparto chiuso: suonare e attendere l'infermiere.", "kw": "cardio cardiologia utic unita coronarica cuore", "verificato_il": "2026-10-30" }
+            {
+              "id": "demo-cardio",
+              "nome": "Cardiologia – UTIC",
+              "tipo": "Degenza",
+              "ingresso": "demo-r-ing4",
+              "ascensore": "demo-r-ascb",
+              "piano": 5,
+              "dove": "Porta con citofono di fronte all'ascensore",
+              "note": "Reparto chiuso: suonare e attendere l'infermiere.",
+              "kw": "cardio cardiologia utic unita coronarica cuore",
+              "verificato_il": "2026-10-30"
+            }
           ]
         }
       ]
@@ -59,16 +181,58 @@
           "nome": "Sede Nord",
           "indirizzo": "Viale dei Tigli 3",
           "ingressi": [
-            { "id": "demo-vv-inga", "nome": "Ingresso A – principale", "sigla": "A", "nota": "Sosta solo per carico e scarico" },
-            { "id": "demo-vv-ingc", "nome": "Ingresso C", "sigla": "C", "nota": "Pensilina coperta, sosta breve" }
+            {
+              "id": "demo-vv-inga",
+              "nome": "Ingresso A – principale",
+              "sigla": "A",
+              "nota": "Sosta solo per carico e scarico",
+              "piano": 0
+            },
+            {
+              "id": "demo-vv-ingc",
+              "nome": "Ingresso C",
+              "sigla": "C",
+              "nota": "Pensilina coperta, sosta breve",
+              "piano": 0
+            }
           ],
           "ascensori": [
-            { "id": "demo-vv-asc12", "sigla": "1 / 2", "tipo": "Pubblici" },
-            { "id": "demo-vv-asc3", "sigla": "3", "tipo": "Montalettighe" }
+            {
+              "id": "demo-vv-asc12",
+              "sigla": "1 / 2",
+              "tipo": "Pubblici"
+            },
+            {
+              "id": "demo-vv-asc3",
+              "sigla": "3",
+              "tipo": "Montalettighe"
+            }
           ],
           "reparti": [
-            { "id": "demo-orto-ds", "nome": "Ortopedia – Day Surgery", "tipo": "Day Hospital", "ingresso": "demo-vv-inga", "ascensore": "demo-vv-asc12", "piano": 1, "dove": "Corridoio blu, in fondo a sinistra", "note": "Accesso pazienti dalle 7:30.", "kw": "orto ortopedia day surgery dh chirurgia", "verificato_il": "2026-10-15" },
-            { "id": "demo-onco", "nome": "Oncologia – Day Hospital", "tipo": "Day Hospital", "ingresso": "demo-vv-ingc", "ascensore": "demo-vv-asc3", "piano": 2, "dove": "Accettazione DH di fronte all'ascensore", "note": "Prenotare il trasporto di ritorno al banco accettazione.", "kw": "oncologia dh day hospital chemio terapia", "verificato_il": "2026-10-19" }
+            {
+              "id": "demo-orto-ds",
+              "nome": "Ortopedia – Day Surgery",
+              "tipo": "Day Hospital",
+              "ingresso": "demo-vv-inga",
+              "ascensore": "demo-vv-asc12",
+              "piano": 1,
+              "dove": "Corridoio blu, in fondo a sinistra",
+              "note": "Accesso pazienti dalle 7:30.",
+              "kw": "orto ortopedia day surgery dh chirurgia",
+              "verificato_il": "2026-10-15"
+            },
+            {
+              "id": "demo-onco",
+              "nome": "Oncologia – Day Hospital",
+              "tipo": "Day Hospital",
+              "ingresso": "demo-vv-ingc",
+              "ascensore": "demo-vv-asc3",
+              "piano": 2,
+              "dove": "Accettazione DH di fronte all'ascensore",
+              "note": "Prenotare il trasporto di ritorno al banco accettazione.",
+              "kw": "oncologia dh day hospital chemio terapia",
+              "verificato_il": "2026-10-19"
+            }
           ]
         },
         {
@@ -76,13 +240,34 @@
           "nome": "Sede Sud",
           "indirizzo": "Via Roma 140",
           "ingressi": [
-            { "id": "demo-vv-ing2", "nome": "Ingresso 2", "sigla": "2", "nota": "Ingresso laterale, rampa a sinistra" }
+            {
+              "id": "demo-vv-ing2",
+              "nome": "Ingresso 2",
+              "sigla": "2",
+              "nota": "Ingresso laterale, rampa a sinistra",
+              "piano": 0
+            }
           ],
           "ascensori": [
-            { "id": "demo-vv-asc1", "sigla": "1", "tipo": "Montalettighe" }
+            {
+              "id": "demo-vv-asc1",
+              "sigla": "1",
+              "tipo": "Montalettighe"
+            }
           ],
           "reparti": [
-            { "id": "demo-tac", "nome": "Radiologia – TAC", "tipo": "Servizio", "ingresso": "demo-vv-ing2", "ascensore": "demo-vv-asc1", "piano": -1, "dove": "Seguire la linea gialla a terra", "note": "Portare impegnativa e referti precedenti; attesa in sala 2.", "kw": "radiologia tac rx raggi risonanza diagnostica", "verificato_il": "2026-10-12" }
+            {
+              "id": "demo-tac",
+              "nome": "Radiologia – TAC",
+              "tipo": "Servizio",
+              "ingresso": "demo-vv-ing2",
+              "ascensore": "demo-vv-asc1",
+              "piano": -1,
+              "dove": "Seguire la linea gialla a terra",
+              "note": "Portare impegnativa e referti precedenti; attesa in sala 2.",
+              "kw": "radiologia tac rx raggi risonanza diagnostica",
+              "verificato_il": "2026-10-12"
+            }
           ]
         }
       ]
@@ -99,13 +284,34 @@
           "nome": "Sede unica",
           "indirizzo": "Via Belvedere 1",
           "ingressi": [
-            { "id": "demo-c-ing", "nome": "Ingresso unico", "sigla": "U", "nota": "Davanti alla portineria" }
+            {
+              "id": "demo-c-ing",
+              "nome": "Ingresso unico",
+              "sigla": "U",
+              "nota": "Davanti alla portineria",
+              "piano": 0
+            }
           ],
           "ascensori": [
-            { "id": "demo-c-ascab", "sigla": "A / B", "tipo": "Pubblici" }
+            {
+              "id": "demo-c-ascab",
+              "sigla": "A / B",
+              "tipo": "Pubblici"
+            }
           ],
           "reparti": [
-            { "id": "demo-medicina", "nome": "Medicina Interna", "tipo": "Degenza", "ingresso": "demo-c-ing", "ascensore": "demo-c-ascab", "piano": 4, "dove": "Ala est", "note": "Le dimissioni di solito sono dopo le 11:00.", "kw": "medicina interna degenza ricovero", "verificato_il": "2026-10-02" }
+            {
+              "id": "demo-medicina",
+              "nome": "Medicina Interna",
+              "tipo": "Degenza",
+              "ingresso": "demo-c-ing",
+              "ascensore": "demo-c-ascab",
+              "piano": 4,
+              "dove": "Ala est",
+              "note": "Le dimissioni di solito sono dopo le 11:00.",
+              "kw": "medicina interna degenza ricovero",
+              "verificato_il": "2026-10-02"
+            }
           ]
         }
       ]

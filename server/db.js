@@ -92,7 +92,8 @@ export const ENTITIES = {
     order: 'ordine, nome'
   },
   ingressi: {
-    fields: { sede_id: 'ref!', nome: 'text!', sigla: 'text', nota: 'text', badge: 'badge', lat: 'real', lng: 'real', ordine: 'int' },
+    // piano = floor you enter at; corpo/punto = where it is on the 3D map (whole block, or a point)
+    fields: { sede_id: 'ref!', nome: 'text!', sigla: 'text', nota: 'text', badge: 'badge', piano: 'int', corpo: 'textnull', punto: 'point', ordine: 'int' },
     parent: { field: 'sede_id', table: 'sedi' },
     order: 'ordine, nome'
   },
@@ -104,7 +105,7 @@ export const ENTITIES = {
   reparti: {
     fields: {
       sede_id: 'ref!', nome: 'text!', tipo: 'text', ingresso_id: 'ref', ascensore_id: 'ref', piano: 'int',
-      dove: 'text', note: 'text', tel: 'text', kw: 'text', corpo: 'textnull'
+      dove: 'text', note: 'text', tel: 'text', kw: 'text', corpo: 'textnull', punto: 'point'
     },
     parent: { field: 'sede_id', table: 'sedi' },
     order: 'nome'
@@ -133,6 +134,12 @@ function coerce(type, value, name) {
       if (required && !s) throw new ValidationError(`Campo obbligatorio: ${name}`);
       if (s.length > 2000) throw new ValidationError(`Campo troppo lungo: ${name}`);
       return s || (t === 'text' ? '' : null);
+    }
+    case 'point': {
+      // A spot on the 3D map, in the map's plan coordinates.
+      const p = typeof value === 'string' ? (() => { try { return JSON.parse(value); } catch { return null; } })() : value;
+      if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y)) throw new ValidationError(`Punto non valido: ${name}`);
+      return JSON.stringify({ x: Math.round(p.x * 100) / 100, y: Math.round(p.y * 100) / 100 });
     }
     case 'bool':
       return value === true || value === 1 || value === '1' || value === 'true' ? 1 : 0;
@@ -169,7 +176,11 @@ export function openDb(file) {
 // Columns added after the first release; existing databases get them on startup.
 const ADDED_COLUMNS = [
   // { min, max, nomi: { "<piano>": "nome" } }: floors offered in the editor and custom floor names
-  ['ospedali', 'piani', 'TEXT']
+  ['ospedali', 'piani', 'TEXT'],
+  ['ingressi', 'piano', 'INTEGER'],
+  ['ingressi', 'corpo', 'TEXT'],
+  ['ingressi', 'punto', 'TEXT'],
+  ['reparti', 'punto', 'TEXT']
 ];
 
 function migrate(db) {
@@ -217,6 +228,9 @@ class Store {
       o.mappa = o.mappa ? JSON.parse(o.mappa) : null;
       o.piani = o.piani ? JSON.parse(o.piani) : null;
     }
+    for (const x of [...out.ingressi, ...out.reparti]) x.punto = x.punto ? JSON.parse(x.punto) : null;
+    // GPS columns of older releases are no longer used.
+    for (const x of out.ingressi) { delete x.lat; delete x.lng; }
     // Last change across all tables, so clients can tell whether their copy is current.
     const row = this.db.prepare('SELECT MAX(ts) AS ts FROM modifiche').get();
     out.aggiornato = row.ts || null;
