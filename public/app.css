@@ -260,6 +260,8 @@ a.hero-sub:hover { color: #FFFFFF; text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) { .jpulse { animation: none; } }
 .map-flabel { position: absolute; transform: translate(-100%, -50%); padding: 2px 6px; border-radius: 6px; font-size: 11px; font-weight: 800; pointer-events: none; }
 .map-blabel { position: absolute; transform: translate(-50%, -50%); font-size: 11px; font-weight: 800; pointer-events: none; white-space: nowrap; }
+.map-blabel.named { overflow: hidden; text-overflow: ellipsis; font-size: 11px !important; font-weight: 700; }
+.map-blabel.named b { font-weight: 800; margin-right: 5px; }
 .map-marker { position: absolute; transform: translate(-50%, -50%); height: 20px; padding: 0 7px; border-radius: 999px; background: #FFFFFF; color: var(--ink); font-size: 10px; font-weight: 800; display: flex; align-items: center; gap: 4px; pointer-events: none; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
 .map-marker .dot { width: 7px; height: 7px; border-radius: 999px; }
 .map-pin { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; pointer-events: none; }

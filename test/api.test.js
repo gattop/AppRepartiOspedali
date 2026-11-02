@@ -149,6 +149,17 @@ test('adds the new per-body fields to maps seeded by an older release', () => {
   assert.equal(after.blocks.length, mappa.blocks.length);
 });
 
+test('replaces a stored map with a newer drawing from the seed', () => {
+  const old = JSON.parse(store.get('ospedali', 'jesi').mappa);
+  delete old.versione;
+  old.rot = -28;
+  store.db.prepare('UPDATE ospedali SET mappa = ? WHERE id = ?').run(JSON.stringify(old), 'jesi');
+  updateSeededMaps(store);
+  const now = JSON.parse(store.get('ospedali', 'jesi').mappa);
+  assert.equal(now.versione, 2);
+  assert.equal(now.rot, -12);
+});
+
 test('writes one consistent backup per day and keeps the last N', () => {
   const bdir = path.join(dir, 'backup');
   for (const day of ['2026-10-30', '2026-10-31', '2026-11-01', '2026-11-02']) {

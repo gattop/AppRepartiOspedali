@@ -40,8 +40,14 @@ export function updateSeededMaps(store) {
       if (!o.mappa?.corpi) continue;
       const row = store.get('ospedali', o.id);
       if (!row?.mappa) continue;
-      const mappa = JSON.parse(row.mappa);
+      let mappa = JSON.parse(row.mappa);
       let changed = false;
+      // A newer drawing of the map in the seed replaces the stored one (bodies keep their ids,
+      // so wards and entrances stay where they are).
+      if ((o.mappa.versione || 1) > (mappa.versione || 1)) {
+        mappa = o.mappa;
+        changed = true;
+      }
       for (const [k, extra] of Object.entries(o.mappa.corpi)) {
         const cur = mappa.corpi?.[k];
         if (!cur) continue;

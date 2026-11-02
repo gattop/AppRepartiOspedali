@@ -9,7 +9,8 @@
       "prefisso_tel": "",
       "fonte": "Dati dal Piano di emergenza P.O. Carlo Urbani (rev. 2015): da verificare sul posto.",
       "mappa": {
-        "rot": -28,
+        "versione": 2,
+        "rot": -12,
         "livelli": [
           0,
           1,

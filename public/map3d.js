@@ -14,8 +14,7 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
   const selR = sel ? reparti.find((r) => r.id === sel) || null : null;
   const hi = target || (selR && selR.corpo != null ? { corpo: selR.corpo, liv: selR.piano, punto: selR.punto, text: selR.nome } : null);
   const th = (rot * Math.PI) / 180, c = Math.cos(th), s = Math.sin(th);
-  const SP = exp ? 46 : 26, TH = 7, T = 0.55, K = 10;
-  const top = (L) => L * SP + TH;
+  const TH = 7, T = 0.5, K = 10;
 
   let bx0 = Infinity, bx1 = -Infinity, by0 = Infinity, by1 = -Infinity;
   for (const b of B) {
@@ -23,6 +22,20 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
     by0 = Math.min(by0, b.y0); by1 = Math.max(by1, b.y1);
   }
   const cx = (bx0 + bx1) / 2, cy = (by0 + by1) / 2;
+
+  // Floor spacing: at any screen column a floor covers about (plan depth / cos θ) of depth, capped
+  // by the depth of the whole plan. Spacing floors more than that keeps them from interleaving
+  // whatever the rotation; "separa i piani" adds extra air.
+  let yrMin = Infinity, yrMax = -Infinity;
+  for (const b of B) {
+    for (const [x, y] of [[b.x0, b.y0], [b.x1, b.y0], [b.x0, b.y1], [b.x1, b.y1]]) {
+      const yr = (x - cx) * s + (y - cy) * c;
+      yrMin = Math.min(yrMin, yr); yrMax = Math.max(yrMax, yr);
+    }
+  }
+  const depth = Math.min((by1 - by0) / Math.max(Math.abs(c), 0.2), yrMax - yrMin) * K * T;
+  const SP = depth + TH + (exp ? 40 : 12);
+  const top = (L) => L * SP + TH;
 
   function P(x, y, z) {
     const xc = x - cx, yc = y - cy;
@@ -135,7 +148,14 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
       faces.push(html`<div class="mf${pulse}" aria-hidden="true" style="${topStyle}"></div>`);
     }
     if (it.mode === 'act' && it.b.label) {
-      blockLabels.push(html`<span class="map-blabel" style="${`left: ${sx(r.cen).toFixed(1)}px; top: ${sy(r.cen).toFixed(1)}px; color: ${it.isSel ? '#FFFFFF' : '#0F172A'}`}">${it.b.label}</span>`);
+      // On a wide stage, with one level shown, write the wards inside the block like the paper plan.
+      const b = it.b;
+      const span = Math.abs(sx(P(b.x1, (b.y0 + b.y1) / 2, it.zt)) - sx(P(b.x0, (b.y0 + b.y1) / 2, it.zt)));
+      const names = big && !b.node && list.length > 0 && span > 70 ? list.map((x) => x.nome.split(' – ')[0]).join(' · ') : '';
+      const css = `left: ${sx(r.cen).toFixed(1)}px; top: ${sy(r.cen).toFixed(1)}px; color: ${it.isSel ? '#FFFFFF' : '#0F172A'}`;
+      blockLabels.push(names
+        ? html`<span class="map-blabel named" style="${css + `; max-width: ${Math.round(span - 12)}px`}"><b>${b.label}</b>${names}</span>`
+        : html`<span class="map-blabel" style="${css}">${b.label}</span>`);
     }
   }
 
