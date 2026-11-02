@@ -1,5 +1,4 @@
 node_modules/
 data/
 .env
-oauth2-proxy.env
 public/icons/*.png

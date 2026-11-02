@@ -21,7 +21,7 @@ Internet ──► Traefik ──► oauth2-proxy ──► app (Node 24 + SQLit
 - `server/`: server HTTP in Node senza dipendenze npm (`node:http` + `node:sqlite`). API JSON più i file statici.
 - `public/`: frontend in JavaScript puro, senza build. Il service worker (`sw.js`) tiene in cache l'app e i dati.
 - `server/seed/`: dati caricati al primo avvio, solo se il database è vuoto. `jesi.json` è reale (Piano di emergenza 2015, da verificare); `demo.json` è finto e si carica solo con `SEED_DEMO=true`.
-- Il database è `/data/reparti.db` nel volume `data`. Ogni modifica finisce anche nella tabella `modifiche` (chi, quando, cosa).
+- Il database è `data/reparti.db` nella cartella del compose (montata in `/data` nel container, esclusa da git). Ogni modifica finisce anche nella tabella `modifiche` (chi, quando, cosa).
 
 L'app non gestisce login: si fida degli header `X-Forwarded-Preferred-Username/Email/Groups` messi da oauth2-proxy. Per questo il container `app` **non va mai collegato alla rete di Traefik né esposto con una porta**.
 
@@ -46,62 +46,56 @@ Con `DEV_USER` impostato l'app ti considera loggato con quel nome e con i permes
 | tag `v1.2.3`        | `1.2.3`, `1.2`, `sha-xxxxxxx`              |
 | pull request        | build e test, nessun push                  |
 
-L'immagine è `ghcr.io/<owner>/<repo>` in minuscolo, per esempio `ghcr.io/pippi/apprepartiospedali`. Se il repo è privato anche il package lo è: sulla VPS fai login con un Personal Access Token (classic) che ha solo lo scope `read:packages`:
-
-```sh
-echo <TOKEN> | docker login ghcr.io -u <utente-github> --password-stdin
-```
+L'immagine è `ghcr.io/<owner>/<repo>` in minuscolo, per esempio `ghcr.io/pippi/apprepartiospedali`. Con il repo pubblico anche il package è pubblico (verifica in *Packages → Package settings → visibility*), quindi sulla VPS non serve `docker login`.
 
 ## Configurazione Keycloak
 
-Nel realm che usi già:
+Su `https://login.gattp.it/admin/`, realm **vps.homelab**:
 
 1. **Clients → Create client**
    - Client type: OpenID Connect, Client ID: `reparti`
    - Client authentication: **On** (client confidenziale), Standard flow: On
-   - Valid redirect URIs: `https://reparti.example.com/oauth2/callback`
-   - Valid post logout redirect URIs: `https://reparti.example.com/*`
-   - Web origins: `https://reparti.example.com`
-2. **Credentials** del client: copia il *Client secret* in `oauth2-proxy.env`.
-3. **Audience mapper** (oauth2-proxy lo richiede): *Client scopes → reparti-dedicated → Add mapper → By configuration → Audience*, Included Client Audience = `reparti`, Add to access token = On.
-4. **Ruoli** (facoltativi):
-   - `reparti-editor` (ruolo di realm): chi può modificare. Corrisponde a `EDITOR_GROUPS=role:reparti-editor` nel `.env`.
-   - `reparti-user`: se vuoi che solo alcuni utenti del realm possano entrare, attiva `OAUTH2_PROXY_ALLOWED_ROLES=reparti-user` in `oauth2-proxy.env`.
+   - Valid redirect URIs: `https://ospedali.kyrie.ee/oauth2/callback`
+   - Valid post logout redirect URIs: `https://ospedali.kyrie.ee/*`
+   - Web origins: `https://ospedali.kyrie.ee`
+2. **Credentials** del client: copia il *Client secret* in `OIDC_CLIENT_SECRET` nel `.env`.
+3. **Realm roles → Create role** `reparti-editor` e assegnalo (*Users → utente → Role mapping*) a chi deve poter modificare. Se non lo vuoi, metti `EDITOR_GROUPS=` (vuoto) nel `.env`: allora possono modificare tutti gli utenti autenticati.
+
+Se dopo il login i log di oauth2-proxy mostrano `audience ... does not match`, aggiungi `OAUTH2_PROXY_OIDC_EXTRA_AUDIENCES: account` all'`environment` di oauth2-proxy nel compose.
 
 ## Deploy sulla VPS
 
+Tutta la configurazione non segreta (dominio, Keycloak, Traefik) è nel [docker-compose.yml](docker-compose.yml) come default. Sulla VPS il `.env`, che non va nel repo, contiene solo l'immagine e i due segreti:
+
 ```sh
-mkdir -p /opt/reparti && cd /opt/reparti
-# copia qui docker-compose.yml, .env.example e oauth2-proxy.env.example dal repo
-cp .env.example .env                       # dominio, immagine, rete/resolver Traefik, EDITOR_GROUPS
-cp oauth2-proxy.env.example oauth2-proxy.env   # issuer Keycloak, client id/secret, cookie secret
-chmod 600 oauth2-proxy.env
+git clone https://github.com/<utente>/AppRepartiOspedali.git /opt/reparti && cd /opt/reparti
+cp .env.example .env && chmod 600 .env
+openssl rand -base64 32 | tr -- '+/' '-_'   # -> COOKIE_SECRET
+nano .env                                   # IMAGE, OIDC_CLIENT_SECRET, COOKIE_SECRET
 
 docker compose pull
 docker compose up -d
 docker compose logs -f
 ```
 
-Il compose presuppone che la rete Docker di Traefik (`proxy`) esista già, e che Traefik abbia l'entrypoint `websecure` e il certresolver `le`. Tutti e tre si cambiano nel `.env`.
+Il compose presuppone che la rete Docker di Traefik (`proxy`) esista già, e che Traefik abbia l'entrypoint `websecure` e il certresolver `le`. Si possono cambiare nel `.env` (vedi le righe commentate in [.env.example](.env.example)).
 
 ### Aggiornare
 
 Dopo ogni push su `main`:
 
 ```sh
-cd /opt/reparti && docker compose pull && docker compose up -d
+cd /opt/reparti && git pull && docker compose pull && docker compose up -d
 ```
 
 Per tornare a una versione precedente imposta `TAG=sha-xxxxxxx` (o `TAG=1.2.3`) nel `.env` e rilancia `up -d`. Il service worker scarica la nuova versione dell'app alla prima apertura successiva.
 
 ### Backup
 
-Il database è un unico file SQLite nel volume. Backup consistente anche ad app avviata:
+Tutti i dati sono in `./data` accanto al `docker-compose.yml`. Per un backup basta copiare la cartella ad app ferma (`docker compose stop app`). Ad app avviata, questo comando crea una copia consistente in `./data/backups/`:
 
 ```sh
-docker compose exec app rm -f /data/backup.db
-docker compose exec app node -e "new (require('node:sqlite').DatabaseSync)('/data/reparti.db').exec(\"VACUUM INTO '/data/backup.db'\")"
-docker compose cp app:/data/backup.db ./reparti-$(date +%F).db
+docker compose exec -u node app node -e "require('fs').mkdirSync('/data/backups',{recursive:true});new (require('node:sqlite').DatabaseSync)('/data/reparti.db').exec(\"VACUUM INTO '/data/backups/reparti-$(date +%F-%H%M).db'\")"
 ```
 
 ## Variabili d'ambiente dell'app

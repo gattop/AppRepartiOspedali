@@ -4,17 +4,22 @@
 #
 # L'app non è mai sulla rete di Traefik: ogni richiesta passa da oauth2-proxy, che gestisce
 # il login e passa l'utente all'app negli header X-Forwarded-*.
-# Configurazione: .env (vedi .env.example) e oauth2-proxy.env (vedi oauth2-proxy.env.example).
+#
+# Qui c'è tutta la configurazione non segreta (con valori di default sovrascrivibili).
+# I segreti stanno solo nel file .env sulla VPS, che non va nel repo: vedi .env.example.
 
 services:
   app:
-    image: ${IMAGE:-ghcr.io/owner/apprepartiospedali}:${TAG:-latest}
+    image: ${IMAGE:?imposta IMAGE nel .env}:${TAG:-latest}
     restart: unless-stopped
     environment:
-      EDITOR_GROUPS: ${EDITOR_GROUPS:-}
+      # Ruoli Keycloak che possono modificare i dati; vuoto = tutti gli utenti autenticati
+      EDITOR_GROUPS: ${EDITOR_GROUPS-role:reparti-editor}
+      # true = al primo avvio carica anche gli ospedali di esempio (finti)
       SEED_DEMO: ${SEED_DEMO:-false}
     volumes:
-      - data:/data
+      # Database e backup nella cartella del compose (./data, esclusa da git)
+      - ./data:/data
     networks:
       internal:
         aliases:
@@ -26,13 +31,15 @@ services:
     depends_on:
       app:
         condition: service_healthy
-    env_file:
-      - oauth2-proxy.env
     environment:
       OAUTH2_PROXY_PROVIDER: keycloak-oidc
+      OAUTH2_PROXY_OIDC_ISSUER_URL: ${OIDC_ISSUER_URL:-https://login.gattp.it/realms/vps.homelab}
+      OAUTH2_PROXY_CLIENT_ID: ${OIDC_CLIENT_ID:-reparti}
+      OAUTH2_PROXY_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:?imposta OIDC_CLIENT_SECRET nel .env}
+      OAUTH2_PROXY_COOKIE_SECRET: ${COOKIE_SECRET:?imposta COOKIE_SECRET nel .env}
       OAUTH2_PROXY_HTTP_ADDRESS: 0.0.0.0:4180
       OAUTH2_PROXY_UPSTREAMS: http://reparti-app:3000/
-      OAUTH2_PROXY_REDIRECT_URL: https://${APP_HOST}/oauth2/callback
+      OAUTH2_PROXY_REDIRECT_URL: https://${APP_HOST:-ospedali.kyrie.ee}/oauth2/callback
       OAUTH2_PROXY_REVERSE_PROXY: "true"
       OAUTH2_PROXY_PASS_USER_HEADERS: "true"
       OAUTH2_PROXY_SKIP_PROVIDER_BUTTON: "true"
@@ -53,7 +60,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=${TRAEFIK_NETWORK:-proxy}
-      - traefik.http.routers.reparti-ospedali.rule=Host(`${APP_HOST}`)
+      - traefik.http.routers.reparti-ospedali.rule=Host(`${APP_HOST:-ospedali.kyrie.ee}`)
       - traefik.http.routers.reparti-ospedali.entrypoints=${TRAEFIK_ENTRYPOINT:-websecure}
       - traefik.http.routers.reparti-ospedali.tls=true
       - traefik.http.routers.reparti-ospedali.tls.certresolver=${TRAEFIK_CERTRESOLVER:-le}
@@ -64,6 +71,3 @@ networks:
   proxy:
     external: true
     name: ${TRAEFIK_NETWORK:-proxy}
-
-volumes:
-  data:
