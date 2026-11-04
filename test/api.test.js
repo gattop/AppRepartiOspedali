@@ -227,6 +227,11 @@ test('writes one consistent backup per day and keeps the last N', () => {
 test('serves the app shell with the build version', async () => {
   const sw = await (await req('GET', '/sw.js')).text();
   assert.match(sw, /VERSION = 'test123'/);
+  // The offline cache lists every file of the app, modules in subfolders and photos included.
+  const files = JSON.parse(sw.match(/const SHELL = (\[.*?\]);/)[1]);
+  for (const f of ['/', '/app.js', '/app.css', '/views/mappa.js', '/map/map3d.js', '/img/jesi.webp']) assert.ok(files.includes(f), f);
+  assert.ok(!files.includes('/sw.js') && !files.includes('/index.html'));
+  for (const f of files.filter((x) => x !== '/')) assert.equal((await req('GET', f)).status, 200, f);
   const page = await req('GET', '/reparto/qualcosa');
   assert.equal(page.status, 200);
   assert.match(await page.text(), /<div id="app"/);

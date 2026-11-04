@@ -1,16 +1,15 @@
-import { html, raw } from './util.js';
-import { pinShift, ICON_PLUS, ICON_MINUS, ICON_FIT } from './map3d.js';
+import { html, raw } from '../util.js';
+import { highlightOf, labelSpace, pinHtml, routeSvg, controls, hintAndLegend } from './common.js';
 
 // Flat plan seen from above, for hospitals without a 3D drawing (map `tipo: 'pianta'`).
 // `mappa`   = { view: {x0, y0, x1, y1}, blocks: [{id, label, poly: [[x, y]...], l: [x, y], colore, lv}],
 //              decor: { area, strade, edifici, percorsi, scritte }, corpi, livelli }
 // Same options and return value as renderMap (map3d.js); the level only decides which
 // buildings are lit and whose ward names are written, since every floor shares the plan.
-export function renderPlan({ mappa, reparti, sel, lvl, width, height = 300, target, points = [], pick = false, route = null, zoom = 1, panX = 0, panY = 0 }) {
+export function renderPlan({ mappa, reparti, sel, lvl, width, height = 300, target, points = [], pick = false, route = null, zoom = 1, panX = 0, panY = 0, corpoWord = 'Palazzina' }) {
   const B = mappa.blocks || [];
   const byId = Object.fromEntries(B.map((b) => [b.id, b]));
-  const selR = sel ? reparti.find((r) => r.id === sel) || null : null;
-  const hi = target || (selR && selR.corpo != null ? { corpo: selR.corpo, liv: selR.piano, punto: selR.punto, text: selR.nome } : null);
+  const hi = highlightOf(reparti, sel, target);
   const v = mappa.view;
 
   const W = width, H = height;
@@ -28,6 +27,7 @@ export function renderPlan({ mappa, reparti, sel, lvl, width, height = 300, targ
   const pts = (poly) => poly.map(([x, y]) => `${sx(x).toFixed(1)},${sy(y).toFixed(1)}`).join(' ');
   const clip = (poly) => 'polygon(' + poly.map(([x, y]) => `${sx(x).toFixed(1)}px ${sy(y).toFixed(1)}px`).join(', ') + ')';
 
+  // Where a building's letter goes (its label point, else the middle of its outline).
   const anchor = (b) => b.l || bbox(b.poly).c;
   function spot(corpo, punto) {
     const b = byId[corpo];
@@ -51,19 +51,21 @@ export function renderPlan({ mappa, reparti, sel, lvl, width, height = 300, targ
     ${(d.edifici || []).map((e) => html`<polygon class="p-other ${e.cls || ''}" points="${pts(e.poly)}"></polygon>`)}
     ${(d.percorsi || []).map((p) => html`<polyline class="p-path" points="${pts(p)}"></polyline>`)}`;
 
-  const shapes = [], buttons = [], cands = [], taken = [];
+  const shapes = [], buttons = [], cands = [];
+  const levelAttr = lvl === 'all' ? '' : raw(`data-liv="${lvl}"`);
   for (const b of B) {
     const lit = onLevel(b);
     const isSel = !!(hi && hi.corpo === b.id);
     const name = mappa.corpi?.[b.id]?.label || b.label || b.id;
+    // Building colours come with the map (each building its own colour, as on the paper plan).
     shapes.push(html`<polygon class="p-bld${lit ? '' : ' dim'}${isSel ? ' sel' : ''}${isSel && !hi.punto ? ' jpulse' : ''}" points="${pts(b.poly)}" style="${`fill: ${b.colore}`}"></polygon>`);
     const list = (byBlock[b.id] || []).filter((r) => lvl === 'all' || r.piano === lvl);
     const css = `clip-path: ${clip(b.poly)}`;
     if (pick) {
-      buttons.push(html`<button type="button" class="mf mf-btn" data-act="pickBlock" data-corpo="${b.id}" ${lvl === 'all' ? '' : raw(`data-liv="${lvl}"`)} aria-label="${`Palazzina ${name}`}" style="${css}"></button>`);
+      buttons.push(html`<button type="button" class="mf mf-btn" data-act="pickBlock" data-corpo="${b.id}" ${levelAttr} aria-label="${`${corpoWord} ${name}`}" style="${css}"></button>`);
     } else if (list.length > 0) {
-      const label = `Palazzina ${name}: ${list.map((x) => x.nome).join(', ')}`;
-      buttons.push(html`<button type="button" class="mf mf-btn" data-act="mapPick" data-id="${list[0].id}" ${lvl === 'all' ? '' : raw(`data-liv="${lvl}"`)} aria-label="${label}" style="${css}"></button>`);
+      const label = `${corpoWord} ${name}: ${list.map((x) => x.nome).join(', ')}`;
+      buttons.push(html`<button type="button" class="mf mf-btn" data-act="mapPick" data-id="${list[0].id}" ${levelAttr} aria-label="${label}" style="${css}"></button>`);
     }
     const [lx, ly] = anchor(b);
     const style = `left: ${sx(lx).toFixed(1)}px; top: ${sy(ly).toFixed(1)}px; color: ${ink(b.colore)}${lit ? '' : '; opacity: 0.45'}`;
@@ -73,7 +75,8 @@ export function renderPlan({ mappa, reparti, sel, lvl, width, height = 300, targ
     // The ward names sit in a box (up to 150px wide, 3 lines) under the letter.
     const nw = Math.min(150, names.length * 5.8 + 12);
     const nh = Math.min(3, Math.ceil((names.length * 5.8) / (nw - 12))) * 13 + 6;
-    cands.push({ x: sx(lx), y: sy(ly), prio: isSel ? 0 : 1, letter, full: names ? { w: Math.max(nw, 16), h: 19 + nh, html: html`<span class="map-plabel" style="${style}"><b>${b.label || b.id}</b><span class="n">${names}</span></span>` } : null });
+    const full = names ? { w: Math.max(nw, 16), h: 19 + nh, html: html`<span class="map-plabel" style="${style}"><b>${b.label || b.id}</b><span class="n">${names}</span></span>` } : null;
+    cands.push({ x: sx(lx), y: sy(ly), prio: isSel ? 0 : 1, variants: [full, letter] });
   }
 
   const text = (d.scritte || []).map((t) => {
@@ -82,67 +85,39 @@ export function renderPlan({ mappa, reparti, sel, lvl, width, height = 300, targ
   });
 
   // Doors, numbered like the signs on site; the one the route starts from stands out.
+  const space = labelSpace();
   const start = route?.[0];
   const markers = points.map((m) => {
     const p = spot(m.corpo, m.punto);
     if (!p) return '';
-    taken.push({ x: p.x, y: p.y, w: m.text.length * 7 + 14, h: 20 });
+    space.take({ x: p.x, y: p.y, w: m.text.length * 7 + 14, h: 20 });
     const on = start && start.corpo === m.corpo && start.punto && m.punto && start.punto.x === m.punto.x && start.punto.y === m.punto.y;
-    return html`<span class="map-door${on ? ' on' : ''}" style="${`left: ${p.x.toFixed(1)}px; top: ${p.y.toFixed(1)}px; background: ${m.dot}`}">${m.text}</span>`;
+    return html`<span class="map-door${m.amb ? ' amb' : ''}${on ? ' on' : ''}" style="${`left: ${p.x.toFixed(1)}px; top: ${p.y.toFixed(1)}px`}">${m.text}</span>`;
   });
 
-  let routeSvg = '';
   const rpts = (route || []).map((p) => ({ ...p, at: spot(p.corpo, p.punto) })).filter((p) => p.at);
-  if (rpts.length >= 2) {
-    const dd = rpts.map((p, i) => `${i ? 'L' : 'M'}${p.at.x.toFixed(1)} ${p.at.y.toFixed(1)}`).join(' ');
-    routeSvg = html`<svg class="map-route" width="${W}" height="${H}" viewBox="${`0 0 ${W} ${H}`}" aria-hidden="true">
-      <path class="halo" d="${dd}"></path><path class="line" d="${dd}"></path>
-    </svg>`;
-  }
+  const path = rpts.length >= 2 ? routeSvg(W, H, rpts) : '';
 
   let pin = '';
-  if (hi) {
-    const p = spot(hi.corpo, hi.punto);
-    if (p) {
-      pin = html`<div class="map-pin${hi.punto ? ' exact' : ''}" aria-hidden="true" style="${`left: ${p.x.toFixed(1)}px; top: ${p.y.toFixed(1)}px`}">
-        ${hi.text && html`<span class="t" style="${`transform: translateX(${pinShift(p.x, W)}px)`}">${hi.text}</span>`}<span class="stick"></span><span class="head"></span>
-      </div>`;
-    }
+  const hp = hi && spot(hi.corpo, hi.punto);
+  if (hp) {
+    pin = pinHtml(hp, hi, W);
+    space.take({ x: hp.x, y: hp.y - 30, w: Math.min(200, (hi.text || '').length * 7.4 + 20), h: 30 });
   }
 
   // Doors and the chosen pin first; then names, the chosen building first. A name box that would
   // cover a door or another label is dropped, leaving just the building's letter.
-  const hits = (a) => taken.some((t) => Math.abs(a.x - t.x) < (a.w + t.w) / 2 && Math.abs(a.y - t.y) < (a.h + t.h) / 2);
-  if (hi) {
-    const p = spot(hi.corpo, hi.punto);
-    if (p) taken.push({ x: p.x, y: p.y - 30, w: Math.min(200, (hi.text || '').length * 7.4 + 20), h: 30 });
-  }
-  const labels = [];
-  for (const c of cands.sort((a, b) => a.prio - b.prio)) {
-    const [fx, fy] = [c.x, c.y];
-    if (c.full && !hits({ x: fx, y: fy, w: c.full.w, h: c.full.h })) {
-      taken.push({ x: fx, y: fy, w: c.full.w, h: c.full.h });
-      labels.push(c.full.html);
-    } else {
-      taken.push({ x: fx, y: fy, w: c.letter.w, h: c.letter.h });
-      labels.push(c.letter.html);
-    }
-  }
+  const labels = space.place(cands, { fallback: true });
 
   const out = html`
     <svg class="map-plan" width="${W}" height="${H}" viewBox="${`0 0 ${W} ${H}`}" aria-hidden="true">${decor}${shapes}</svg>
-    ${buttons}${text}${routeSvg}${markers}${labels}${pin}
-    <div class="map-ctrl">
-      <button type="button" class="map-cbtn" data-act="mapZoom" data-f="1.5" aria-label="Ingrandisci">${raw(ICON_PLUS)}</button>
-      <button type="button" class="map-cbtn" data-act="mapZoom" data-f="0.6667" aria-label="Riduci" ${zoom <= 1.001 ? raw('disabled') : ''}>${raw(ICON_MINUS)}</button>
-      ${(zoom > 1.001 || !!panX || !!panY) && html`<button type="button" class="map-cbtn" data-act="mapReset" aria-label="Vista iniziale">${raw(ICON_FIT)}</button>`}
-    </div>
-    <span class="map-hint" aria-hidden="true">${big ? 'Trascina per spostare · rotella o due dita per lo zoom' : 'Due dita: zoom e sposta'}</span>
-    <div class="map-legend" aria-hidden="true">
-      <span><span class="sw ring"></span>${pick ? 'Posizione scelta' : 'Reparto'}</span>
-      ${points.length > 0 && html`<span><span class="sw round" style="background: #16A34A"></span>Ingressi</span>`}
-      ${d.percorsi?.length > 0 && html`<span><span class="sw dash"></span>Percorso principale</span>`}
-    </div>`;
+    ${buttons}${text}${path}${markers}${labels}${pin}
+    ${controls({ zoom, panX, panY })}
+    ${hintAndLegend(big ? 'Trascina per spostare · rotella o due dita per lo zoom' : 'Due dita: zoom e sposta', [
+      ['ring', pick ? 'Posizione scelta' : 'Reparto'],
+      points.length > 0 && ['round door', 'Ingressi'],
+      d.percorsi?.length > 0 && ['dash', 'Percorso principale']
+    ])}`;
 
   out.geo = {
     unproject: (px, py) => ({ x: (px - ox) / f, y: (py - oy) / f }),

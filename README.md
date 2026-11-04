@@ -22,7 +22,25 @@ Internet ──► Traefik ──► oauth2-proxy ──► app (Node 24 + SQLit
 ```
 
 - `server/`: server HTTP in Node senza dipendenze npm (`node:http` + `node:sqlite`). API JSON più i file statici.
-- `public/`: frontend in JavaScript puro, senza build. Il service worker (`sw.js`) tiene in cache l'app e i dati.
+- `public/`: frontend in JavaScript puro (moduli ES), senza build. Il service worker (`sw.js`) tiene in cache l'app e i dati: l'elenco dei file lo scrive il server, quindi un file nuovo in `public/` non va aggiunto da nessuna parte (né lì, né nelle rotte pubbliche del compose, che riconoscono i file dall'estensione).
+
+### Struttura del frontend
+
+| File | Cosa contiene |
+|---|---|
+| `app.js` | punto d'ingresso: quale schermata per quale indirizzo, disegno della pagina, smistamento degli eventi |
+| `router.js` | **l'unica tabella degli indirizzi** (`#/reparto/:id`…): i link si costruiscono con `href('reparto', id)`; regole di Indietro/Annulla |
+| `data.js` | stato (`S`), indici (`X`), chiamate all'API, copia offline |
+| `domain.js` | regole sugli ospedali: nomi dei piani (`floorWord`, `pianoInfo`), corpi/palazzine, percorso, telefono |
+| `icons.js` | icone dell'interfaccia e icona per ogni tipo di reparto (regole sul nome) |
+| `ui.js` | `render()`, messaggi, `mutate()` (salva, ricarica, avvisa) |
+| `views/*.js` | le schermate; ognuna esporta accanto al suo HTML i propri gestori (`handlers.act/input/change/submit/key`) |
+| `map/stage.js` | stato unico di tutte le mappe sullo schermo (`S.stages`), zoom, scelta della posizione nei moduli |
+| `map/map3d.js`, `map/map2d.js` | disegno della mappa 3D e della pianta 2D; le parti comuni sono in `map/common.js` |
+| `map/gestures.js` | trascinamento, pinch, rotella, doppio clic, tocco a vuoto |
+| `app.css` | un blocco per componente; i colori delle mappe sono variabili `--m-*` su `.map-stage` |
+
+Gli eventi sono delegati: un elemento con `data-act="nome"` esegue `handlers.act.nome` della sua schermata (lo stesso per `data-input`, `data-change`, `data-submit`). Un nome usato da due schermate blocca l'avvio con un errore, così non si sovrascrivono a vicenda.
 - `server/seed/`: dati caricati al primo avvio, solo se il database è vuoto. `jesi.json` è reale (Piano di emergenza 2015, da verificare); `demo.json` è finto e si carica solo con `SEED_DEMO=true`.
 - Il database è `data/reparti.db` nella cartella del compose (montata in `/data` nel container, esclusa da git). Ogni modifica finisce anche nella tabella `modifiche` (chi, quando, cosa).
 

@@ -3,7 +3,9 @@ const VERSION = '__APP_VERSION__';
 const SHELL_CACHE = 'reparti-shell-' + VERSION;
 const DATA_CACHE = 'reparti-data';
 const FONT_CACHE = 'reparti-fonts';
-const SHELL = ['/', '/app.css', '/app.js', '/util.js', '/map3d.js', '/map2d.js', '/theme.js', '/manifest.webmanifest', '/icons/icon.svg', '/icons/icon-192.png'];
+// Every file of the app (scripts, styles, icons, hospital photos): the server writes the list,
+// so a new file is cached without touching this one.
+const SHELL = __APP_FILES__;
 const NETWORK_TIMEOUT = 5000;
 
 self.addEventListener('install', (event) => {

@@ -69,6 +69,18 @@ function readJson(req) {
   });
 }
 
+// Paths of the files the service worker caches for offline use: everything in public/ but the
+// worker itself and the page (cached as "/").
+export function appFiles(dir = PUBLIC, base = '') {
+  const out = [];
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const rel = base + '/' + e.name;
+    if (e.isDirectory()) out.push(...appFiles(path.join(dir, e.name), rel));
+    else if (TYPES[path.extname(e.name)] && rel !== '/sw.js' && rel !== '/index.html') out.push(rel);
+  }
+  return out;
+}
+
 function serveStatic(req, res, pathname, cfg) {
   let rel = decodeURIComponent(pathname);
   if (rel === '/' || !path.extname(rel)) rel = '/index.html';
@@ -87,7 +99,9 @@ function serveStatic(req, res, pathname, cfg) {
     }
     // The service worker carries the build version so each deploy refreshes the offline cache.
     if (rel === '/sw.js' || rel === '/index.html') {
-      const body = fs.readFileSync(file, 'utf8').replaceAll('__APP_VERSION__', cfg.version);
+      const body = fs.readFileSync(file, 'utf8')
+        .replaceAll('__APP_VERSION__', cfg.version)
+        .replace('__APP_FILES__', () => JSON.stringify(['/', ...appFiles()]));
       res.writeHead(200, headers);
       return res.end(req.method === 'HEAD' ? undefined : body);
     }
