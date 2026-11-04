@@ -40,6 +40,8 @@ const ICON = {
   layers: (w = 20) => svg('<path d="M12 3l9 5-9 5-9-5z"></path><path d="M3 13l9 5 9-5"></path>', { w }),
   check: (w = 18) => svg('<path d="M5 12l5 5L20 7"></path>', { w, sw: 2.4 }),
   pin: (w = 18) => svg('<path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle>', { w }),
+  sun: (w = 22) => svg('<circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>', { w }),
+  moon: (w = 22) => svg('<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"></path>', { w }),
   user: (w = 22) => svg('<circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path>', { w })
 };
 
@@ -300,6 +302,8 @@ function banner() {
   return '';
 }
 
+const isDark = () => (document.documentElement.dataset.theme ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark';
+
 function tabbar(active) {
   const items = [
     ['ospedali', '#/', 'Ospedali', ICON.hospital(22)],
@@ -308,8 +312,10 @@ function tabbar(active) {
   if (S.me.canEdit) items.push(['aggiungi', '#/aggiungi', 'Aggiungi', ICON.plus(22)]);
   // Login is optional (only needed to edit): offered while not logged in and online.
   else if (!S.me.user && !S.offline) items.push(['accedi', loginUrl(), 'Accedi', ICON.user(22)]);
-  return html`<nav class="tabbar" style="grid-template-columns: repeat(${items.length}, minmax(0, 1fr))">
+  const dark = isDark();
+  return html`<nav class="tabbar" style="grid-template-columns: repeat(${items.length + 1}, minmax(0, 1fr))">
     ${items.map(([k, href, label, icon]) => html`<a href="${href}" class="${k === active ? 'on' : ''} ${k === 'accedi' ? 'login' : ''}" ${k === active ? raw('aria-current="page"') : ''}>${icon}${label}</a>`)}
+    <button type="button" data-act="theme" aria-label="${dark ? 'Tema chiaro' : 'Tema scuro'}" title="${dark ? 'Tema chiaro' : 'Tema scuro'}">${dark ? ICON.sun(22) : ICON.moon(22)}Tema</button>
   </nav>`;
 }
 
@@ -418,7 +424,7 @@ function viewOspedali() {
           ${S.me.canEdit && html`<a class="hbtn" href="#/ospedali/nuovo">${ICON.plus(20)}Nuovo</a>`}
         </div>
       </div>
-      <h1>Dove devi portare il paziente?</h1>
+      <h1>Dove devi portare il <span class="serif-i">paziente?</span></h1>
       <span class="hero-sub">Scegli l'ospedale</span>
     </header>
     <main class="scroll pad col gap14 hosp-list">
@@ -428,6 +434,7 @@ function viewOspedali() {
         return html`<a class="hcard" href="#/ospedale/${encodeURIComponent(o.id)}">
           ${o.foto ? html`<img src="${o.foto}" alt="" ${i === 0 ? raw('fetchpriority="high"') : raw('loading="lazy"')} decoding="async">` : html`<span class="hcard-ph">${ICON.hospital(56)}</span>`}
           <span class="hcard-shade"></span>
+          <span class="hcard-num">${String(i + 1).padStart(2, '0')}<i>/</i>${o.citta || 'Ospedale'}</span>
           <span class="hcard-text">
             <b>${o.nome}</b>
             <span class="hcard-city">${[o.indirizzo, o.citta].filter(Boolean).join(', ')}</span>
@@ -1246,6 +1253,7 @@ function render() {
   };
   $app.innerHTML = String(route()) + String(toast());
   drawStages();
+  reveal();
   // Re-renders triggered by a save, a toast or a data reload shouldn't steal the caret from a
   // field (e.g. tabbing to the next field in "Gestisci" while the previous one is saving).
   if (keep && (keep.id || keep.input)) {
@@ -1259,6 +1267,39 @@ function render() {
   }
 }
 
+// ---------------------------------------------------------------- entrance animation
+// Each time a new screen opens (not on every re-render of the same one), its blocks come in as on
+// kyrie.ee: up from 28 px, unblurring, in a short wave; the ones below the fold as they scroll in.
+
+const REVEAL = '.hero > *, .hcard, .rcard, .ocard, .tiles, .panel, .sec, .grow-r, .empty, .who, .form > *';
+let revealedPath = null;
+let revealObserver = null;
+
+function reveal() {
+  const path = location.hash.split('?')[0];
+  if (path === revealedPath) return;
+  revealedPath = path;
+  revealObserver?.disconnect();
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  $app.querySelector('.hero')?.classList.add('draw');
+  const els = [...$app.querySelectorAll(REVEAL)].slice(0, 40);
+  let wave = 0;
+  revealObserver = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (!e.isIntersecting) continue;
+      const el = e.target;
+      revealObserver.unobserve(el);
+      el.style.setProperty('--d', Math.min(wave++ * 0.05, 0.4) + 's');
+      requestAnimationFrame(() => el.classList.add('in'));
+    }
+    wave = Math.max(0, wave - 4);
+  }, { rootMargin: '0px 0px -6% 0px' });
+  for (const el of els) {
+    el.classList.add('rv');
+    revealObserver.observe(el);
+  }
+}
+
 // ---------------------------------------------------------------- actions
 
 function draftChanged() {
@@ -1267,6 +1308,17 @@ function draftChanged() {
 
 const ACT = {
   reload: () => start(),
+  // Light/dark, with the colour tokens fading over 0.4 s (as on kyrie.ee).
+  theme: () => {
+    const root = document.documentElement;
+    const next = isDark() ? 'light' : 'dark';
+    root.classList.add('theme-anim');
+    root.dataset.theme = next;
+    try { localStorage.setItem('theme', next); } catch { /* storage unavailable */ }
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', next === 'dark' ? '#121316' : '#f2f1ee');
+    setTimeout(() => root.classList.remove('theme-anim'), 450);
+    render();
+  },
   back: () => (history.length > 1 ? history.back() : (location.hash = '#/')),
   toggleFav: ({ id }) => {
     S.fav.has(id) ? S.fav.delete(id) : S.fav.add(id);

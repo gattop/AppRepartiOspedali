@@ -60,7 +60,7 @@ services:
       OAUTH2_PROXY_COOKIE_REFRESH: 1h
       # Consultazione pubblica: la pagina, i file dell'app e i dati (GET /api/data) non chiedono
       # il login. Il login serve solo per /api/me (chi sei) e per qualsiasi modifica.
-      OAUTH2_PROXY_SKIP_AUTH_ROUTES: 'GET=^/($$|(app|util|map3d|map2d|sw)\.js$$|app\.css$$|manifest\.webmanifest$$|favicon\.ico$$|icons/|img/|api/data$$|healthz$$)'
+      OAUTH2_PROXY_SKIP_AUTH_ROUTES: 'GET=^/($$|(app|util|map3d|map2d|theme|sw)\.js$$|app\.css$$|manifest\.webmanifest$$|favicon\.ico$$|icons/|img/|api/data$$|healthz$$)'
       # Sulle richieste pubbliche toglie eventuali header di identità falsificati dal client.
       OAUTH2_PROXY_SKIP_AUTH_STRIP_HEADERS: "true"
       OAUTH2_PROXY_SILENCE_PING_LOGGING: "true"

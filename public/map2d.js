@@ -135,7 +135,7 @@ export function renderPlan({ mappa, reparti, sel, lvl, width, height = 300, targ
     <div class="map-ctrl">
       <button type="button" class="map-cbtn" data-act="mapZoom" data-f="1.5" aria-label="Ingrandisci">${raw(ICON_PLUS)}</button>
       <button type="button" class="map-cbtn" data-act="mapZoom" data-f="0.6667" aria-label="Riduci" ${zoom <= 1.001 ? raw('disabled') : ''}>${raw(ICON_MINUS)}</button>
-      ${(zoom > 1.001 || panX || panY) && html`<button type="button" class="map-cbtn" data-act="mapReset" aria-label="Vista iniziale">${raw(ICON_FIT)}</button>`}
+      ${(zoom > 1.001 || !!panX || !!panY) && html`<button type="button" class="map-cbtn" data-act="mapReset" aria-label="Vista iniziale">${raw(ICON_FIT)}</button>`}
     </div>
     <span class="map-hint" aria-hidden="true">${big ? 'Trascina per spostare · rotella o due dita per lo zoom' : 'Due dita: zoom e sposta'}</span>
     <div class="map-legend" aria-hidden="true">

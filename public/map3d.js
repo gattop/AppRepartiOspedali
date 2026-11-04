@@ -270,7 +270,7 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
       <button type="button" class="map-cbtn${exp ? ' on' : ''}" data-act="mapExp" aria-label="${exp ? 'Unisci i piani' : 'Separa i piani'}" title="${exp ? 'Unisci i piani' : 'Separa i piani'}" aria-pressed="${exp}">${raw(ICON_LAYERS)}</button>
       <button type="button" class="map-cbtn" data-act="mapZoom" data-f="1.5" aria-label="Ingrandisci" title="Ingrandisci">${raw(ICON_PLUS)}</button>
       <button type="button" class="map-cbtn" data-act="mapZoom" data-f="0.6667" aria-label="Riduci" title="Riduci" ${zoom <= 1.001 ? raw('disabled') : ''}>${raw(ICON_MINUS)}</button>
-      ${(zoom > 1.001 || panX || panY) && html`<button type="button" class="map-cbtn" data-act="mapReset" aria-label="Vista iniziale" title="Vista iniziale">${raw(ICON_FIT)}</button>`}
+      ${(zoom > 1.001 || !!panX || !!panY) && html`<button type="button" class="map-cbtn" data-act="mapReset" aria-label="Vista iniziale" title="Vista iniziale">${raw(ICON_FIT)}</button>`}
     </div>
     <span class="map-hint" aria-hidden="true">${big ? 'Trascina per ruotare · rotella o due dita per lo zoom' : 'Trascina: ruota · Due dita: zoom'}</span>
     <div class="map-legend" aria-hidden="true">
