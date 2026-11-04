@@ -6,7 +6,7 @@ import path from 'node:path';
 import { createApp, configFromEnv } from '../server/index.js';
 import { snapshot } from '../server/backup.js';
 import { openDb } from '../server/db.js';
-import { updateSeededMaps } from '../server/seed.js';
+import { updateSeededMaps, applyDataFixes } from '../server/seed.js';
 
 let server, store, base, dir;
 const EDITOR = { 'x-forwarded-preferred-username': 'mario', 'x-forwarded-groups': 'role:reparti-editor,altro' };
@@ -33,7 +33,11 @@ test('seeds Jesi and demo data on first start', async () => {
   const data = await (await req('GET', '/api/data')).json();
   const jesi = data.ospedali.find((o) => o.id === 'jesi');
   assert.ok(jesi.mappa.blocks.length > 0);
-  assert.equal(data.reparti.filter((r) => r.sede_id === 'jesi-sede').length, 37);
+  assert.equal(data.reparti.filter((r) => r.sede_id === 'jesi-sede').length, 38);
+  const byId = Object.fromEntries(data.reparti.map((r) => [r.id, r]));
+  assert.equal(byId['jesi-orto-deg'].corpo, 'D');
+  assert.equal(byId['jesi-gessi'].corpo, 'D');
+  assert.equal(byId['jesi-pneumologia'].corpo, 'B');
   assert.ok(data.ospedali.some((o) => o.id === 'demo-riviera'));
 });
 
@@ -158,6 +162,26 @@ test('replaces a stored map with a newer drawing from the seed', () => {
   const now = JSON.parse(store.get('ospedali', 'jesi').mappa);
   assert.equal(now.versione, 2);
   assert.equal(now.rot, -12);
+});
+
+test('one-off data fixes update an old database once, without overwriting manual edits', () => {
+  // Put the database back as an older release had seeded it, with one ward already edited by hand.
+  store.db.prepare("UPDATE reparti SET corpo = 'B' WHERE id = 'jesi-orto-deg'").run();
+  store.db.prepare("UPDATE reparti SET corpo = 'A' WHERE id = 'jesi-gessi'").run();
+  store.db.prepare("DELETE FROM reparti WHERE id = 'jesi-pneumologia'").run();
+  store.db.exec('DELETE FROM correzioni');
+
+  applyDataFixes(store);
+  assert.equal(store.get('reparti', 'jesi-orto-deg').corpo, 'D');
+  assert.equal(store.get('reparti', 'jesi-orto-deg').ascensore_id, 'asc-cd');
+  assert.equal(store.get('reparti', 'jesi-gessi').corpo, 'A', 'a ward edited by hand is left alone');
+  assert.equal(store.get('reparti', 'jesi-pneumologia').piano, 3);
+
+  // Runs only once: undoing the change by hand is not reverted at the next start.
+  store.db.prepare("UPDATE reparti SET corpo = 'B' WHERE id = 'jesi-orto-deg'").run();
+  applyDataFixes(store);
+  assert.equal(store.get('reparti', 'jesi-orto-deg').corpo, 'B');
+  assert.equal(store.db.prepare("SELECT COUNT(*) AS n FROM reparti WHERE lower(nome) LIKE '%pneumologia –%'").get().n, 1);
 });
 
 test('writes one consistent backup per day and keeps the last N', () => {

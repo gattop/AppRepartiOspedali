@@ -255,6 +255,7 @@ a.hero-sub:hover { color: #FFFFFF; text-decoration: underline; }
 /* drag sideways to rotate; vertical swipes still scroll the page */
 .map-stage { touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
 .map-stage.dragging { cursor: grabbing; }
+.map-stage.zoomed { touch-action: none; }
 .map-stage.dragging .mf-btn { cursor: grabbing; }
 .map-stage .map-ctrl { cursor: default; }
 .map-hint { position: absolute; left: 12px; top: 10px; font-size: 11px; font-weight: 700; color: rgba(203, 213, 225, 0.7); pointer-events: none; }
@@ -267,7 +268,7 @@ a.hero-sub:hover { color: #FFFFFF; text-decoration: underline; }
 @media (prefers-reduced-motion: reduce) { .jpulse { animation: none; } }
 .map-flabel { position: absolute; transform: translate(-100%, -50%); padding: 2px 6px; border-radius: 6px; font-size: 11px; font-weight: 800; pointer-events: none; }
 .map-blabel { position: absolute; transform: translate(-50%, -50%); font-size: 11px; font-weight: 800; pointer-events: none; white-space: nowrap; }
-.map-blabel.named { overflow: hidden; text-overflow: ellipsis; font-size: 11px !important; font-weight: 700; }
+.map-blabel.named { overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
 .map-blabel.named b { font-weight: 800; margin-right: 5px; }
 .map-marker { position: absolute; transform: translate(-50%, -50%); height: 20px; padding: 0 7px; border-radius: 999px; background: #FFFFFF; color: var(--ink); font-size: 10px; font-weight: 800; display: flex; align-items: center; gap: 4px; pointer-events: none; white-space: nowrap; box-shadow: 0 2px 6px rgba(0,0,0,0.4); }
 .map-marker .dot { width: 7px; height: 7px; border-radius: 999px; }
@@ -278,6 +279,17 @@ a.hero-sub:hover { color: #FFFFFF; text-decoration: underline; }
 .map-ctrl { position: absolute; right: 10px; top: 10px; display: flex; flex-direction: column; gap: 6px; }
 .map-cbtn { width: 44px; height: 44px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.18); background: rgba(15,23,42,0.85); color: #FFFFFF; display: flex; align-items: center; justify-content: center; }
 .map-cbtn.on { background: #FFFFFF; color: var(--ink); border-color: #FFFFFF; }
+.map-cbtn[disabled] { opacity: 0.4; cursor: default; }
+/* small stages (ward page, phone): compact controls so the column fits */
+.map-stage.small .map-ctrl, .pickfield .map-ctrl { gap: 4px; top: 8px; right: 8px; }
+.map-stage.small .map-cbtn, .pickfield .map-cbtn { width: 36px; height: 36px; border-radius: 10px; }
+@media (max-width: 899px) {
+  .map-ctrl { gap: 4px; top: 8px; right: 8px; }
+  .map-cbtn { width: 38px; height: 38px; border-radius: 10px; }
+  /* the hospital map gets most of the phone screen, so the controls and the model both fit */
+  .map-col .map-stage { height: min(58vh, 440px); min-height: 340px; }
+  .map-hint { max-width: calc(100% - 64px); }
+}
 .map-legend { position: absolute; left: 10px; bottom: 8px; display: flex; gap: 10px; font-size: 11px; font-weight: 700; color: var(--hero-sub); pointer-events: none; }
 .map-legend > span { display: flex; align-items: center; gap: 5px; }
 .map-legend .sw { width: 10px; height: 10px; border-radius: 3px; }
@@ -467,7 +479,6 @@ a.hero-sub:hover { color: #FFFFFF; text-decoration: underline; }
 
   /* map labels readable at desktop size */
   .map-col .map-flabel { font-size: 13px; padding: 3px 8px; }
-  .map-col .map-blabel { font-size: 14px; }
   .map-col .map-marker { height: 26px; padding: 0 10px; font-size: 12px; gap: 6px; }
   .map-col .map-marker .dot { width: 9px; height: 9px; }
   .map-col .map-pin .t { font-size: 14px; padding: 7px 12px; max-width: 260px; }

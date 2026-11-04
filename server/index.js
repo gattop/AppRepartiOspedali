@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { openDb, ENTITIES, ValidationError } from './db.js';
-import { seed, updateSeededMaps } from './seed.js';
+import { seed, updateSeededMaps, applyDataFixes } from './seed.js';
 import { scheduleBackups } from './backup.js';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
@@ -106,6 +106,7 @@ export function createApp(cfg) {
   const store = openDb(path.join(cfg.dataDir, 'reparti.db'));
   if (store.isEmpty()) seed(store, { demo: cfg.seedDemo });
   else updateSeededMaps(store);
+  applyDataFixes(store);
 
   async function api(req, res, pathname) {
     const user = userFrom(req, cfg);

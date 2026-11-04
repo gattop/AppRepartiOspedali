@@ -589,7 +589,7 @@ function mapState(o, query) {
   const sel = query.get('sel');
   if (!st || (sel && st.fromQuery !== sel)) {
     const r = sel && X.rep[sel];
-    st = S.map[o.id] = { q: '', sel: r ? r.id : null, lvl: r && r.piano != null ? r.piano : 'all', rot: o.mappa.rot ?? -28, exp: false, fromQuery: sel };
+    st = S.map[o.id] = { q: '', sel: r ? r.id : null, lvl: r && r.piano != null ? r.piano : 'all', rot: o.mappa.rot ?? -12, exp: false, fromQuery: sel };
   }
   return st;
 }
@@ -611,7 +611,7 @@ function stageState(el) {
   }
   if (el.dataset.rep) {
     const r = X.rep[el.dataset.rep];
-    const st = (S.mapDetail[o.id] ||= { rot: o.mappa.rot ?? -28, exp: false });
+    const st = (S.mapDetail[o.id] ||= { rot: o.mappa.rot ?? -12, exp: false });
     st.sel = r?.id || null;
     st.lvl = r?.piano ?? 'all';
     return st;
@@ -627,10 +627,13 @@ function drawStage(el) {
     mappa: o.mappa, reparti: X.repByOsp[o.id] || [], sel: st.sel, lvl: st.lvl, rot: st.rot, exp: st.exp,
     target: st.pick ? st.highlight : undefined, pick: !!st.pick, points: entrancePoints(o),
     route: st.pick ? null : routeFor(X.rep[st.sel]),
+    zoom: st.zoom || 1, panX: st.panX || 0, panY: st.panY || 0,
     width: el.clientWidth || 390, height: el.clientHeight || 300
   });
   el.innerHTML = String(out);
   el._geo = out.geo;
+  // Zoomed in, one-finger drags belong to the map instead of scrolling the page.
+  el.classList.toggle('zoomed', (st.zoom || 1) > 1.001);
 }
 
 function drawStages() {
@@ -653,7 +656,7 @@ function pickValues() {
 
 function initPick(key, o, target, values, label) {
   if (S.pick?.key !== key) {
-    S.pick = { key, target, mode: values.punto ? 'punto' : 'ala', rot: o.mappa.rot ?? -28, exp: false, ...values };
+    S.pick = { key, target, mode: values.punto ? 'punto' : 'ala', rot: o.mappa.rot ?? -12, exp: false, ...values };
   }
   S.pick.label = label;
 }
@@ -1349,6 +1352,19 @@ const ACT = {
     st.sel = null;
     render();
   },
+  mapZoom: ({ f }, el) => {
+    const stage = el.closest('.map-stage');
+    const st = viewOf(stageState(stage));
+    const c = { x: stage.clientWidth / 2, y: stage.clientHeight / 2 };
+    zoomAt(stage, st, st.zoom * Number(f), c);
+    drawStage(stage);
+  },
+  mapReset: (_, el) => {
+    const stage = el.closest('.map-stage');
+    const st = stageState(stage);
+    Object.assign(st, { zoom: 1, panX: 0, panY: 0, rot: X.osp[stage.dataset.osp].mappa.rot ?? -12 });
+    drawStage(stage);
+  },
   mapExp: (_, el) => {
     const stage = el.closest('.map-stage');
     const st = stageState(stage);
@@ -1602,51 +1618,143 @@ const SUBMIT = {
   }
 };
 
-// Drag a 3D map sideways (finger or mouse) to rotate it. Movement under a few pixels stays a tap,
-// so blocks remain clickable; the click that ends a real drag is swallowed.
+// Gestures on a 3D map:
+//  - one finger / left mouse: drag sideways to rotate (the model follows the pointer);
+//  - right mouse or Shift + drag: pan;
+//  - two fingers: pinch to zoom around the fingers, move them to pan;
+//  - mouse wheel (and trackpad pinch): zoom around the cursor.
+// Movement under a few pixels stays a tap, so blocks remain clickable; the click that ends a
+// real gesture is swallowed.
 const DRAG_START = 6;
 const DEG_PER_PX = 0.45;
-let drag = null;
+const ZOOM_MIN = 1, ZOOM_MAX = 6;
+let gest = null;
 let swallowClick = false;
+
+function viewOf(st) {
+  st.zoom ??= 1;
+  st.panX ??= 0;
+  st.panY ??= 0;
+  return st;
+}
+
+// Zoom to `z` so that the stage point `anchor` (as seen with the `from` view) ends up at `to`.
+function zoomAt(stage, st, z, anchor, to = anchor, from = st) {
+  const W = stage.clientWidth, H = stage.clientHeight;
+  z = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, z));
+  const bx = W / 2 + (anchor.x - W / 2 - from.panX) / from.zoom;
+  const by = H / 2 + (anchor.y - H / 2 - from.panY) / from.zoom;
+  const limX = (W * z) / 2, limY = (H * z) / 2;
+  st.zoom = z;
+  st.panX = Math.min(limX, Math.max(-limX, to.x - W / 2 - (bx - W / 2) * z));
+  st.panY = Math.min(limY, Math.max(-limY, to.y - H / 2 - (by - H / 2) * z));
+}
+
+function redrawSoon(stage) {
+  if (stage._raf) return;
+  stage._raf = requestAnimationFrame(() => {
+    stage._raf = 0;
+    if (stage.isConnected) drawStage(stage);
+  });
+}
+
+const stagePoint = (stage, e) => {
+  const r = stage.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+};
+
+function startSingle(g, p, mode) {
+  g.mode = mode;
+  g.start = { ...p, rot: g.st.rot, panX: g.st.panX, panY: g.st.panY };
+}
 
 document.addEventListener('pointerdown', (e) => {
   const stage = e.target.closest('.map-stage');
-  if (!stage || e.target.closest('.map-ctrl') || (e.pointerType === 'mouse' && e.button !== 0)) return;
+  if (!stage || e.target.closest('.map-ctrl')) return;
+  if (e.pointerType === 'mouse' && e.button !== 0 && e.button !== 2) return;
   const st = stageState(stage);
-  if (st) drag = { stage, st, id: e.pointerId, x: e.clientX, rot: st.rot, moved: false, raf: 0 };
+  if (!st) return;
+  if (!gest || gest.stage !== stage) gest = { stage, st: viewOf(st), pts: new Map(), moved: false };
+  const p = stagePoint(stage, e);
+  gest.pts.set(e.pointerId, p);
+  if (gest.pts.size === 2) {
+    // Second finger: pinch (zoom + pan) from here on.
+    const [a, b] = [...gest.pts.values()];
+    gest.mode = 'pinch';
+    gest.moved = true;
+    gest.pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, from: { zoom: gest.st.zoom, panX: gest.st.panX, panY: gest.st.panY } };
+  } else if (gest.pts.size === 1) {
+    startSingle(gest, p, e.pointerType === 'mouse' && (e.button === 2 || e.shiftKey) ? 'pan' : 'rotate');
+  }
 });
 
 document.addEventListener('pointermove', (e) => {
-  if (!drag || e.pointerId !== drag.id) return;
-  const dx = e.clientX - drag.x;
-  if (!drag.moved) {
-    if (Math.abs(dx) < DRAG_START) return;
-    drag.moved = true;
-    cancelAnimationFrame(ACT.mapRot.raf);
-    drag.stage.classList.add('dragging');
-    try { drag.stage.setPointerCapture(e.pointerId); } catch { /* pointer already gone */ }
+  if (!gest || !gest.pts.has(e.pointerId)) return;
+  const { stage, st } = gest;
+  const p = stagePoint(stage, e);
+  gest.pts.set(e.pointerId, p);
+  if (gest.mode === 'pinch' && gest.pts.size >= 2) {
+    const [a, b] = [...gest.pts.values()];
+    const d = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+    const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    zoomAt(stage, st, gest.pinch.from.zoom * (d / gest.pinch.d), gest.pinch.mid, mid, gest.pinch.from);
+  } else {
+    const dx = p.x - gest.start.x, dy = p.y - gest.start.y;
+    if (!gest.moved) {
+      if (Math.hypot(dx, dy) < DRAG_START) return;
+      gest.moved = true;
+      cancelAnimationFrame(ACT.mapRot.raf);
+      stage.classList.add('dragging');
+      try { stage.setPointerCapture(e.pointerId); } catch { /* pointer already gone */ }
+    }
+    if (gest.mode === 'pan') {
+      st.panX = gest.start.panX + dx;
+      st.panY = gest.start.panY + dy;
+    } else {
+      st.rot = gest.start.rot - dx * DEG_PER_PX;
+    }
   }
-  drag.st.rot = drag.rot + dx * DEG_PER_PX;
-  if (!drag.raf) {
-    const d = drag;
-    d.raf = requestAnimationFrame(() => {
-      d.raf = 0;
-      if (d.stage.isConnected) drawStage(d.stage);
-    });
-  }
+  redrawSoon(stage);
 });
 
-function endDrag(e) {
-  if (!drag || e.pointerId !== drag.id) return;
-  if (drag.moved) {
-    drag.stage.classList.remove('dragging');
+function endGesture(e) {
+  if (!gest || !gest.pts.has(e.pointerId)) return;
+  gest.pts.delete(e.pointerId);
+  if (gest.pts.size === 1) {
+    // One finger left after a pinch: carry on rotating from where it is, without jumping.
+    startSingle(gest, [...gest.pts.values()][0], 'rotate');
+    return;
+  }
+  if (gest.pts.size > 0) return;
+  if (gest.moved) {
+    gest.stage.classList.remove('dragging');
     swallowClick = true;
     setTimeout(() => { swallowClick = false; }, 0);
   }
-  drag = null;
+  gest = null;
 }
-document.addEventListener('pointerup', endDrag);
-document.addEventListener('pointercancel', endDrag);
+document.addEventListener('pointerup', endGesture);
+document.addEventListener('pointercancel', endGesture);
+
+// Right-drag pans the map, so no context menu there.
+document.addEventListener('contextmenu', (e) => {
+  if (e.target.closest('.map-stage')) e.preventDefault();
+});
+
+document.addEventListener('wheel', (e) => {
+  const stage = e.target.closest('.map-stage');
+  if (!stage || e.target.closest('.map-ctrl')) return;
+  const st = stageState(stage);
+  if (!st) return;
+  e.preventDefault();
+  viewOf(st);
+  // Lines (Firefox) are ~33px; ctrl+wheel is a trackpad pinch, which sends small deltas.
+  const delta = e.deltaY * (e.deltaMode === 1 ? 33 : 1);
+  const z = st.zoom * Math.exp(-delta * (e.ctrlKey ? 0.01 : 0.0015));
+  const p = stagePoint(stage, e);
+  zoomAt(stage, st, z, p);
+  redrawSoon(stage);
+}, { passive: false });
 
 document.addEventListener('click', (e) => {
   if (swallowClick) {

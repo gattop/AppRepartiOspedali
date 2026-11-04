@@ -9,7 +9,7 @@ import { html, raw } from './util.js';
 // `route`   = path to draw: [{ corpo, liv, punto?, kind: 'ing' | 'asc' | 'rep' }], entrance first.
 // The returned markup carries `geo.unproject(sx, sy, liv)`, which turns a click on the stage
 // back into plan coordinates on that level.
-export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 300, target, points = [], pick = false, route = null }) {
+export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 300, target, points = [], pick = false, route = null, zoom = 1, panX = 0, panY = 0 }) {
   const B = mappa.blocks || [];
   const byId = Object.fromEntries(B.map((b) => [b.id, b]));
   const selR = sel ? reparti.find((r) => r.id === sel) || null : null;
@@ -99,9 +99,13 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
   // Margins keep the drawing clear of the floor labels (left), controls (right) and legend (bottom).
   const big = W > 600;
   const fx0 = big ? 64 : 40, fx1 = W - (big ? 90 : 62), fy0 = big ? 56 : 46, fy1 = H - (big ? 64 : 34);
-  const f = Math.min((fx1 - fx0) / (maxX - minX), (fy1 - fy0) / (maxY - minY));
-  const ox = fx0 + ((fx1 - fx0) - (maxX - minX) * f) / 2 - minX * f;
-  const oy = fy0 + ((fy1 - fy0) - (maxY - minY) * f) / 2 - minY * f;
+  const fit = Math.min((fx1 - fx0) / (maxX - minX), (fy1 - fy0) / (maxY - minY));
+  const fitX = fx0 + ((fx1 - fx0) - (maxX - minX) * fit) / 2 - minX * fit;
+  const fitY = fy0 + ((fy1 - fy0) - (maxY - minY) * fit) / 2 - minY * fit;
+  // Zoom scales the fitted drawing around the stage centre, then the pan shifts it (in pixels).
+  const f = fit * zoom;
+  const ox = W / 2 + (fitX - W / 2) * zoom + panX;
+  const oy = H / 2 + (fitY - H / 2) * zoom + panY;
   const sx = (p) => p[0] * f + ox;
   const sy = (p) => p[1] * f + oy;
   const poly = (arr) => 'polygon(' + arr.map((p) => sx(p).toFixed(1) + 'px ' + sy(p).toFixed(1) + 'px').join(', ') + ')';
@@ -148,15 +152,24 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
     } else {
       faces.push(html`<div class="mf${pulse}" aria-hidden="true" style="${topStyle}"></div>`);
     }
-    if (it.mode === 'act' && it.b.label) {
-      // On a wide stage, with one level shown, write the wards inside the block like the paper plan.
-      const b = it.b;
-      const span = Math.abs(sx(P(b.x1, (b.y0 + b.y1) / 2, it.zt)) - sx(P(b.x0, (b.y0 + b.y1) / 2, it.zt)));
-      const names = big && !b.node && list.length > 0 && span > 70 ? list.map((x) => x.nome.split(' – ')[0]).join(' · ') : '';
-      const css = `left: ${sx(r.cen).toFixed(1)}px; top: ${sy(r.cen).toFixed(1)}px; color: ${it.isSel ? '#FFFFFF' : '#0F172A'}`;
-      blockLabels.push(names
-        ? html`<span class="map-blabel named" style="${css + `; max-width: ${Math.round(span - 12)}px`}"><b>${b.label}</b>${names}</span>`
-        : html`<span class="map-blabel" style="${css}">${b.label}</span>`);
+    // Ward names written on every visible block top, like the paper plan, whenever the top is big
+    // enough on screen to hold readable text (zooming in makes room for more of them).
+    const b = it.b;
+    if (reachable && !b.node && (list.length > 0 || (it.mode === 'act' && b.label))) {
+      const my = (b.y0 + b.y1) / 2, mx = (b.x0 + b.x1) / 2;
+      const span = Math.hypot(sx(P(b.x1, my, it.zt)) - sx(P(b.x0, my, it.zt)), sy(P(b.x1, my, it.zt)) - sy(P(b.x0, my, it.zt)));
+      const faceH = Math.abs(sy(P(mx, b.y1, it.zt)) - sy(P(mx, b.y0, it.zt)));
+      const size = Math.min(13, Math.max(8, faceH * 0.62));
+      const fits = span >= 46 && faceH >= 8;
+      // Light text on the dark tops of the "all levels" view, dark text on the light active level.
+      const color = it.isSel || it.mode === 'norm' ? '#FFFFFF' : '#0F172A';
+      const css = `left: ${sx(r.cen).toFixed(1)}px; top: ${sy(r.cen).toFixed(1)}px; color: ${color}; font-size: ${size.toFixed(1)}px`;
+      if (fits && list.length > 0) {
+        const names = list.map((x) => x.nome.split(' – ')[0]).join(' · ');
+        blockLabels.push(html`<span class="map-blabel named" style="${css + `; max-width: ${Math.round(span - 10)}px`}">${b.label && html`<b>${b.label}</b>`}${names}</span>`);
+      } else if (it.mode === 'act' && b.label) {
+        blockLabels.push(html`<span class="map-blabel" style="${css}">${b.label}</span>`);
+      }
     }
   }
 
@@ -207,8 +220,11 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
       <button type="button" class="map-cbtn" data-act="mapRot" data-d="-45" aria-label="Ruota a sinistra">${raw(ICON_ROT_L)}</button>
       <button type="button" class="map-cbtn" data-act="mapRot" data-d="45" aria-label="Ruota a destra">${raw(ICON_ROT_R)}</button>
       <button type="button" class="map-cbtn${exp ? ' on' : ''}" data-act="mapExp" aria-label="${exp ? 'Unisci i piani' : 'Separa i piani'}" aria-pressed="${exp}">${raw(ICON_LAYERS)}</button>
+      <button type="button" class="map-cbtn" data-act="mapZoom" data-f="1.5" aria-label="Ingrandisci">${raw(ICON_PLUS)}</button>
+      <button type="button" class="map-cbtn" data-act="mapZoom" data-f="0.6667" aria-label="Riduci" ${zoom <= 1.001 ? raw('disabled') : ''}>${raw(ICON_MINUS)}</button>
+      ${(zoom > 1.001 || panX || panY) && html`<button type="button" class="map-cbtn" data-act="mapReset" aria-label="Vista iniziale">${raw(ICON_FIT)}</button>`}
     </div>
-    <span class="map-hint" aria-hidden="true">↔ Trascina per ruotare</span>
+    <span class="map-hint" aria-hidden="true">${big ? 'Trascina per ruotare · rotella o due dita per lo zoom' : 'Trascina: ruota · Due dita: zoom'}</span>
     <div class="map-legend" aria-hidden="true">
       <span><span class="sw" style="background: #3B82F6"></span>Scale / ascensori</span>
       <span><span class="sw" style="background: #F43F5E"></span>${pick ? 'Posizione scelta' : 'Reparto'}</span>
@@ -238,3 +254,6 @@ const svg = (d, w = 20) => `<svg width="${w}" height="${w}" viewBox="0 0 24 24" 
 const ICON_ROT_L = svg('<path d="M4 12a8 8 0 1 0 2.5-5.8"></path><path d="M4 4v5h5"></path>');
 const ICON_ROT_R = svg('<path d="M20 12a8 8 0 1 1-2.5-5.8"></path><path d="M20 4v5h-5"></path>');
 const ICON_LAYERS = svg('<path d="M12 3l9 5-9 5-9-5z"></path><path d="M3 16l9 5 9-5"></path>');
+const ICON_PLUS = svg('<path d="M12 5v14M5 12h14"></path>');
+const ICON_MINUS = svg('<path d="M5 12h14"></path>');
+const ICON_FIT = svg('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path>');

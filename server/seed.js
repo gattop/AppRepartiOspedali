@@ -73,6 +73,54 @@ export function updateSeededMaps(store) {
   }
 }
 
+// One-off corrections to data already in production (seeded by an older release). Each runs once,
+// and only touches a row that is still as originally seeded, so manual edits are never overwritten.
+const DATA_FIXES = [
+  {
+    id: '2026-11-04-jesi-ortopedia-pneumologia-gessi',
+    run(store, log) {
+      const corpi = JSON.parse(store.get('ospedali', 'jesi')?.mappa || '{}').corpi || {};
+      const dove = (k) => corpi[k]?.dove || '';
+      const orto = store.get('reparti', 'jesi-orto-deg');
+      // L3: Ortopedia degenze moved to body D, together with Clinica reumatologica.
+      if (orto && orto.corpo === 'B' && orto.piano === 3) {
+        store.db.prepare('UPDATE reparti SET corpo = ?, ascensore_id = ?, dove = ?, punto = NULL WHERE id = ?')
+          .run('D', store.get('ascensori', 'asc-cd') ? 'asc-cd' : orto.ascensore_id, dove('D') || orto.dove, orto.id);
+        log('reparti', orto.id, { corpo: 'D' });
+      }
+      // L3 body B is now Pneumologia.
+      const hasPneumo = store.db.prepare("SELECT 1 FROM reparti WHERE sede_id = 'jesi-sede' AND piano = 3 AND lower(nome) LIKE '%pneumologia%'").get();
+      if (store.get('sedi', 'jesi-sede') && !hasPneumo && !store.get('reparti', 'jesi-pneumologia')) {
+        store.insertRaw('reparti', {
+          id: 'jesi-pneumologia', sede_id: 'jesi-sede', nome: 'Pneumologia – Degenze', tipo: 'Degenza', piano: 3, corpo: 'B',
+          ingresso_id: store.get('ingressi', 'ing-principale') ? 'ing-principale' : null,
+          ascensore_id: store.get('ascensori', 'asc-ab') ? 'asc-ab' : null,
+          dove: dove('B'), kw: 'pneumologia pneumo polmoni respiratorio degenza ricovero'
+        }, 'aggiornamento dati');
+        log('reparti', 'jesi-pneumologia', { nome: 'Pneumologia – Degenze' });
+      }
+      // L2: Sala gessi is on the right, with Ambulatori Ortopedia (body D).
+      const gessi = store.get('reparti', 'jesi-gessi');
+      if (gessi && gessi.corpo === 'B' && gessi.piano === 2) {
+        store.db.prepare('UPDATE reparti SET corpo = ?, dove = ?, punto = NULL WHERE id = ?').run('D', dove('D') || gessi.dove, gessi.id);
+        log('reparti', gessi.id, { corpo: 'D' });
+      }
+    }
+  }
+];
+
+export function applyDataFixes(store) {
+  store.db.exec('CREATE TABLE IF NOT EXISTS correzioni (id TEXT PRIMARY KEY, ts TEXT NOT NULL)');
+  for (const fix of DATA_FIXES) {
+    if (store.db.prepare('SELECT 1 FROM correzioni WHERE id = ?').get(fix.id)) continue;
+    store.tx(() => {
+      fix.run(store, (entity, id, data) => store.log('aggiornamento dati', entity, id, 'modifica', data));
+      store.db.prepare('INSERT INTO correzioni (id, ts) VALUES (?, ?)').run(fix.id, new Date().toISOString());
+    });
+    console.log(`Correzione dati applicata: ${fix.id}`);
+  }
+}
+
 export function seed(store, { demo = false } = {}) {
   const files = ['jesi.json', ...(demo ? ['demo.json'] : [])];
   for (const f of files) {

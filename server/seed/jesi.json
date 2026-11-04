@@ -482,10 +482,10 @@
               "nome": "Sala gessi",
               "tipo": "Ambulatorio",
               "piano": 2,
-              "corpo": "B",
+              "corpo": "D",
               "ingresso": "ing-principale",
               "ascensore": null,
-              "dove": "Corpo B – dalla portineria segui il corridoio verso i corpi A-B",
+              "dove": "Corpo D – dalla portineria segui il corridoio verso i corpi C-D",
               "note": "",
               "tel": "",
               "kw": "gessi gesso ortopedia orto fratture"
@@ -547,13 +547,26 @@
               "nome": "Ortopedia e Traumatologia – Degenze",
               "tipo": "Degenza",
               "piano": 3,
+              "corpo": "D",
+              "ingresso": "ing-principale",
+              "ascensore": "asc-cd",
+              "dove": "Corpo D – dalla portineria segui il corridoio verso i corpi C-D",
+              "note": "",
+              "tel": "2459",
+              "kw": "ortopedia orto traumatologia trauma degenza ricovero"
+            },
+            {
+              "id": "jesi-pneumologia",
+              "nome": "Pneumologia – Degenze",
+              "tipo": "Degenza",
+              "piano": 3,
               "corpo": "B",
               "ingresso": "ing-principale",
               "ascensore": "asc-ab",
               "dove": "Corpo B – dalla portineria segui il corridoio verso i corpi A-B",
               "note": "",
-              "tel": "2459",
-              "kw": "ortopedia orto traumatologia trauma degenza ricovero"
+              "tel": "",
+              "kw": "pneumologia pneumo polmoni respiratorio degenza ricovero"
             },
             {
               "id": "jesi-radiologia",
