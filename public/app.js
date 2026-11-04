@@ -490,11 +490,10 @@ function viewOspedali() {
           <a class="logo" href="#/" aria-label="Pagina iniziale">${LOGO}</a>
           <div class="col">
             <span class="brand">Reparti <span class="serif-i">Ospedali</span></span>
-            <span class="brand-sub">${osps.length} ${osps.length === 1 ? 'ospedale' : 'ospedali'} · ${S.data.reparti.length} reparti</span>
           </div>
         </div>
         <div class="row gap8">
-          <div class="status ${S.offline ? 'off' : ''}"><span class="dot"></span>${S.offline ? 'Offline' : live ? 'Disponibile offline' : 'Online'}</div>
+          <div class="status ${S.offline ? 'off' : ''}"><span class="dot"></span>${S.offline ? 'Offline' : live ? html`<span class="hide-sm">Disponibile offline</span><span class="show-sm">Offline ok</span>` : 'Online'}</div>
           ${S.me.canEdit && html`<a class="hbtn" href="#/ospedali/nuovo">${ICON.plus(20)}Nuovo</a>`}
         </div>
       </div>
@@ -1024,7 +1023,7 @@ function viewGestisci(id) {
   return html`
     ${banner()}
     <div class="topbar">
-      <a href="#/ospedale/${enc}" class="tlink">${ICON.back(18)}Fine</a>
+      <a href="#/ospedale/${enc}" class="tlink" data-act="leave" data-href="#/ospedale/${enc}">${ICON.back(18)}Fine</a>
       <span class="ttitle">Gestisci</span>
       <a href="#/ospedale/${enc}/modifica?ritorno=${encodeURIComponent(location.hash)}" class="tlink">Dati ospedale</a>
     </div>
@@ -1246,7 +1245,7 @@ function viewEntityForm(entity, id, parent, query) {
   return html`
     ${banner()}
     <div class="topbar">
-      <a href="${back}" class="tlink">Annulla</a>
+      <a href="${back}" class="tlink" data-act="leave" data-href="${back}">Annulla</a>
       <span class="ttitle">${cfg.title[id ? 1 : 0]}</span>
       <button type="submit" form="eform" class="btn primary small" ${S.busy ? raw('disabled') : ''}>Salva</button>
     </div>
@@ -1509,8 +1508,9 @@ const ACT = {
   },
   cancelDraft: ({ href }) => {
     S.draft = null;
-    location.hash = href;
+    cancelTo(href);
   },
+  leave: ({ href }) => cancelTo(href),
   saveRep: async () => {
     const d = S.draft;
     addKw();
@@ -1523,7 +1523,7 @@ const ACT = {
     const saved = await mutate(() => (d.id ? api('PUT', `reparti/${encodeURIComponent(d.id)}`, body) : api('POST', 'reparti', body)), 'Reparto salvato');
     if (saved) {
       S.draft = null;
-      location.hash = `#/reparto/${encodeURIComponent(saved.id)}`;
+      leave(`#/reparto/${encodeURIComponent(saved.id)}`);
     }
   },
   deleteRep: async ({ id }) => {
@@ -1532,13 +1532,13 @@ const ACT = {
       S.draft = null;
       S.fav.delete(id);
       local.set('preferiti', [...S.fav]);
-      location.hash = '#/';
+      location.replace('#/');
     }
   },
   deleteEntity: async ({ entity, id }) => {
     if (!confirm(FORMS[entity].del)) return;
     if (await mutate(() => api('DELETE', `${entity}/${encodeURIComponent(id)}`), 'Eliminato')) {
-      location.hash = '#/ospedali';
+      location.replace('#/');
     }
   },
   // Click on a block while choosing a position: whole wing, or the exact spot clicked.
@@ -1691,11 +1691,11 @@ const SUBMIT = {
     const saved = await mutate(() => (id ? api('PUT', `${entity}/${encodeURIComponent(id)}`, body) : api('POST', entity, body)), 'Salvato');
     if (!saved) return;
     if (scegli && !id) S.pendingSelect = { field: scegli, id: saved.id };
-    if (entity === 'ospedali' && !id) location.hash = `#/ospedale/${encodeURIComponent(saved.id)}/nuova-sede`;
+    if (entity === 'ospedali' && !id) location.replace(`#/ospedale/${encodeURIComponent(saved.id)}/nuova-sede`);
     else if (entity === 'sedi' && !id) {
       S.sedeTab[saved.ospedale_id] = saved.id;
-      location.hash = `#/ospedale/${encodeURIComponent(saved.ospedale_id)}`;
-    } else location.hash = back;
+      leave(`#/ospedale/${encodeURIComponent(saved.ospedale_id)}`);
+    } else leave(back);
   }
 };
 
@@ -1905,7 +1905,27 @@ document.addEventListener('keydown', (e) => {
 });
 
 let lastRoute = null;
+// The previous and current hash, to know where the user came from.
+let prevHash = null;
+let curHash = location.hash;
+
+// Leaving a form ("Annulla", "Salva", "Fine"): if the page to go back to is the one the user came
+// from, step back in the history; otherwise the form's entry is replaced. Either way the form doesn't
+// stay in the history, so "Indietro" on the next page can't bring it back (and loop).
+function leave(href) {
+  if (href && href === prevHash && history.length > 1) history.back();
+  else location.replace(href || '#/');
+}
+
+// "Annulla": back to wherever the form was opened from; `href` only when it was opened directly.
+function cancelTo(href) {
+  if (prevHash && history.length > 1) history.back();
+  else location.replace(href || '#/');
+}
+
 window.addEventListener('hashchange', () => {
+  prevHash = curHash;
+  curHash = location.hash;
   const path = location.hash.split('?')[0];
   // A position being chosen belongs to the form that was open; the ward draft keeps its own values.
   if (path !== lastRoute) S.pick = null;

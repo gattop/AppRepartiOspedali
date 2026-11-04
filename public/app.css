@@ -148,6 +148,7 @@ a.hero-sub:hover { color: var(--ink-strong); text-decoration: underline; }
 .brand-sub { font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
 .logo { width: 36px; height: 36px; background: var(--invert-bg); color: var(--invert-fg); display: flex; align-items: center; justify-content: center; }
 .status {
+  flex: none; white-space: nowrap;
   display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 10px;
   border: 1px solid var(--line); color: var(--muted);
   font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase;
@@ -808,3 +809,8 @@ a:hover > .logo-mark { transform: rotate(-4deg); }
 .hero .ricon.big { margin-top: 2px; }
 .mrow.on .ricon { background: var(--accent); border-color: var(--accent); color: #fff; }
 @media (min-width: 900px) { .hero .ricon.big { width: 60px; height: 60px; margin-top: 4px; } .hero .ricon.big svg { width: 34px; height: 34px; } }
+@media (min-width: 900px) {
+  /* on PC the logo and title already sit in the top bar: not repeated in the home header */
+  .hero .row.gap10:has(> .logo) { display: none; }
+  .hero .row.gap10:has(> .logo) + * { margin-left: auto; }
+}
