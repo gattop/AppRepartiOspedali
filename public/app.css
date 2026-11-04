@@ -149,6 +149,7 @@ a.hero-sub:hover { color: var(--ink-strong); text-decoration: underline; }
 .logo-mark { transition: transform .3s ease-out; }
 .logo-mark rect { fill: var(--invert-bg); }
 .logo-mark g { stroke: var(--invert-fg); }
+.logo-mark .cross { stroke: var(--accent); }
 a:hover > .logo-mark { transform: rotate(-4deg); }
 .brand .serif-i { color: var(--muted); font-size: 1.1em; }
 .status {
@@ -755,6 +756,7 @@ a.lrow:hover b { color: var(--accent-ink); }
     letter-spacing: -.02em; text-transform: none; color: var(--ink-strong);
   }
   .tabbar .tab-brand .serif-i { font-size: 20px; font-weight: 400; color: var(--muted); }
+  .tabbar .tab-brand .logo-mark { width: 26px; height: 26px; }
   .tabbar .tab-brand:hover { background: transparent; color: var(--ink-strong); opacity: .75; }
   .tabbar .themesw button { flex-direction: row; gap: 7px; padding: 0 14px; font-size: 12px; border-left: 0; }
   .tabbar .themesw button + button { border-left: 1px dashed var(--line); }

@@ -11,11 +11,15 @@ const PAPER = [0xF2, 0xF1, 0xEE];
 const BLUE = [0x2D, 0x81, 0xFF];
 
 // Strokes in the 32-unit logo grid, drawn at 12x and offset by 64 on a 512 canvas:
-// three stacked floors, the lowest one in the accent blue.
+// a hospital (main block, two lower wings, door, ground line) with the cross in the accent blue.
 const LINES = [
-  { pts: [[16, 6], [26, 11], [16, 16], [6, 11], [16, 6]], color: PAPER },
-  { pts: [[6, 16], [16, 21], [26, 16]], color: PAPER },
-  { pts: [[6, 21], [16, 26], [26, 21]], color: BLUE }
+  { pts: [[16, 10.5], [16, 16.5]], color: BLUE },
+  { pts: [[13, 13.5], [19, 13.5]], color: BLUE },
+  { pts: [[8, 24], [8, 8], [24, 8], [24, 24]], color: PAPER },
+  { pts: [[8, 15], [3, 15], [3, 24]], color: PAPER },
+  { pts: [[24, 15], [29, 15], [29, 24]], color: PAPER },
+  { pts: [[14, 24], [14, 19], [18, 19], [18, 24]], color: PAPER },
+  { pts: [[2, 24], [30, 24]], color: PAPER }
 ];
 const SCALE = 12;
 const HALF_STROKE = 1;

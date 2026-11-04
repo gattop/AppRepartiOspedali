@@ -90,5 +90,5 @@ export function repKind(r) {
 }
 export const repIcon = (r, w = 20) => svg(REP_SVG[repKind(r)], { w, sw: 1.8 });
 
-// The app's mark: three floors stacked, as on the app icon.
-export const LOGO = raw('<svg class="logo-mark" viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><rect width="32" height="32"></rect><g fill="none" stroke-width="2" stroke-linejoin="round"><path d="M16 6 26 11 16 16 6 11z"></path><path d="M6 16l10 5 10-5"></path><path d="M6 21l10 5 10-5"></path></g></svg>');
+// The app's mark: a hospital (main block, two wings, door) with the cross, as on the app icon.
+export const LOGO = raw('<svg class="logo-mark" viewBox="-2 -2 36 36" width="28" height="28" aria-hidden="true"><rect x="-2" y="-2" width="36" height="36"></rect><g fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 24V8h16v16"></path><path d="M8 15H3v9M24 15h5v9"></path><path d="M14 24v-5h4v5"></path><path d="M2 24h28"></path><path class="cross" d="M16 10.5v6M13 13.5h6"></path></g></svg>');
