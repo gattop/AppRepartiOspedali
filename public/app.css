@@ -183,6 +183,21 @@ a.hero-sub:hover { color: var(--ink-strong); text-decoration: underline; }
 .search .clear { width: 38px; height: 38px; border: 0; background: transparent; color: var(--muted); display: flex; align-items: center; justify-content: center; flex: none; }
 .search .clear:hover { background: var(--invert-bg); color: var(--invert-fg); }
 
+/* matches under the search box, attached to it */
+.search-wrap { position: relative; }
+.hero.dropping { z-index: 8; }
+.search-drop {
+  position: absolute; left: 0; right: 0; top: 100%; z-index: 8;
+  max-height: min(60vh, 440px); overflow-y: auto; overscroll-behavior: contain;
+  background: var(--bg); border: 1px solid var(--accent); border-top: 0;
+  box-shadow: 0 0 0 1px var(--accent), 0 18px 40px -12px rgba(0, 0, 0, .35);
+  clip-path: inset(0 -60px -60px -60px);
+}
+.search-drop[hidden] { display: none; }
+.search-wrap:has(.search-drop:not([hidden])) .search { box-shadow: 0 0 0 1px var(--accent); border-color: var(--accent); }
+.search-drop .mrow:last-child { border-bottom: 0; }
+.search-none { padding: 16px; color: var(--muted); font-size: 14px; }
+
 /* chips */
 .chips { display: flex; gap: 6px; padding: 14px 16px 2px; overflow-x: auto; flex: none; scrollbar-width: none; }
 .chips.wrap { flex-wrap: wrap; padding: 0; overflow: visible; }
@@ -728,7 +743,15 @@ a.lrow:hover b { color: var(--accent-ink); }
   .hero.compact > .row.between { display: contents; }
   .hero.compact > .row.between > :first-child { grid-column: 1; grid-row: 1; }
   .hero.compact > .row.between > :last-child { grid-column: 4; grid-row: 1; }
-  .hero.compact > .search { grid-column: 2; grid-row: 1; }
+  .hero.compact > .search-wrap { grid-column: 2; grid-row: 1; }
+
+  /* home: title on the left, status and "Nuovo" on its right, no empty band above */
+  .hero.home { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 24px; row-gap: 8px; padding: 26px 40px 24px; }
+  .hero.home > .row.between { display: contents; }
+  .hero.home > .row.between > :last-child { grid-column: 2; grid-row: 1 / span 2; align-self: center; margin: 0; }
+  .hero.home > h1 { grid-column: 1; grid-row: 1; }
+  .hero.home > .hero-sub { grid-column: 1; grid-row: 2; }
+  .hosp-list.pad { padding-top: 24px; }
   .hero.compact .brand { font-size: 20px; }
 
   /* map labels readable at desktop size */

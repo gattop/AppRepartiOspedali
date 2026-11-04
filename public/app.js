@@ -75,31 +75,31 @@ const REP_SVG = {
   medicina: '<path d="M6 3v6a4 4 0 0 0 8 0V3"></path><path d="M10 13v2a5 5 0 0 0 10 0v-2"></path><circle cx="20" cy="11" r="2"></circle>'
 };
 const REP_RULES = [
-  ['emergenza', /pronto soccorso|osservazione breve|118|potes|guardia medica/],
+  ['emergenza', /pronto soccorso|osservazione breve|\b118\b|potes|guardia medica/],
   ['sangue', /trasfusion|prelievi|accessi vascolari/],
-  ['ufficio', /direzion|u.?r.?p|cup|cassa ticket|cartelle|tribunale|protocollo|personale|accettazione|ufficio|amministra|medico competente|formazione|infermieristica|portineria|informazioni/],
+  ['ufficio', /direzion|\bu.?r.?p\b|\bcup\b|cassa ticket|cartelle|tribunale|protocollo|personale|accettazione|ufficio|amministra|medico competente|formazione|infermieristica|portineria|informazioni/],
   ['lab', /laboratorio|analisi|patologia clinica|anatomia patologica/],
-  ['radio', /radiolog|diagnostica per immagini|tac|t.a.c|risonanza|rmn?|ecograf|senolog|rx/],
-  ['cuore', /cardio|utic|u.t.i.c|emodinam|coronar/],
-  ['cervello', /neurolog|elettroencefal|eeg|ictus|stroke/],
+  ['radio', /radiolog|diagnostica per immagini|\btac\b|t.a.c|risonanza|\brmn?\b|ecograf|senolog|\brx\b/],
+  ['cuore', /cardio|\butic\b|u.t.i.c|emodinam|coronar/],
+  ['cervello', /neurolog|elettroencefal|\beeg\b|ictus|stroke/],
   ['polmoni', /pneumo|bronco|respirat/],
   ['rene', /nefrolog|dialisi|urolog/],
-  ['stomaco', /gastro|endoscop|epatolog|fibroscan|m.?i.?c.?i|digestiv/],
+  ['stomaco', /gastro|endoscop|epatolog|fibroscan|m.?i.?c.?i\b|digestiv/],
   ['occhio', /oculist|ortottic|oftalm/],
-  ['orecchio', /otorino|o.?r.?l/],
+  ['orecchio', /otorino|\bo.?r.?l\b/],
   ['dente', /odonto|dentist/],
   ['osso', /ortoped|traumatol|gessi|reumatol|fisiatr|riabilit/],
-  ['mamma', /ostetric|ginecolog|parto|travaglio/],
-  ['bambino', /pediatr|neonat|nido/],
+  ['mamma', /ostetric|ginecolog|\bparto\b|travaglio/],
+  ['bambino', /pediatr|neonat|\bnido\b/],
   ['onco', /oncolog/],
   ['farmacia', /farmacia/],
-  ['mente', /psichiatr|sert|serd|dipendenz|salute mentale/],
+  ['mente', /psichiatr|\bsert\b|\bserd\b|dipendenz|salute mentale/],
   ['chirurgia', /chirurg|operatori|prericover|preospedal/],
   ['intensiva', /rianimaz|anestes|intensiv/],
-  ['bar', /bar|mensa|cucina/],
+  ['bar', /\bbar\b|mensa|cucina/],
   ['chiesa', /chiesa|cappella/],
   ['servizio', /obitorio|mortuaria|sterilizz|tecnico/],
-  ['medicina', /medicina|diabetolog|geriatr|d.?p.?a|post acuzie/]
+  ['medicina', /medicina|diabetolog|geriatr|\bd.?p.?a\b|post acuzie/]
 ];
 const BY_TIPO = { Emergenza: 'emergenza', Servizio: 'servizio', Ufficio: 'ufficio' };
 
@@ -484,7 +484,7 @@ function viewOspedali() {
   const live = navigator.serviceWorker?.controller && !S.offline;
   return html`
     ${banner()}
-    <header class="hero">
+    <header class="hero home">
       <div class="row between">
         <div class="row gap10">
           <a class="logo" href="#/" aria-label="Pagina iniziale">${LOGO}</a>
@@ -742,17 +742,57 @@ function setPick(v) {
   drawStages();
 }
 
-function mapList(o, st) {
+// Wards of the hospital matching the search text, lowest floor first.
+function mapMatches(o, q) {
   const corpi = o.mappa.corpi || {};
+  const words = norm(q).split(/\s+/).filter(Boolean);
+  return (X.repByOsp[o.id] || [])
+    .filter((r) => {
+      const hay = r._hay + ' ' + norm(`${corpoWord(o)} ${corpi[r.corpo]?.short || ''} livello ${r.piano}`);
+      return words.every((w) => hay.includes(w));
+    })
+    .sort((a, b) => (a.piano ?? 99) - (b.piano ?? 99));
+}
+
+// One row of a ward list on the map page (the list under the map and the search drop-down).
+function mapRow(o, r, act, on = false) {
+  const ci = o.mappa.corpi?.[r.corpo];
+  return html`<button type="button" class="mrow ${on ? 'on' : ''}" data-act="${act}" data-id="${r.id}">
+    <span class="mrow-l">${o.uso_livelli ? 'L' + (r.piano ?? '?') : pianoInfo(o, r.piano).short}</span>
+    <span class="ricon">${repIcon(r, 18)}</span>
+    <span class="col gap2 grow"><b>${r.nome}</b><span class="sub">${ci ? Corpo(o) + ' ' + ci.label : ''}${r._asc ? ' · ascensori ' + r._asc.sigla : ''}</span></span>
+  </button>`;
+}
+
+// ---- search drop-down: the matches right under the search box. It closes on Enter only if there's
+// nothing to choose (one match opens the ward), and on any scroll, tap elsewhere or Esc; the list
+// under the map keeps showing the same matches.
+let dropGuard = 0;
+
+function dropShow(o, q) {
+  const box = document.getElementById('search-drop');
+  if (!box) return;
+  if (!norm(q).trim()) return dropHide();
+  const res = mapMatches(o, q);
+  box.innerHTML = String(html`${res.map((r) => mapRow(o, r, 'dropOpen'))}${!res.length && html`<div class="search-none">Nessun reparto trovato</div>`}`);
+  box.hidden = false;
+  box.scrollTop = 0;
+  box.closest('.hero')?.classList.add('dropping');
+}
+
+function dropHide() {
+  const box = document.getElementById('search-drop');
+  if (!box || box.hidden) return;
+  box.hidden = true;
+  box.closest('.hero')?.classList.remove('dropping');
+}
+
+function mapList(o, st) {
   const all = X.repByOsp[o.id] || [];
   const words = norm(st.q).split(/\s+/).filter(Boolean);
   let res;
   if (words.length) {
-    res = all.filter((r) => {
-      const ci = corpi[r.corpo];
-      const hay = r._hay + ' ' + norm(`${corpoWord(o)} ${ci?.short || ''} livello ${r.piano}`);
-      return words.every((w) => hay.includes(w));
-    });
+    res = mapMatches(o, st.q);
   } else if (st.lvl !== 'all') {
     res = all.filter((r) => r.piano === st.lvl);
   } else {
@@ -763,15 +803,7 @@ function mapList(o, st) {
   return html`
     <div class="row between list-head"><b>${title}</b><span class="muted strong">${res.length} ${res.length === 1 ? 'reparto' : 'reparti'}</span></div>
     <div class="panel list tight">
-      ${res.map((r) => {
-        const on = r.id === st.sel;
-        const ci = corpi[r.corpo];
-        return html`<button type="button" class="mrow ${on ? 'on' : ''}" data-act="mapSel" data-id="${r.id}">
-          <span class="mrow-l">${o.uso_livelli ? 'L' + (r.piano ?? '?') : pianoInfo(o, r.piano).short}</span>
-          <span class="ricon">${repIcon(r, 18)}</span>
-          <span class="col gap2 grow"><b>${r.nome}</b><span class="sub">${ci ? Corpo(o) + ' ' + ci.label : ''}${r._asc ? ' · ascensori ' + r._asc.sigla : ''}</span></span>
-        </button>`;
-      })}
+      ${res.map((r) => mapRow(o, r, 'mapSel', r.id === st.sel))}
       ${!res.length && html`<div class="pad muted center">Nessun reparto trovato.</div>`}
     </div>`;
 }
@@ -828,12 +860,15 @@ function viewMappa(id, query) {
           ${S.me.canEdit && html`<a class="hbtn icon" href="#/ospedale/${enc}/gestisci" aria-label="Gestisci ospedale" title="Gestisci">${ICON.edit()}</a>`}
         </div>
       </div>
-      <label class="search">
-        ${ICON.search(20)}
-        <span class="sr">Cerca un reparto in questo ospedale</span>
-        <input type="search" data-input="mapQ" data-osp="${o.id}" value="${st.q}" placeholder="Cerca: orto, TAC, dialisi, UTIC…" autocomplete="off">
-        <button type="button" class="clear ${st.q ? '' : 'hide'}" data-act="mapClear" data-osp="${o.id}" aria-label="Cancella ricerca">${ICON.close(16)}</button>
-      </label>
+      <div class="search-wrap">
+        <label class="search">
+          ${ICON.search(20)}
+          <span class="sr">Cerca un reparto in questo ospedale</span>
+          <input type="search" data-input="mapQ" data-osp="${o.id}" value="${st.q}" placeholder="Cerca: orto, TAC, dialisi, UTIC…" autocomplete="off" enterkeyhint="search" aria-controls="search-drop">
+          <button type="button" class="clear ${st.q ? '' : 'hide'}" data-act="mapClear" data-osp="${o.id}" aria-label="Cancella ricerca">${ICON.close(16)}</button>
+        </label>
+        <div class="search-drop" id="search-drop" role="listbox" aria-label="Reparti trovati" hidden></div>
+      </div>
     </header>
     <div class="map-layout">
       <div class="map-col">
@@ -1491,6 +1526,10 @@ const ACT = {
     S.map[osp].q = '';
     render();
   },
+  dropOpen: ({ id }) => {
+    dropHide();
+    location.hash = `#/reparto/${encodeURIComponent(id)}`;
+  },
 
   draftSet: ({ field, value }) => {
     const d = S.draft;
@@ -1584,6 +1623,7 @@ const INPUT = {
     st.q = el.value;
     document.getElementById('maplist').innerHTML = String(mapList(X.osp[el.dataset.osp], st));
     $app.querySelector('[data-act="mapClear"]').classList.toggle('hide', !el.value);
+    dropShow(X.osp[el.dataset.osp], el.value);
   },
   draftText: (el) => {
     S.draft[el.dataset.field] = el.value;
@@ -1902,6 +1942,33 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     if (addKw()) { draftChanged(); render(); }
   }
+  if (e.target.dataset?.input === 'mapQ') {
+    if (e.key === 'Escape') return dropHide();
+    if (e.key !== 'Enter') return;
+    // Enter closes the keyboard: one match opens its ward, several stay listed under the box.
+    e.preventDefault();
+    const o = X.osp[e.target.dataset.osp];
+    const res = norm(e.target.value).trim() ? mapMatches(o, e.target.value) : [];
+    // Closing the keyboard scrolls/resizes the page on phones: that mustn't close the list.
+    dropGuard = performance.now() + 700;
+    e.target.blur();
+    if (res.length === 1) {
+      dropHide();
+      location.hash = `#/reparto/${encodeURIComponent(res[0].id)}`;
+    } else dropShow(o, e.target.value);
+  }
+});
+
+// The drop-down goes away with anything else: a scroll (except inside it), or a tap outside the search.
+document.addEventListener('scroll', (e) => {
+  if (performance.now() < dropGuard || e.target?.closest?.('.search-drop')) return;
+  dropHide();
+}, true);
+document.addEventListener('pointerdown', (e) => {
+  if (!e.target.closest('.search-wrap')) dropHide();
+});
+document.addEventListener('focusin', (e) => {
+  if (e.target.dataset?.input === 'mapQ') dropShow(X.osp[e.target.dataset.osp], e.target.value);
 });
 
 let lastRoute = null;
