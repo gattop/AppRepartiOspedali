@@ -1771,6 +1771,17 @@ document.addEventListener('wheel', (e) => {
   redrawSoon(stage);
 }, { passive: false });
 
+// A click on an empty part of the hospital map (no ward, no button) clears the selection.
+// Drags never get here (swallowClick); the ward page and the position picker keep theirs.
+function deselectOnMap(e) {
+  const stage = e.target.closest('.map-stage');
+  if (!stage || stage.dataset.pick || stage.dataset.rep || e.target.closest('.map-ctrl')) return;
+  const st = S.map[stage.dataset.osp];
+  if (!st?.sel) return;
+  st.sel = null;
+  render();
+}
+
 document.addEventListener('click', (e) => {
   if (swallowClick) {
     swallowClick = false;
@@ -1779,7 +1790,8 @@ document.addEventListener('click', (e) => {
     return;
   }
   const el = e.target.closest('[data-act]');
-  if (!el || !ACT[el.dataset.act]) return;
+  if (!el) return deselectOnMap(e);
+  if (!ACT[el.dataset.act]) return;
   e.preventDefault();
   ACT[el.dataset.act](el.dataset, el, e);
 });
