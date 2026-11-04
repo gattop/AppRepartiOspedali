@@ -48,6 +48,7 @@ export function viewOspedali() {
         ? html`Accesso come <b>${S.me.user.name}</b> · ${S.me.canEdit ? 'puoi modificare' : 'sola lettura'} · <a href="/oauth2/sign_out?rd=%2F">Esci</a>`
         : html`Stai consultando senza accesso. <a href="${loginUrl()}">Accedi</a> solo se devi modificare i dati.`}<br>Versione ${VERSION}</p>
       ${S.me.user && !S.me.canEdit && html`<p class="who">Per modificare serve il ruolo ${(S.me.editorGroups || []).join(' o ')}. Ruoli ricevuti: ${S.me.user.groups?.length ? S.me.user.groups.join(', ') : 'nessuno'}.</p>`}
+      <p class="madeby">Made with <span class="heart" aria-label="amore">♥</span> by <a href="https://kyrie.ee" target="_blank" rel="noopener">kyrie.ee</a></p>
     </main>
     ${tabbar('ospedali')}`;
 }
