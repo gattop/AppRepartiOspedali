@@ -147,9 +147,6 @@ a.hero-sub:hover { color: var(--ink-strong); text-decoration: underline; }
 .logo { display: flex; align-items: center; justify-content: center; }
 .logo .logo-mark { width: 36px; height: 36px; }
 .logo-mark { transition: transform .3s ease-out; }
-.logo-mark rect { fill: var(--invert-bg); }
-.logo-mark g { stroke: var(--invert-fg); }
-.logo-mark .cross { stroke: var(--accent); }
 a:hover > .logo-mark { transform: rotate(-4deg); }
 .brand .serif-i { color: var(--muted); font-size: 1.1em; }
 .status {

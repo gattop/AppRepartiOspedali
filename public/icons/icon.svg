@@ -1,10 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#101014"/>
-  <g fill="none" stroke="#f2f1ee" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="translate(64 64) scale(12)">
-    <path d="M8 24V8h16v16"/>
-    <path d="M8 15H3v9M24 15h5v9"/>
-    <path d="M14 24v-5h4v5"/>
-    <path d="M2 24h28"/>
-    <path d="M16 10.5v6M13 13.5h6" stroke="#2d81ff"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- App icon and logo: a hospital building with the red cross on its facade.
+       Only rectangles, in painting order: tools/make-icons.mjs reads them to draw the PNG icons. -->
+  <rect width="32" height="32" fill="#101014"/>
+  <!-- wings -->
+  <rect x="3" y="13.5" width="4.5" height="12" fill="#c9c7c1"/>
+  <rect x="24.5" y="13.5" width="4.5" height="12" fill="#c9c7c1"/>
+  <rect x="4.25" y="15.5" width="2" height="2" fill="#101014"/>
+  <rect x="4.25" y="19.5" width="2" height="2" fill="#101014"/>
+  <rect x="25.75" y="15.5" width="2" height="2" fill="#101014"/>
+  <rect x="25.75" y="19.5" width="2" height="2" fill="#101014"/>
+  <!-- main block, roof edge -->
+  <rect x="7" y="6.5" width="18" height="19" fill="#f2f1ee"/>
+  <rect x="6.25" y="5.5" width="19.5" height="1.5" fill="#f2f1ee"/>
+  <!-- windows -->
+  <rect x="9" y="8.5" width="2" height="2" fill="#101014"/>
+  <rect x="9" y="12.5" width="2" height="2" fill="#101014"/>
+  <rect x="9" y="16.5" width="2" height="2" fill="#101014"/>
+  <rect x="21" y="8.5" width="2" height="2" fill="#101014"/>
+  <rect x="21" y="12.5" width="2" height="2" fill="#101014"/>
+  <rect x="21" y="16.5" width="2" height="2" fill="#101014"/>
+  <!-- red cross -->
+  <rect x="14.5" y="8.25" width="3" height="8.5" fill="#e3242b"/>
+  <rect x="11.75" y="11" width="8.5" height="3" fill="#e3242b"/>
+  <!-- door -->
+  <rect x="13.5" y="19.5" width="5" height="6" fill="#101014"/>
+  <rect x="15.75" y="19.5" width="0.5" height="6" fill="#f2f1ee"/>
+  <!-- ground -->
+  <rect x="2" y="25.5" width="28" height="1" fill="#f2f1ee"/>
 </svg>

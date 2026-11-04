@@ -1,43 +1,29 @@
-// Rasterizes the app icon (same shape as public/icons/icon.svg) into the PNG sizes that
-// Android and iOS need. Runs at image build time, so no binaries live in the repo.
+// Rasterizes the app icon public/icons/icon.svg into the PNG sizes that Android and iOS need.
+// Runs at image build time, so no binaries live in the repo. The SVG is the only source of the
+// drawing: it's made of <rect>s only (viewBox 0 0 32 32), read here in painting order.
 import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 
 const OUT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public', 'icons');
-const BG = [0x10, 0x10, 0x14];
-const PAPER = [0xF2, 0xF1, 0xEE];
-const BLUE = [0x2D, 0x81, 0xFF];
+const GRID = 32;
 
-// Strokes in the 32-unit logo grid, drawn at 12x and offset by 64 on a 512 canvas:
-// a hospital (main block, two lower wings, door, ground line) with the cross in the accent blue.
-const LINES = [
-  { pts: [[16, 10.5], [16, 16.5]], color: BLUE },
-  { pts: [[13, 13.5], [19, 13.5]], color: BLUE },
-  { pts: [[8, 24], [8, 8], [24, 8], [24, 24]], color: PAPER },
-  { pts: [[8, 15], [3, 15], [3, 24]], color: PAPER },
-  { pts: [[24, 15], [29, 15], [29, 24]], color: PAPER },
-  { pts: [[14, 24], [14, 19], [18, 19], [18, 24]], color: PAPER },
-  { pts: [[2, 24], [30, 24]], color: PAPER }
-];
-const SCALE = 12;
-const HALF_STROKE = 1;
+const attr = (tag, name, d = 0) => Number(tag.match(new RegExp(`\\s${name}="([^"]+)"`))?.[1] ?? d);
+const RECTS = [...fs.readFileSync(path.join(OUT, 'icon.svg'), 'utf8').matchAll(/<rect\b[^>]*>/g)].map(([tag]) => {
+  const hex = tag.match(/fill="#([0-9a-f]{6})"/i)?.[1];
+  if (!hex) throw new Error('icon.svg: every rect needs a #rrggbb fill: ' + tag);
+  const x = attr(tag, 'x'), y = attr(tag, 'y');
+  return { x0: x, y0: y, x1: x + attr(tag, 'width'), y1: y + attr(tag, 'height'), color: [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16)) };
+});
 
-function distToSegment(px, py, [ax, ay], [bx, by]) {
-  const dx = bx - ax, dy = by - ay;
-  const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)));
-  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
-}
-
-// Colour of the stroke under (x, y), or null for the background.
-function strokeAt(x, y) {
-  for (const { pts, color } of LINES) {
-    for (let i = 0; i < pts.length - 1; i++) {
-      if (distToSegment(x, y, pts[i], pts[i + 1]) <= HALF_STROKE) return color;
-    }
+// Colour at (x, y) in the 32-unit grid: the last rect drawn there.
+function colorAt(x, y) {
+  for (let i = RECTS.length - 1; i >= 0; i--) {
+    const r = RECTS[i];
+    if (x >= r.x0 && x < r.x1 && y >= r.y0 && y < r.y1) return r.color;
   }
-  return null;
+  return RECTS[0].color;
 }
 
 function render(size) {
@@ -48,9 +34,9 @@ function render(size) {
       const sum = [0, 0, 0];
       for (let sy = 0; sy < SS; sy++) {
         for (let sx = 0; sx < SS; sx++) {
-          const u = ((x + (sx + 0.5) / SS) / size) * 512;
-          const v = ((y + (sy + 0.5) / SS) / size) * 512;
-          const col = strokeAt((u - 64) / SCALE, (v - 64) / SCALE) || BG;
+          const u = ((x + (sx + 0.5) / SS) / size) * GRID;
+          const v = ((y + (sy + 0.5) / SS) / size) * GRID;
+          const col = colorAt(u, v);
           for (let c = 0; c < 3; c++) sum[c] += col[c];
         }
       }
