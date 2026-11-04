@@ -1285,6 +1285,7 @@ const ACT = {
     const r = X.rep[id];
     const st = S.map[r._osp.id];
     st.sel = id;
+    if (st.lvl !== (liv === undefined ? r.piano ?? 'all' : Number(liv))) homeView(st);
     // The 2D plan shows every floor at once: tapping a building opens its first ward's floor.
     st.lvl = liv === undefined ? r.piano ?? 'all' : Number(liv);
     render();
@@ -1294,7 +1295,10 @@ const ACT = {
     const stage = $app.querySelector('.map-stage');
     const st = S.map[stage.dataset.osp];
     st.sel = r ? r.id : null;
-    if (r && r.piano != null) st.lvl = r.piano;
+    if (r && r.piano != null) {
+      if (st.lvl !== r.piano) homeView(st);
+      st.lvl = r.piano;
+    }
     render();
     if (r) $app.querySelector('.selcard')?.scrollIntoView({ block: 'nearest' });
   },
@@ -1302,6 +1306,7 @@ const ACT = {
     const st = S.map[osp];
     st.lvl = lvl === 'all' ? 'all' : Number(lvl);
     st.sel = null;
+    homeView(st);
     render();
   },
   mapZoom: ({ f }, el) => {
@@ -1579,6 +1584,8 @@ const ZOOM_MIN = 1, ZOOM_MAX = 6;
 let gest = null;
 let swallowClick = false;
 
+const homeView = (st) => Object.assign(st, { zoom: 1, panX: 0, panY: 0 });
+
 function viewOf(st) {
   st.zoom ??= 1;
   st.panX ??= 0;
@@ -1691,6 +1698,17 @@ document.addEventListener('pointerup', endGesture);
 document.addEventListener('pointercancel', endGesture);
 
 // Right-drag pans the map, so no context menu there.
+document.addEventListener('dblclick', (e) => {
+  const stage = e.target.closest('.map-stage');
+  if (!stage || e.target.closest('.map-ctrl')) return;
+  const st = stageState(stage);
+  if (!st) return;
+  viewOf(st);
+  if (st.zoom > 1.5) homeView(st);
+  else zoomAt(stage, st, 2.6, stagePoint(stage, e));
+  drawStage(stage);
+});
+
 document.addEventListener('contextmenu', (e) => {
   if (e.target.closest('.map-stage')) e.preventDefault();
 });

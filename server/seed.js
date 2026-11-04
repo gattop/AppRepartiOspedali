@@ -37,8 +37,8 @@ export function loadSeed(store, data, user = 'seed') {
 export function updateSeededMaps(store) {
   for (const f of fs.readdirSync(DIR).filter((x) => x.endsWith('.json'))) {
     for (const o of JSON.parse(fs.readFileSync(path.join(DIR, f), 'utf8')).ospedali) {
-      // Photo added after the hospital was seeded: fill it in once.
-      if (o.foto) store.db.prepare('UPDATE ospedali SET foto = ? WHERE id = ? AND foto IS NULL').run(o.foto, o.id);
+      // Photo added after the hospital was seeded: fill it in once (and move the first release's .jpg to the .webp).
+      if (o.foto) store.db.prepare('UPDATE ospedali SET foto = ? WHERE id = ? AND (foto IS NULL OR foto = ?)').run(o.foto, o.id, o.foto.replace(/\.webp$/, '.jpg'));
       if (!o.mappa?.corpi) continue;
       const row = store.get('ospedali', o.id);
       if (!row?.mappa) continue;

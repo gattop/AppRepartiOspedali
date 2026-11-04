@@ -237,10 +237,10 @@ test('serves the app shell with the build version', async () => {
 test('hospital cards have a photo that is served as an image', async () => {
   // (Senigallia was deleted on purpose by an earlier test, so only its photo file is checked.)
   const data = await (await req('GET', '/api/data')).json();
-  assert.equal(data.ospedali.find((o) => o.id === 'jesi').foto, '/img/jesi.jpg');
-  for (const f of ['/img/jesi.jpg', '/img/senigallia.jpg']) {
+  assert.equal(data.ospedali.find((o) => o.id === 'jesi').foto, '/img/jesi.webp');
+  for (const f of ['/img/jesi.webp', '/img/senigallia.webp']) {
     const res = await req('GET', f);
     assert.equal(res.status, 200);
-    assert.equal(res.headers.get('content-type'), 'image/jpeg');
+    assert.equal(res.headers.get('content-type'), 'image/webp');
   }
 });

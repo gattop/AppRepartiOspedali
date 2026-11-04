@@ -51,7 +51,7 @@ export function renderPlan({ mappa, reparti, sel, lvl, width, height = 300, targ
     ${(d.edifici || []).map((e) => html`<polygon class="p-other ${e.cls || ''}" points="${pts(e.poly)}"></polygon>`)}
     ${(d.percorsi || []).map((p) => html`<polyline class="p-path" points="${pts(p)}"></polyline>`)}`;
 
-  const shapes = [], buttons = [], labels = [];
+  const shapes = [], buttons = [], cands = [], taken = [];
   for (const b of B) {
     const lit = onLevel(b);
     const isSel = !!(hi && hi.corpo === b.id);
@@ -69,7 +69,11 @@ export function renderPlan({ mappa, reparti, sel, lvl, width, height = 300, targ
     const style = `left: ${sx(lx).toFixed(1)}px; top: ${sy(ly).toFixed(1)}px; color: ${ink(b.colore)}${lit ? '' : '; opacity: 0.45'}`;
     // With one level shown, each lit building also lists what's on that floor.
     const names = lvl !== 'all' && lit && list.length > 0 ? list.map((x) => x.nome.split(' – ')[0]).join(' · ') : '';
-    labels.push(html`<span class="map-plabel" style="${style}"><b>${b.label || b.id}</b>${names && html`<span class="n">${names}</span>`}</span>`);
+    const letter = { w: 16, h: 16, html: html`<span class="map-plabel" style="${style}"><b>${b.label || b.id}</b></span>` };
+    // The ward names sit in a box (up to 150px wide, 3 lines) under the letter.
+    const nw = Math.min(150, names.length * 5.8 + 12);
+    const nh = Math.min(3, Math.ceil((names.length * 5.8) / (nw - 12))) * 13 + 6;
+    cands.push({ x: sx(lx), y: sy(ly), prio: isSel ? 0 : 1, letter, full: names ? { w: Math.max(nw, 16), h: 19 + nh, html: html`<span class="map-plabel" style="${style}"><b>${b.label || b.id}</b><span class="n">${names}</span></span>` } : null });
   }
 
   const text = (d.scritte || []).map((t) => {
@@ -82,6 +86,7 @@ export function renderPlan({ mappa, reparti, sel, lvl, width, height = 300, targ
   const markers = points.map((m) => {
     const p = spot(m.corpo, m.punto);
     if (!p) return '';
+    taken.push({ x: p.x, y: p.y, w: m.text.length * 7 + 14, h: 20 });
     const on = start && start.corpo === m.corpo && start.punto && m.punto && start.punto.x === m.punto.x && start.punto.y === m.punto.y;
     return html`<span class="map-door${on ? ' on' : ''}" style="${`left: ${p.x.toFixed(1)}px; top: ${p.y.toFixed(1)}px; background: ${m.dot}`}">${m.text}</span>`;
   });
@@ -102,6 +107,25 @@ export function renderPlan({ mappa, reparti, sel, lvl, width, height = 300, targ
       pin = html`<div class="map-pin${hi.punto ? ' exact' : ''}" aria-hidden="true" style="${`left: ${p.x.toFixed(1)}px; top: ${p.y.toFixed(1)}px`}">
         ${hi.text && html`<span class="t" style="${`transform: translateX(${pinShift(p.x, W)}px)`}">${hi.text}</span>`}<span class="stick"></span><span class="head"></span>
       </div>`;
+    }
+  }
+
+  // Doors and the chosen pin first; then names, the chosen building first. A name box that would
+  // cover a door or another label is dropped, leaving just the building's letter.
+  const hits = (a) => taken.some((t) => Math.abs(a.x - t.x) < (a.w + t.w) / 2 && Math.abs(a.y - t.y) < (a.h + t.h) / 2);
+  if (hi) {
+    const p = spot(hi.corpo, hi.punto);
+    if (p) taken.push({ x: p.x, y: p.y - 30, w: Math.min(200, (hi.text || '').length * 7.4 + 20), h: 30 });
+  }
+  const labels = [];
+  for (const c of cands.sort((a, b) => a.prio - b.prio)) {
+    const [fx, fy] = [c.x, c.y];
+    if (c.full && !hits({ x: fx, y: fy, w: c.full.w, h: c.full.h })) {
+      taken.push({ x: fx, y: fy, w: c.full.w, h: c.full.h });
+      labels.push(c.full.html);
+    } else {
+      taken.push({ x: fx, y: fy, w: c.letter.w, h: c.letter.h });
+      labels.push(c.letter.html);
     }
   }
 

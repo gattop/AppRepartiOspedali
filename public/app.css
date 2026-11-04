@@ -251,7 +251,7 @@ a.hero-sub:hover { color: #FFFFFF; text-decoration: underline; }
 
 /* 3D map */
 .map-stage { position: relative; width: 100%; height: 300px; flex: none; background: #0B1220; overflow: hidden; }
-.map-stage.small { height: 260px; }
+.map-stage.small { height: 280px; }
 /* drag sideways to rotate; vertical swipes still scroll the page */
 .map-stage { touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
 .map-stage.dragging { cursor: grabbing; }
@@ -282,10 +282,10 @@ a.hero-sub:hover { color: #FFFFFF; text-decoration: underline; }
 .map-cbtn[disabled] { opacity: 0.4; cursor: default; }
 /* small stages (ward page, phone): compact controls so the column fits */
 .map-stage.small .map-ctrl, .pickfield .map-ctrl { gap: 4px; top: 8px; right: 8px; }
-.map-stage.small .map-cbtn, .pickfield .map-cbtn { width: 36px; height: 36px; border-radius: 10px; }
+.map-stage.small .map-cbtn, .pickfield .map-cbtn { width: 40px; height: 40px; border-radius: 10px; }
 @media (max-width: 899px) {
   .map-ctrl { gap: 4px; top: 8px; right: 8px; }
-  .map-cbtn { width: 38px; height: 38px; border-radius: 10px; }
+  .map-cbtn { width: 40px; height: 40px; border-radius: 10px; }
   /* the hospital map gets most of the phone screen, so the controls and the model both fit */
   .map-col .map-stage { height: min(58vh, 440px); min-height: 340px; }
   .map-hint { max-width: calc(100% - 64px); }
@@ -557,7 +557,7 @@ a.hero-sub:hover { color: #FFFFFF; text-decoration: underline; }
 .hcard { position: relative; flex: none; display: block; overflow: hidden; border-radius: 18px; background: #1E293B; color: #FFFFFF; text-decoration: none; aspect-ratio: 4 / 3; box-shadow: 0 2px 10px rgba(15, 23, 42, 0.18); }
 .hcard:hover { color: #FFFFFF; box-shadow: 0 6px 20px rgba(15, 23, 42, 0.3); }
 .hcard img, .hcard-ph { position: absolute; inset: 0; width: 100%; height: 100%; }
-.hcard img { object-fit: cover; transition: transform 0.4s; }
+.hcard img { object-fit: cover; object-position: 50% 35%; transition: transform 0.4s; }
 .hcard:hover img { transform: scale(1.03); }
 .hcard-ph { display: flex; align-items: center; justify-content: center; color: #475569; background: linear-gradient(135deg, #1E293B, #334155); }
 .hcard-shade { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8, 12, 24, 0.92) 0%, rgba(8, 12, 24, 0.55) 38%, rgba(8, 12, 24, 0) 70%); }
@@ -567,3 +567,10 @@ a.hero-sub:hover { color: #FFFFFF; text-decoration: underline; }
 .hcard-meta { font-size: 12px; font-weight: 800; color: #FCA5A5; letter-spacing: 0.02em; }
 .hcard-go { position: absolute; right: 14px; bottom: 16px; width: 36px; height: 36px; border-radius: 999px; background: var(--red); display: flex; align-items: center; justify-content: center; }
 .hcard:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
+
+@media (max-width: 899px) {
+  /* phones: bigger small print on the maps, and a one-line header so the map gets the room */
+  .map-legend { font-size: 12px; }
+  .map-flabel { font-size: 12px; }
+  .hero.compact .brand, .hero.compact .brand-sub { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}

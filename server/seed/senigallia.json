@@ -4,7 +4,7 @@
       "id": "senigallia",
       "nome": "Ospedale Civile di Senigallia “Principe di Piemonte”",
       "citta": "Senigallia",
-      "foto": "/img/senigallia.jpg",
+      "foto": "/img/senigallia.webp",
       "indirizzo": "Via Cellini",
       "uso_livelli": false,
       "prefisso_tel": "",
@@ -18,7 +18,7 @@
       },
       "mappa": {
         "tipo": "pianta",
-        "versione": 1,
+        "versione": 2,
         "livelli": [
           -1,
           0,
@@ -861,7 +861,7 @@
             {
               "x": 59,
               "y": 36.1,
-              "t": "Fondazione Città di Senigallia"
+              "t": "Fondazione"
             },
             {
               "x": 85.3,

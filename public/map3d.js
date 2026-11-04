@@ -91,17 +91,43 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
   const labelRaw = levels.map((L) => ({ L, p: add(P(bx0 - 0.8, by0 + 1, L * SP + TH / 2)) }));
 
   const W = width, H = height;
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-  for (const p of pts) {
-    if (p[0] < minX) minX = p[0]; if (p[0] > maxX) maxX = p[0];
-    if (p[1] < minY) minY = p[1]; if (p[1] > maxY) maxY = p[1];
-  }
   // Margins keep the drawing clear of the floor labels (left), controls (right) and legend (bottom).
   const big = W > 600;
   const fx0 = big ? 64 : 40, fx1 = W - (big ? 90 : 62), fy0 = big ? 56 : 46, fy1 = H - (big ? 64 : 34);
-  const fit = Math.min((fx1 - fx0) / (maxX - minX), (fy1 - fy0) / (maxY - minY));
-  const fitX = fx0 + ((fx1 - fx0) - (maxX - minX) * fit) / 2 - minX * fit;
-  const fitY = fy0 + ((fy1 - fy0) - (maxY - minY) * fit) / 2 - minY * fit;
+  // Scale and offset that centre `arr` in the frame; `maxFit` stops one small floor being blown up too much.
+  const fitTo = (arr, maxFit = Infinity) => {
+    let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+    for (const p of arr) {
+      if (p[0] < x0) x0 = p[0]; if (p[0] > x1) x1 = p[0];
+      if (p[1] < y0) y0 = p[1]; if (p[1] > y1) y1 = p[1];
+    }
+    const k = Math.min((fx1 - fx0) / Math.max(x1 - x0, 1), (fy1 - fy0) / Math.max(y1 - y0, 1), maxFit);
+    return { fit: k, x: fx0 + ((fx1 - fx0) - (x1 - x0) * k) / 2 - x0 * k, y: fy0 + ((fy1 - fy0) - (y1 - y0) * k) / 2 - y0 * k };
+  };
+  const rawAt = (corpo, liv, punto) => {
+    const b = byId[corpo];
+    if (!b || liv == null) return null;
+    return punto ? P(punto.x, punto.y, top(liv)) : P((b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2, top(liv));
+  };
+  const whole = fitTo(pts);
+  let view = whole;
+  if (lvl !== 'all') {
+    // With one level shown, the drawing is fitted to that level (plus what's drawn on it: the route,
+    // the entrances, the chosen ward) instead of to the whole stack, so it fills the stage.
+    const focus = [];
+    for (const r of rawFaces) {
+      if (r.it.L !== lvl) continue;
+      focus.push(...r.top);
+      for (const sd of r.sides) focus.push(...sd.poly);
+    }
+    const lp = labelRaw.find((l) => l.L === lvl);
+    if (lp) focus.push(lp.p);
+    for (const p of route || []) { const q = rawAt(p.corpo, p.liv, p.punto); if (q) focus.push(q); }
+    for (const m of points) if (m.liv === lvl) { const q = rawAt(m.corpo, m.liv, m.punto); if (q) focus.push(q); }
+    if (hi && hi.liv != null) { const q = rawAt(hi.corpo, hi.liv, hi.punto); if (q) focus.push(q); }
+    if (focus.length) view = fitTo(focus, whole.fit * 2.4);
+  }
+  const fit = view.fit, fitX = view.x, fitY = view.y;
   // Zoom scales the fitted drawing around the stage centre, then the pan shifts it (in pixels).
   const f = fit * zoom;
   const ox = W / 2 + (fitX - W / 2) * zoom + panX;
@@ -133,7 +159,7 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
   }
 
   const corpi = mappa.corpi || {};
-  const faces = [], blockLabels = [];
+  const faces = [], cands = [], taken = [];
   for (const r of rawFaces) {
     const it = r.it, col = colors(it), op = opacity(it);
     const pulse = it.isSel && !hi?.punto ? ' jpulse' : '';
@@ -159,16 +185,20 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
       const my = (b.y0 + b.y1) / 2, mx = (b.x0 + b.x1) / 2;
       const span = Math.hypot(sx(P(b.x1, my, it.zt)) - sx(P(b.x0, my, it.zt)), sy(P(b.x1, my, it.zt)) - sy(P(b.x0, my, it.zt)));
       const faceH = Math.abs(sy(P(mx, b.y1, it.zt)) - sy(P(mx, b.y0, it.zt)));
-      const size = Math.min(13, Math.max(8, faceH * 0.62));
+      const size = Math.min(13, Math.max(big ? 8 : 9.5, faceH * 0.62));
       const fits = span >= 46 && faceH >= 8;
       // Light text on the dark tops of the "all levels" view, dark text on the light active level.
       const color = it.isSel || it.mode === 'norm' ? '#FFFFFF' : '#0F172A';
       const css = `left: ${sx(r.cen).toFixed(1)}px; top: ${sy(r.cen).toFixed(1)}px; color: ${color}; font-size: ${size.toFixed(1)}px`;
+      const x = sx(r.cen), y = sy(r.cen), h = size * 1.3;
+      const short = b.label ? { w: b.label.length * size * 0.7 + 4, h, html: html`<span class="map-blabel" style="${css}">${b.label}</span>` } : null;
+      const prio = it.isSel ? 0 : it.mode === 'act' ? 1 : 2;
       if (fits && list.length > 0) {
         const names = list.map((x) => x.nome.split(' – ')[0]).join(' · ');
-        blockLabels.push(html`<span class="map-blabel named" style="${css + `; max-width: ${Math.round(span - 10)}px`}">${b.label && html`<b>${b.label}</b>`}${names}</span>`);
-      } else if (it.mode === 'act' && b.label) {
-        blockLabels.push(html`<span class="map-blabel" style="${css}">${b.label}</span>`);
+        const w = Math.min(span - 10, ((b.label?.length || 0) + 1) * size * 0.7 + names.length * size * 0.56 + 6);
+        cands.push({ x, y, prio, w, h, html: html`<span class="map-blabel named" style="${css + `; max-width: ${Math.round(span - 10)}px`}">${b.label && html`<b>${b.label}</b>`}${names}</span>`, short });
+      } else if (it.mode === 'act' && short) {
+        cands.push({ x, y, prio, ...short, short: null });
       }
     }
   }
@@ -180,6 +210,7 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
     .map((m) => {
       const p = spot(m.corpo, m.liv, m.punto);
       if (!p) return '';
+      taken.push({ x: p.x, y: p.y, w: m.text.length * 6.4 + 22, h: 22 });
       return html`<span class="map-marker${m.punto ? ' exact' : ''}" style="${`left: ${p.x.toFixed(1)}px; top: ${p.y.toFixed(1)}px`}"><span class="dot" style="${`background: ${m.dot}`}"></span>${m.text}</span>`;
     });
 
@@ -201,28 +232,45 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
   if (hi && hi.liv != null) {
     const p = spot(hi.corpo, hi.liv, hi.punto);
     if (p) {
+      taken.push({ x: p.x, y: p.y - 34, w: Math.min(200, (hi.text || '').length * 7.4 + 20), h: 30 });
       pin = html`<div class="map-pin${hi.punto ? ' exact' : ''}" aria-hidden="true" style="${`left: ${p.x.toFixed(1)}px; top: ${(p.y - (hi.punto ? 0 : 4)).toFixed(1)}px`}">
         ${hi.text && html`<span class="t" style="${`transform: translateX(${pinShift(p.x, W)}px)`}">${hi.text}</span>`}<span class="stick"></span><span class="head"></span>
       </div>`;
     }
   }
 
-  const floorLabels = labelRaw.map((l) => {
+  // Longest name first, the chosen block before the others; if the full text would cover a marker,
+  // the pin or another label, fall back to the block letter alone, or leave it out.
+  const hits = (a) => taken.some((t) => Math.abs(a.x - t.x) < (a.w + t.w) / 2 && Math.abs(a.y - t.y) < (a.h + t.h) / 2);
+  const blockLabels = [];
+  for (const c of cands.sort((a, b) => a.prio - b.prio)) {
+    for (const v of [c, c.short]) {
+      if (!v) continue;
+      const box = { x: c.x, y: c.y, w: v.w, h: v.h };
+      if (hits(box)) continue;
+      taken.push(box);
+      blockLabels.push(v.html);
+      break;
+    }
+  }
+
+  // Floors pushed off the stage by the fit (or under the hint line) get no label.
+  const floorLabels = labelRaw.filter((l) => sy(l.p) > 34 && sy(l.p) < H - 40).map((l) => {
     const active = lvl === l.L;
     const hidden = lvl !== 'all' && l.L > lvl;
-    const css = active ? 'background: #FFFFFF; color: #0F172A' : hidden ? 'color: rgba(203,213,225,0.35)' : 'color: #CBD5E1';
+    const css = active ? 'background: #FFFFFF; color: #0F172A' : hidden ? 'color: rgba(203,213,225,0.5)' : 'color: #CBD5E1';
     return html`<span class="map-flabel" style="${`left: ${Math.max(sx(l.p), 34).toFixed(1)}px; top: ${sy(l.p).toFixed(1)}px; ${css}`}">L${l.L}</span>`;
   });
 
   const out = html`
     ${faces}${floorLabels}${blockLabels}${routeSvg}${markers}${pin}
     <div class="map-ctrl">
-      <button type="button" class="map-cbtn" data-act="mapRot" data-d="-45" aria-label="Ruota a sinistra">${raw(ICON_ROT_L)}</button>
-      <button type="button" class="map-cbtn" data-act="mapRot" data-d="45" aria-label="Ruota a destra">${raw(ICON_ROT_R)}</button>
-      <button type="button" class="map-cbtn${exp ? ' on' : ''}" data-act="mapExp" aria-label="${exp ? 'Unisci i piani' : 'Separa i piani'}" aria-pressed="${exp}">${raw(ICON_LAYERS)}</button>
-      <button type="button" class="map-cbtn" data-act="mapZoom" data-f="1.5" aria-label="Ingrandisci">${raw(ICON_PLUS)}</button>
-      <button type="button" class="map-cbtn" data-act="mapZoom" data-f="0.6667" aria-label="Riduci" ${zoom <= 1.001 ? raw('disabled') : ''}>${raw(ICON_MINUS)}</button>
-      ${(zoom > 1.001 || panX || panY) && html`<button type="button" class="map-cbtn" data-act="mapReset" aria-label="Vista iniziale">${raw(ICON_FIT)}</button>`}
+      <button type="button" class="map-cbtn" data-act="mapRot" data-d="-45" aria-label="Ruota a sinistra" title="Ruota a sinistra">${raw(ICON_ROT_L)}</button>
+      <button type="button" class="map-cbtn" data-act="mapRot" data-d="45" aria-label="Ruota a destra" title="Ruota a destra">${raw(ICON_ROT_R)}</button>
+      <button type="button" class="map-cbtn${exp ? ' on' : ''}" data-act="mapExp" aria-label="${exp ? 'Unisci i piani' : 'Separa i piani'}" title="${exp ? 'Unisci i piani' : 'Separa i piani'}" aria-pressed="${exp}">${raw(ICON_LAYERS)}</button>
+      <button type="button" class="map-cbtn" data-act="mapZoom" data-f="1.5" aria-label="Ingrandisci" title="Ingrandisci">${raw(ICON_PLUS)}</button>
+      <button type="button" class="map-cbtn" data-act="mapZoom" data-f="0.6667" aria-label="Riduci" title="Riduci" ${zoom <= 1.001 ? raw('disabled') : ''}>${raw(ICON_MINUS)}</button>
+      ${(zoom > 1.001 || panX || panY) && html`<button type="button" class="map-cbtn" data-act="mapReset" aria-label="Vista iniziale" title="Vista iniziale">${raw(ICON_FIT)}</button>`}
     </div>
     <span class="map-hint" aria-hidden="true">${big ? 'Trascina per ruotare · rotella o due dita per lo zoom' : 'Trascina: ruota · Due dita: zoom'}</span>
     <div class="map-legend" aria-hidden="true">
