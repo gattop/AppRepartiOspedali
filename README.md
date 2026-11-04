@@ -2,7 +2,7 @@
 
 PWA per gli equipaggi: cerchi un reparto e vedi **ingresso, ascensore e piano**, con il percorso in 4 passi e il numero del reparto. Funziona offline con l'ultima copia dei dati scaricata.
 
-- **Cerca**: ricerca su tutti gli ospedali (nome, sigla, parole chiave), filtro per ospedale
+- **Ospedali** (pagina iniziale): una grande card con foto per ogni ospedale; da lì si entra nella mappa e si cerca il reparto (nome, sigla, parole chiave). La foto è il campo `foto` dell'ospedale (file in `public/img/`)
 - **Scheda reparto**: ingresso / ascensore / piano, percorso, note per l'equipaggio, "Chiama", verifica dei dati
 - **Ospedali**: sedi (plessi/padiglioni), ingressi (con indicazione "consigliato ambulanze" / "non adatto a barelle"), ascensori, reparti piano per piano
 - **Mappa 3D** per gli ospedali che la hanno (oggi l'Ospedale Carlo Urbani di Jesi): l'ospedale si apre direttamente sulla mappa, e la scheda di ogni reparto la mostra con il reparto evidenziato e il percorso disegnato (ingresso → ascensore → reparto)

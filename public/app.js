@@ -52,7 +52,6 @@ const S = {
   sessionExpired: false,
   loadError: null,
   fav: new Set(local.get('preferiti', [])),
-  search: { q: '', osp: 'all' },
   sedeTab: {},
   map: {},
   mapDetail: {},
@@ -303,8 +302,7 @@ function banner() {
 
 function tabbar(active) {
   const items = [
-    ['cerca', '#/', 'Cerca', ICON.search(22)],
-    ['ospedali', '#/ospedali', 'Ospedali', ICON.hospital(22)],
+    ['ospedali', '#/', 'Ospedali', ICON.hospital(22)],
     ['preferiti', '#/preferiti', 'Preferiti', ICON.star(22)]
   ];
   if (S.me.canEdit) items.push(['aggiungi', '#/aggiungi', 'Aggiungi', ICON.plus(22)]);
@@ -334,64 +332,6 @@ function repCard(r) {
     </div>
     <div class="rcard-go">${ICON.chevron()}</div>
   </a>`;
-}
-
-function emptyAdd(text) {
-  return html`<div class="empty">
-    <b>Nessun reparto trovato</b>
-    <span>${text}</span>
-    ${S.me.canEdit && html`<a class="btn primary" href="#/aggiungi">Aggiungi reparto</a>`}
-  </div>`;
-}
-
-// ---------------------------------------------------------------- views: search
-
-function searchResults() {
-  const words = norm(S.search.q).split(/\s+/).filter(Boolean);
-  const res = S.data.reparti.filter((r) => {
-    if (S.search.osp !== 'all' && r._osp?.id !== S.search.osp) return false;
-    return words.every((w) => r._hay.includes(w));
-  });
-  res.sort((a, b) => (a._osp?.nome || '').localeCompare(b._osp?.nome || '') || a.nome.localeCompare(b.nome));
-  const n = res.length;
-  const count = words.length ? `${n} ${n === 1 ? 'risultato' : 'risultati'} per “${S.search.q}”` : `${n} reparti`;
-  return { res, count };
-}
-
-function searchList() {
-  const { res, count } = searchResults();
-  return html`<div class="count">${count}</div>
-    <div class="cards">${res.slice(0, 200).map(repCard)}${!res.length && emptyAdd('Prova con una sigla (DH, UTIC, TAC) o aggiungilo tu.')}</div>`;
-}
-
-function viewSearch() {
-  const osps = S.data.ospedali;
-  const chips = [{ id: 'all', label: 'Tutti' }, ...osps.map((o) => ({ id: o.id, label: o.nome }))];
-  const live = navigator.serviceWorker?.controller && !S.offline;
-  return html`
-    ${banner()}
-    <header class="hero">
-      <div class="row between">
-        <div class="row gap10">
-          <div class="logo">${ICON.layers()}</div>
-          <div class="col">
-            <span class="brand">Reparti</span>
-            <span class="brand-sub">${osps.length} ospedali · ${S.data.reparti.length} reparti</span>
-          </div>
-        </div>
-        <div class="status ${S.offline ? 'off' : ''}"><span class="dot"></span>${S.offline ? 'Offline' : live ? 'Disponibile offline' : 'Online'}</div>
-      </div>
-      <h1>Dove devi portare il paziente?</h1>
-      <label class="search big">
-        ${ICON.search(22)}
-        <span class="sr">Cerca reparto, sigla o ospedale</span>
-        <input type="search" data-input="searchQ" value="${S.search.q}" placeholder="Reparto, sigla, ospedale…" autocomplete="off" enterkeyhint="search">
-        <button type="button" class="clear ${S.search.q ? '' : 'hide'}" data-act="clearSearch" aria-label="Cancella ricerca">${ICON.close()}</button>
-      </label>
-    </header>
-    ${osps.length > 1 && html`<div class="chips">${chips.map((c) => html`<button type="button" class="chip ${c.id === S.search.osp ? 'on' : ''}" data-act="searchOsp" data-id="${c.id}">${c.label}</button>`)}</div>`}
-    <main class="scroll" id="results">${searchList()}</main>
-    ${tabbar('cerca')}`;
 }
 
 // ---------------------------------------------------------------- views: ward detail
@@ -461,29 +401,39 @@ function viewReparto(id) {
 
 function viewOspedali() {
   const osps = S.data.ospedali;
+  const live = navigator.serviceWorker?.controller && !S.offline;
   return html`
     ${banner()}
     <header class="hero">
       <div class="row between">
-        <div class="col">
-          <span class="brand">Ospedali</span>
-          <span class="brand-sub">${osps.length} strutture</span>
+        <div class="row gap10">
+          <div class="logo">${ICON.layers()}</div>
+          <div class="col">
+            <span class="brand">Reparti</span>
+            <span class="brand-sub">${osps.length} ${osps.length === 1 ? 'ospedale' : 'ospedali'} · ${S.data.reparti.length} reparti</span>
+          </div>
         </div>
-        ${S.me.canEdit && html`<a class="hbtn" href="#/ospedali/nuovo">${ICON.plus(20)}Nuovo</a>`}
+        <div class="row gap8">
+          <div class="status ${S.offline ? 'off' : ''}"><span class="dot"></span>${S.offline ? 'Offline' : live ? 'Disponibile offline' : 'Online'}</div>
+          ${S.me.canEdit && html`<a class="hbtn" href="#/ospedali/nuovo">${ICON.plus(20)}Nuovo</a>`}
+        </div>
       </div>
+      <h1>Dove devi portare il paziente?</h1>
+      <span class="hero-sub">Scegli l'ospedale</span>
     </header>
-    <main class="scroll pad col gap10">
-      ${osps.map((o) => {
+    <main class="scroll pad col gap14 hosp-list">
+      ${osps.map((o, i) => {
         const sedi = X.sediByOsp[o.id] || [];
         const nrep = (X.repByOsp[o.id] || []).length;
-        return html`<a class="ocard" href="#/ospedale/${encodeURIComponent(o.id)}">
-          <div class="ocard-ico">${ICON.hospital(24)}</div>
-          <div class="col gap4 grow">
+        return html`<a class="hcard" href="#/ospedale/${encodeURIComponent(o.id)}">
+          ${o.foto ? html`<img src="${o.foto}" alt="" ${i === 0 ? raw('fetchpriority="high"') : raw('loading="lazy"')} decoding="async">` : html`<span class="hcard-ph">${ICON.hospital(56)}</span>`}
+          <span class="hcard-shade"></span>
+          <span class="hcard-text">
             <b>${o.nome}</b>
-            <span class="muted">${[o.indirizzo, o.citta].filter(Boolean).join(', ')}</span>
-            <span class="muted strong">${sedi.length} ${sedi.length === 1 ? 'sede' : 'sedi'} · ${nrep} reparti${o.mappa ? ' · ' + mapWord(o) : ''}</span>
-          </div>
-          <div class="rcard-go">${ICON.chevron()}</div>
+            <span class="hcard-city">${[o.indirizzo, o.citta].filter(Boolean).join(', ')}</span>
+            <span class="hcard-meta">${sedi.length} ${sedi.length === 1 ? 'sede' : 'sedi'} · ${nrep} reparti${o.mappa ? ' · ' + mapWord(o) : ''}</span>
+          </span>
+          <span class="hcard-go">${ICON.chevron()}</span>
         </a>`;
       })}
       ${!osps.length && html`<div class="empty"><b>Nessun ospedale</b><span>Aggiungi il primo ospedale per iniziare.</span></div>`}
@@ -1022,16 +972,16 @@ function viewPreferiti() {
 }
 
 function viewNotFound() {
-  return html`${banner()}<header class="hero"><div class="row"><a class="hbtn" href="#/">${ICON.back()}Cerca</a></div><h1>Non trovato</h1></header>
+  return html`${banner()}<header class="hero"><div class="row"><a class="hbtn" href="#/">${ICON.back()}Ospedali</a></div><h1>Non trovato</h1></header>
     <main class="scroll pad"><div class="empty"><b>Questa pagina non esiste più</b><span>Forse il dato è stato eliminato o rinominato.</span></div></main>${tabbar('')}`;
 }
 
 function viewForbidden() {
   if (!S.me.user) {
-    return html`${banner()}<header class="hero"><div class="row"><a class="hbtn" href="#/">${ICON.back()}Cerca</a></div><h1>Accesso richiesto</h1></header>
+    return html`${banner()}<header class="hero"><div class="row"><a class="hbtn" href="#/">${ICON.back()}Ospedali</a></div><h1>Accesso richiesto</h1></header>
       <main class="scroll pad"><div class="empty"><b>Per modificare i dati devi accedere</b><span>La consultazione è libera; aggiungere o modificare richiede un account con i permessi.</span><a class="btn primary" href="${loginUrl()}">Accedi</a></div></main>${tabbar('')}`;
   }
-  return html`${banner()}<header class="hero"><div class="row"><a class="hbtn" href="#/">${ICON.back()}Cerca</a></div><h1>Solo lettura</h1></header>
+  return html`${banner()}<header class="hero"><div class="row"><a class="hbtn" href="#/">${ICON.back()}Ospedali</a></div><h1>Solo lettura</h1></header>
     <main class="scroll pad"><div class="empty"><b>Non hai i permessi per modificare i dati</b><span>Chiedi all'amministratore di aggiungerti al gruppo degli editor.</span></div></main>${tabbar('')}`;
 }
 
@@ -1259,7 +1209,7 @@ function parseHash() {
 function route() {
   const { parts: [a, b, c], query } = parseHash();
   switch (a) {
-    case undefined: case 'cerca': return viewSearch();
+    case undefined: case 'cerca': return viewOspedali();
     case 'reparto': return c === 'modifica' ? viewRepForm(b, query) : viewReparto(b);
     case 'aggiungi': return viewRepForm(null, query);
     case 'preferiti': return viewPreferiti();
@@ -1318,12 +1268,6 @@ function draftChanged() {
 const ACT = {
   reload: () => start(),
   back: () => (history.length > 1 ? history.back() : (location.hash = '#/')),
-  clearSearch: () => {
-    S.search.q = '';
-    render();
-    $app.querySelector('[data-input="searchQ"]')?.focus();
-  },
-  searchOsp: ({ id }) => { S.search.osp = id; render(); },
   toggleFav: ({ id }) => {
     S.fav.has(id) ? S.fav.delete(id) : S.fav.add(id);
     local.set('preferiti', [...S.fav]);
@@ -1501,11 +1445,6 @@ const INPUT = {
   gestQ: (el) => {
     S.gest[el.dataset.osp].q = el.value;
     render();
-  },
-  searchQ: (el) => {
-    S.search.q = el.value;
-    document.getElementById('results').innerHTML = String(searchList());
-    $app.querySelector('[data-act="clearSearch"]').classList.toggle('hide', !el.value);
   },
   mapQ: (el) => {
     const st = S.map[el.dataset.osp];

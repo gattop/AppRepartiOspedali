@@ -37,6 +37,8 @@ export function loadSeed(store, data, user = 'seed') {
 export function updateSeededMaps(store) {
   for (const f of fs.readdirSync(DIR).filter((x) => x.endsWith('.json'))) {
     for (const o of JSON.parse(fs.readFileSync(path.join(DIR, f), 'utf8')).ospedali) {
+      // Photo added after the hospital was seeded: fill it in once.
+      if (o.foto) store.db.prepare('UPDATE ospedali SET foto = ? WHERE id = ? AND foto IS NULL').run(o.foto, o.id);
       if (!o.mappa?.corpi) continue;
       const row = store.get('ospedali', o.id);
       if (!row?.mappa) continue;
@@ -76,6 +78,21 @@ export function updateSeededMaps(store) {
 // One-off corrections to data already in production (seeded by an older release). Each runs once,
 // and only touches a row that is still as originally seeded, so manual edits are never overwritten.
 const DATA_FIXES = [
+  {
+    // Urologia shares the Polo endoscopico (L2, body A).
+    id: '2026-11-04-jesi-urologia',
+    run(store, log) {
+      const polo = store.get('reparti', 'jesi-endoscopia');
+      const exists = store.db.prepare("SELECT 1 FROM reparti WHERE sede_id = 'jesi-sede' AND (lower(nome) LIKE 'urologia%' OR lower(nome) LIKE '% urologia%')").get();
+      if (!polo || exists) return;
+      store.insertRaw('reparti', {
+        id: 'jesi-urologia', sede_id: polo.sede_id, nome: 'Urologia (Polo endoscopico)', tipo: 'Ambulatorio', piano: polo.piano, corpo: polo.corpo,
+        ingresso_id: polo.ingresso_id, ascensore_id: polo.ascensore_id, dove: polo.dove, note: 'Nello stesso polo del Polo endoscopico',
+        kw: 'urologia urologo cistoscopia prostata reni vescica endoscopia'
+      }, 'aggiornamento dati');
+      log('reparti', 'jesi-urologia', { nome: 'Urologia (Polo endoscopico)' });
+    }
+  },
   {
     // Hospitals added to the seed after the database was created.
     id: '2026-11-04-senigallia',

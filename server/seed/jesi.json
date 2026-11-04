@@ -4,6 +4,7 @@
       "id": "jesi",
       "nome": "Ospedale Carlo Urbani",
       "citta": "Jesi",
+      "foto": "/img/jesi.jpg",
       "indirizzo": "Via Aldo Moro 25",
       "uso_livelli": true,
       "prefisso_tel": "",
@@ -476,6 +477,19 @@
               "note": "",
               "tel": "2390",
               "kw": "endoscopia gastroscopia colonscopia gastroenterologia"
+            },
+            {
+              "id": "jesi-urologia",
+              "nome": "Urologia (Polo endoscopico)",
+              "tipo": "Ambulatorio",
+              "piano": 2,
+              "corpo": "A",
+              "ingresso": "ing-principale",
+              "ascensore": null,
+              "dove": "Corpo A – dalla portineria segui il corridoio verso i corpi A-B",
+              "note": "Nello stesso polo del Polo endoscopico",
+              "tel": "",
+              "kw": "urologia urologo cistoscopia prostata reni vescica endoscopia"
             },
             {
               "id": "jesi-gessi",

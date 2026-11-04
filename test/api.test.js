@@ -33,11 +33,12 @@ test('seeds Jesi and demo data on first start', async () => {
   const data = await (await req('GET', '/api/data')).json();
   const jesi = data.ospedali.find((o) => o.id === 'jesi');
   assert.ok(jesi.mappa.blocks.length > 0);
-  assert.equal(data.reparti.filter((r) => r.sede_id === 'jesi-sede').length, 38);
+  assert.equal(data.reparti.filter((r) => r.sede_id === 'jesi-sede').length, 39);
   const byId = Object.fromEntries(data.reparti.map((r) => [r.id, r]));
   assert.equal(byId['jesi-orto-deg'].corpo, 'D');
   assert.equal(byId['jesi-gessi'].corpo, 'D');
   assert.equal(byId['jesi-pneumologia'].corpo, 'B');
+  assert.equal(byId['jesi-urologia'].corpo, byId['jesi-endoscopia'].corpo);
   assert.ok(data.ospedali.some((o) => o.id === 'demo-riviera'));
 });
 
@@ -169,9 +170,11 @@ test('one-off data fixes update an old database once, without overwriting manual
   store.db.prepare("UPDATE reparti SET corpo = 'B' WHERE id = 'jesi-orto-deg'").run();
   store.db.prepare("UPDATE reparti SET corpo = 'A' WHERE id = 'jesi-gessi'").run();
   store.db.prepare("DELETE FROM reparti WHERE id = 'jesi-pneumologia'").run();
+  store.db.prepare("DELETE FROM reparti WHERE id = 'jesi-urologia'").run();
   store.db.exec('DELETE FROM correzioni');
 
   applyDataFixes(store);
+  assert.equal(store.get('reparti', 'jesi-urologia').piano, 2);
   assert.equal(store.get('reparti', 'jesi-orto-deg').corpo, 'D');
   assert.equal(store.get('reparti', 'jesi-orto-deg').ascensore_id, 'asc-cd');
   assert.equal(store.get('reparti', 'jesi-gessi').corpo, 'A', 'a ward edited by hand is left alone');
@@ -229,4 +232,15 @@ test('serves the app shell with the build version', async () => {
   assert.match(await page.text(), /<div id="app"/);
   assert.equal((await req('GET', '/../server/db.js')).status, 404);
   assert.equal((await req('GET', '/healthz')).status, 200);
+});
+
+test('hospital cards have a photo that is served as an image', async () => {
+  // (Senigallia was deleted on purpose by an earlier test, so only its photo file is checked.)
+  const data = await (await req('GET', '/api/data')).json();
+  assert.equal(data.ospedali.find((o) => o.id === 'jesi').foto, '/img/jesi.jpg');
+  for (const f of ['/img/jesi.jpg', '/img/senigallia.jpg']) {
+    const res = await req('GET', f);
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get('content-type'), 'image/jpeg');
+  }
 });
