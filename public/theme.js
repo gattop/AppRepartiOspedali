@@ -1,9 +1,10 @@
-// Runs before the page paints: applies the theme saved by the toggle (else the system one),
-// so there's no light/dark flash. The toggle itself is in app.js.
+// Runs before the page paints: applies the theme chosen in the app, so there's no flash.
+// Light is the default whatever the device setting; the switch itself is in app.js.
 (function () {
   var root = document.documentElement;
-  try { var t = localStorage.getItem('theme'); if (t === 'light' || t === 'dark') root.dataset.theme = t; } catch (e) { /* storage blocked */ }
-  var dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  var t = 'light';
+  try { if (localStorage.getItem('theme') === 'dark') t = 'dark'; } catch (e) { /* storage blocked */ }
+  root.dataset.theme = t;
   var meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.content = dark ? '#121316' : '#f2f1ee';
+  if (meta) meta.content = t === 'dark' ? '#121316' : '#f2f1ee';
 })();
