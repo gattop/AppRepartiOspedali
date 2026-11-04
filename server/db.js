@@ -198,6 +198,8 @@ class Store {
   }
 
   tx(fn) {
+    // Nested calls (e.g. a data fix that loads a seed file) join the outer transaction.
+    if (this.db.isTransaction) return fn();
     this.db.exec('BEGIN');
     try {
       const r = fn();

@@ -523,3 +523,30 @@ a.hero-sub:hover { color: #FFFFFF; text-decoration: underline; }
 }
 .toast.ok { background: var(--ink); color: #FFFFFF; }
 .toast.err { background: #B42318; color: #FFFFFF; }
+
+/* 2D plan (hospitals without a 3D drawing) */
+.map-plan { position: absolute; left: 0; top: 0; pointer-events: none; }
+.map-plan ~ .mf-btn { background: transparent; }
+.map-plan ~ .mf-btn:focus-visible { background: rgba(255, 255, 255, 0.25); }
+.p-road { fill: none; stroke: #2A3547; stroke-linecap: round; stroke-linejoin: round; }
+.p-road-mid { fill: none; stroke: #64748B; stroke-width: 1.2; stroke-dasharray: 8 7; }
+.p-area { fill: #142035; stroke: #EF4444; stroke-width: 1.5; stroke-opacity: 0.7; }
+.p-other { fill: #263244; stroke: #3B4A60; stroke-width: 1; }
+.p-other.park { fill: #1B2638; stroke-dasharray: 4 3; }
+.p-path { fill: none; stroke: #F87171; stroke-width: 2; stroke-dasharray: 3 4; stroke-linecap: round; stroke-linejoin: round; }
+.p-bld { stroke: rgba(11, 18, 32, 0.9); stroke-width: 1.5; stroke-linejoin: round; }
+.p-bld.dim { opacity: 0.28; }
+.p-bld.sel { stroke: #F43F5E; stroke-width: 4; opacity: 1; }
+.map-plabel { position: absolute; z-index: 1; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 3px; pointer-events: none; text-align: center; }
+.map-plabel b { font-size: 13px; font-weight: 900; line-height: 1; text-shadow: 0 0 3px rgba(11, 18, 32, 0.35); }
+.map-plabel .n { max-width: 150px; padding: 3px 6px; border-radius: 6px; background: rgba(15, 23, 42, 0.88); color: #FFFFFF; font-size: 10.5px; font-weight: 700; line-height: 1.25;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.map-ptext { position: absolute; transform: translate(-50%, -50%); font-size: 11px; font-weight: 700; color: #94A3B8; white-space: nowrap; pointer-events: none; }
+.map-ptext.big { font-size: 12px; font-weight: 800; color: #CBD5E1; }
+.map-ptext.red { color: #FCA5A5; font-weight: 800; }
+.map-door { position: absolute; transform: translate(-50%, -50%); min-width: 19px; height: 19px; padding: 0 3px; border-radius: 999px; border: 2px solid #FFFFFF; color: #FFFFFF; font-size: 10px; font-weight: 900; display: flex; align-items: center; justify-content: center; pointer-events: none; box-shadow: 0 1px 4px rgba(0,0,0,0.5); }
+.map-door.on { min-width: 26px; height: 26px; font-size: 12px; border-color: #FACC15; box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.45); z-index: 2; }
+.map-legend .sw.ring { background: transparent; border: 2.5px solid #F43F5E; }
+.map-legend .sw.dash { width: 16px; height: 0; border-top: 2px dashed #F87171; border-radius: 0; }
+@media (max-width: 899px) { .map-plabel .n { max-width: 110px; font-size: 10px; } }
+.map-plan ~ .map-pin { z-index: 3; }

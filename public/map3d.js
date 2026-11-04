@@ -245,7 +245,7 @@ export function renderMap({ mappa, reparti, sel, lvl, rot, exp, width, height = 
 }
 
 // Keeps the pin's label (max 260px wide on desktop, centred on the pin) inside the stage.
-function pinShift(x, W) {
+export function pinShift(x, W) {
   const half = W > 600 ? 136 : 106;
   return Math.max(0, half - x) - Math.max(0, x + half - W);
 }
@@ -254,6 +254,6 @@ const svg = (d, w = 20) => `<svg width="${w}" height="${w}" viewBox="0 0 24 24" 
 const ICON_ROT_L = svg('<path d="M4 12a8 8 0 1 0 2.5-5.8"></path><path d="M4 4v5h5"></path>');
 const ICON_ROT_R = svg('<path d="M20 12a8 8 0 1 1-2.5-5.8"></path><path d="M20 4v5h-5"></path>');
 const ICON_LAYERS = svg('<path d="M12 3l9 5-9 5-9-5z"></path><path d="M3 16l9 5 9-5"></path>');
-const ICON_PLUS = svg('<path d="M12 5v14M5 12h14"></path>');
-const ICON_MINUS = svg('<path d="M5 12h14"></path>');
-const ICON_FIT = svg('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path>');
+export const ICON_PLUS = svg('<path d="M12 5v14M5 12h14"></path>');
+export const ICON_MINUS = svg('<path d="M5 12h14"></path>');
+export const ICON_FIT = svg('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path>');

@@ -77,6 +77,13 @@ export function updateSeededMaps(store) {
 // and only touches a row that is still as originally seeded, so manual edits are never overwritten.
 const DATA_FIXES = [
   {
+    // Hospitals added to the seed after the database was created.
+    id: '2026-11-04-senigallia',
+    run(store) {
+      if (!store.get('ospedali', 'senigallia')) loadSeedFile(store, 'senigallia.json', 'aggiornamento dati');
+    }
+  },
+  {
     id: '2026-11-04-jesi-ortopedia-pneumologia-gessi',
     run(store, log) {
       const corpi = JSON.parse(store.get('ospedali', 'jesi')?.mappa || '{}').corpi || {};
@@ -121,10 +128,11 @@ export function applyDataFixes(store) {
   }
 }
 
+function loadSeedFile(store, f, user) {
+  loadSeed(store, JSON.parse(fs.readFileSync(path.join(DIR, f), 'utf8')), user);
+  console.log(`Dati iniziali caricati da ${f}`);
+}
+
 export function seed(store, { demo = false } = {}) {
-  const files = ['jesi.json', ...(demo ? ['demo.json'] : [])];
-  for (const f of files) {
-    loadSeed(store, JSON.parse(fs.readFileSync(path.join(DIR, f), 'utf8')));
-    console.log(`Dati iniziali caricati da ${f}`);
-  }
+  for (const f of ['jesi.json', 'senigallia.json', ...(demo ? ['demo.json'] : [])]) loadSeedFile(store, f);
 }

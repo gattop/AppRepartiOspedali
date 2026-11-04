@@ -1,0 +1,1903 @@
+{
+  "ospedali": [
+    {
+      "id": "senigallia",
+      "nome": "Ospedale Civile di Senigallia “Principe di Piemonte”",
+      "citta": "Senigallia",
+      "indirizzo": "Via Cellini",
+      "uso_livelli": false,
+      "prefisso_tel": "",
+      "fonte": "Dati dalla piantina dell'Ospedale Civile di Senigallia (ASUR Marche – Area Vasta 2): da verificare sul posto.",
+      "piani": {
+        "min": -1,
+        "max": 6,
+        "nomi": {
+          "-1": "Seminterrato"
+        }
+      },
+      "mappa": {
+        "tipo": "pianta",
+        "versione": 1,
+        "livelli": [
+          -1,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "view": {
+          "x0": 20,
+          "y0": 25,
+          "x1": 123,
+          "y1": 119
+        },
+        "blocks": [
+          {
+            "id": "B",
+            "label": "B",
+            "poly": [
+              [
+                100.5,
+                36
+              ],
+              [
+                108.3,
+                37.2
+              ],
+              [
+                109.2,
+                40.5
+              ],
+              [
+                106.8,
+                42.2
+              ],
+              [
+                106.5,
+                44.5
+              ],
+              [
+                104,
+                44.8
+              ],
+              [
+                103.8,
+                41.2
+              ],
+              [
+                100.3,
+                40
+              ]
+            ],
+            "l": [
+              105.8,
+              39.6
+            ],
+            "colore": "#2D8FD5",
+            "lv": [
+              0
+            ]
+          },
+          {
+            "id": "A2",
+            "label": "A2",
+            "poly": [
+              [
+                105.5,
+                51.2
+              ],
+              [
+                108.5,
+                52.8
+              ],
+              [
+                110.5,
+                54
+              ],
+              [
+                116.8,
+                55.2
+              ],
+              [
+                116,
+                59.8
+              ],
+              [
+                108.8,
+                58.5
+              ],
+              [
+                104.2,
+                56
+              ]
+            ],
+            "l": [
+              110,
+              56
+            ],
+            "colore": "#B7A8DA",
+            "lv": [
+              0,
+              1
+            ]
+          },
+          {
+            "id": "A3",
+            "label": "A3",
+            "poly": [
+              [
+                112,
+                59.8
+              ],
+              [
+                116.2,
+                60.5
+              ],
+              [
+                113.5,
+                70.5
+              ],
+              [
+                109,
+                75.5
+              ],
+              [
+                107,
+                73
+              ],
+              [
+                110.5,
+                68.5
+              ]
+            ],
+            "l": [
+              112.4,
+              66
+            ],
+            "colore": "#EE7D1F",
+            "lv": [
+              0,
+              1,
+              2
+            ]
+          },
+          {
+            "id": "A1",
+            "label": "A1",
+            "poly": [
+              [
+                101,
+                68.5
+              ],
+              [
+                104.5,
+                72
+              ],
+              [
+                106,
+                76
+              ],
+              [
+                103.5,
+                78.5
+              ],
+              [
+                105.5,
+                80.5
+              ],
+              [
+                110.5,
+                85
+              ],
+              [
+                110.5,
+                90.5
+              ],
+              [
+                104,
+                93.5
+              ],
+              [
+                99.5,
+                90
+              ],
+              [
+                97.5,
+                89
+              ],
+              [
+                96,
+                91.5
+              ],
+              [
+                93,
+                90.5
+              ],
+              [
+                91,
+                92
+              ],
+              [
+                87,
+                86
+              ],
+              [
+                90.5,
+                83
+              ],
+              [
+                89,
+                81
+              ],
+              [
+                92.5,
+                78
+              ],
+              [
+                95,
+                80
+              ],
+              [
+                98,
+                76.5
+              ],
+              [
+                97,
+                74.5
+              ]
+            ],
+            "l": [
+              101.5,
+              84.5
+            ],
+            "colore": "#169B48",
+            "lv": [
+              0,
+              1
+            ]
+          },
+          {
+            "id": "D2",
+            "label": "D2",
+            "poly": [
+              [
+                68.5,
+                50
+              ],
+              [
+                80.2,
+                50
+              ],
+              [
+                80.2,
+                48.6
+              ],
+              [
+                82.8,
+                48.6
+              ],
+              [
+                82.8,
+                50
+              ],
+              [
+                85.2,
+                50
+              ],
+              [
+                85.2,
+                60.5
+              ],
+              [
+                68.5,
+                60.5
+              ]
+            ],
+            "l": [
+              76,
+              57
+            ],
+            "colore": "#F5E625",
+            "lv": [
+              -1,
+              0,
+              1,
+              2,
+              3,
+              4
+            ]
+          },
+          {
+            "id": "D1",
+            "label": "D1",
+            "poly": [
+              [
+                80.8,
+                61.5
+              ],
+              [
+                85.2,
+                61.5
+              ],
+              [
+                82.8,
+                77.5
+              ],
+              [
+                83.5,
+                78
+              ],
+              [
+                83,
+                80.5
+              ],
+              [
+                81.8,
+                80.5
+              ],
+              [
+                79.8,
+                94.5
+              ],
+              [
+                75.6,
+                94
+              ],
+              [
+                77.3,
+                80.5
+              ],
+              [
+                76.3,
+                80.3
+              ],
+              [
+                76.6,
+                77.6
+              ],
+              [
+                77.6,
+                77.6
+              ]
+            ],
+            "l": [
+              79.8,
+              79
+            ],
+            "colore": "#DE1D82",
+            "lv": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ]
+          },
+          {
+            "id": "H",
+            "label": "H",
+            "poly": [
+              [
+                87.3,
+                64.3
+              ],
+              [
+                93.8,
+                64.8
+              ],
+              [
+                94.6,
+                73.8
+              ],
+              [
+                92,
+                76.5
+              ],
+              [
+                85.6,
+                75.5
+              ],
+              [
+                85.9,
+                72.5
+              ],
+              [
+                88.4,
+                70.3
+              ],
+              [
+                87.6,
+                67.5
+              ]
+            ],
+            "l": [
+              91.5,
+              70.5
+            ],
+            "colore": "#2E2C72",
+            "lv": [
+              0,
+              1
+            ]
+          },
+          {
+            "id": "F",
+            "label": "F",
+            "poly": [
+              [
+                57.2,
+                59.8
+              ],
+              [
+                61,
+                59.8
+              ],
+              [
+                61,
+                60.6
+              ],
+              [
+                66.3,
+                60.6
+              ],
+              [
+                66.3,
+                67.3
+              ],
+              [
+                53.8,
+                67.3
+              ],
+              [
+                53.8,
+                60.6
+              ],
+              [
+                57.2,
+                60.6
+              ]
+            ],
+            "l": [
+              60,
+              64
+            ],
+            "colore": "#F2A1A8",
+            "lv": [
+              0,
+              1
+            ]
+          },
+          {
+            "id": "C",
+            "label": "C",
+            "poly": [
+              [
+                54.3,
+                94
+              ],
+              [
+                61.7,
+                96.6
+              ],
+              [
+                57.4,
+                106.7
+              ],
+              [
+                52,
+                104.3
+              ]
+            ],
+            "l": [
+              56.8,
+              100.5
+            ],
+            "colore": "#3E8A99",
+            "lv": [
+              0,
+              1
+            ]
+          }
+        ],
+        "corpi": {
+          "B": {
+            "label": "B",
+            "short": "B",
+            "dove": "Palazzina B (azzurra)"
+          },
+          "A2": {
+            "label": "A2",
+            "short": "A2",
+            "dove": "Palazzina A2 (lilla)"
+          },
+          "A3": {
+            "label": "A3",
+            "short": "A3",
+            "dove": "Palazzina A3 (arancione)"
+          },
+          "A1": {
+            "label": "A1",
+            "short": "A1",
+            "dove": "Palazzina A1 (verde)"
+          },
+          "D2": {
+            "label": "D2",
+            "short": "D2",
+            "dove": "Palazzina D2 (gialla)"
+          },
+          "D1": {
+            "label": "D1",
+            "short": "D1",
+            "dove": "Palazzina D1 (fucsia)"
+          },
+          "H": {
+            "label": "H",
+            "short": "H",
+            "dove": "Palazzina H (blu)"
+          },
+          "F": {
+            "label": "F",
+            "short": "F",
+            "dove": "Palazzina F (rosa)"
+          },
+          "C": {
+            "label": "C",
+            "short": "C",
+            "dove": "Palazzina C (verde acqua)"
+          }
+        },
+        "decor": {
+          "area": [
+            [
+              44,
+              116.5
+            ],
+            [
+              44,
+              86.2
+            ],
+            [
+              49.3,
+              86.2
+            ],
+            [
+              49.3,
+              51.7
+            ],
+            [
+              66,
+              51.7
+            ],
+            [
+              72,
+              45
+            ],
+            [
+              93.5,
+              44.5
+            ],
+            [
+              100,
+              35.5
+            ],
+            [
+              114,
+              36.8
+            ],
+            [
+              119.3,
+              42.5
+            ],
+            [
+              115,
+              93.5
+            ]
+          ],
+          "strade": [
+            {
+              "pts": [
+                [
+                  0,
+                  26.5
+                ],
+                [
+                  113,
+                  35.5
+                ]
+              ]
+            },
+            {
+              "pts": [
+                [
+                  121,
+                  40
+                ],
+                [
+                  113.5,
+                  105
+                ]
+              ]
+            },
+            {
+              "pts": [
+                [
+                  44,
+                  120
+                ],
+                [
+                  115,
+                  95.5
+                ]
+              ]
+            },
+            {
+              "pts": [
+                [
+                  48.2,
+                  27.5
+                ],
+                [
+                  48.2,
+                  77
+                ]
+              ]
+            }
+          ],
+          "edifici": [
+            {
+              "poly": [
+                [
+                  2,
+                  33
+                ],
+                [
+                  46.5,
+                  34.5
+                ],
+                [
+                  46.5,
+                  50
+                ],
+                [
+                  2,
+                  49
+                ]
+              ],
+              "cls": "park"
+            },
+            {
+              "poly": [
+                [
+                  52.5,
+                  34
+                ],
+                [
+                  65.8,
+                  34
+                ],
+                [
+                  65.8,
+                  38.2
+                ],
+                [
+                  52.5,
+                  38.2
+                ]
+              ]
+            },
+            {
+              "poly": [
+                [
+                  79,
+                  37.5
+                ],
+                [
+                  91.5,
+                  37.5
+                ],
+                [
+                  91.5,
+                  43.8
+                ],
+                [
+                  79,
+                  43.8
+                ]
+              ]
+            },
+            {
+              "poly": [
+                [
+                  27.2,
+                  62
+                ],
+                [
+                  34,
+                  62.5
+                ],
+                [
+                  34,
+                  70
+                ],
+                [
+                  27.2,
+                  69.5
+                ]
+              ]
+            },
+            {
+              "poly": [
+                [
+                  35.5,
+                  64
+                ],
+                [
+                  42,
+                  63.5
+                ],
+                [
+                  42,
+                  70.5
+                ],
+                [
+                  35.5,
+                  70.5
+                ]
+              ]
+            }
+          ],
+          "percorsi": [
+            [
+              [
+                37.5,
+                51
+              ],
+              [
+                37.5,
+                57.5
+              ],
+              [
+                51.5,
+                57.5
+              ]
+            ],
+            [
+              [
+                48.2,
+                28
+              ],
+              [
+                48.2,
+                34
+              ]
+            ],
+            [
+              [
+                82,
+                100.5
+              ],
+              [
+                84.5,
+                86
+              ],
+              [
+                86.5,
+                83
+              ],
+              [
+                85.7,
+                80.5
+              ]
+            ],
+            [
+              [
+                84.5,
+                86
+              ],
+              [
+                97.5,
+                78
+              ],
+              [
+                99.5,
+                66
+              ],
+              [
+                101,
+                54.5
+              ],
+              [
+                104.5,
+                47
+              ],
+              [
+                111,
+                41.5
+              ]
+            ]
+          ],
+          "scritte": [
+            {
+              "x": 33,
+              "y": 41.5,
+              "t": "Parcheggio",
+              "cls": "big"
+            },
+            {
+              "x": 42.5,
+              "y": 47.8,
+              "t": "Cassa"
+            },
+            {
+              "x": 49,
+              "y": 25.2,
+              "t": "Ingresso parcheggio",
+              "cls": "red"
+            },
+            {
+              "x": 41,
+              "y": 55.3,
+              "t": "Ingresso pedonale",
+              "cls": "red"
+            },
+            {
+              "x": 77.5,
+              "y": 102.7,
+              "t": "Portineria",
+              "cls": "red"
+            },
+            {
+              "x": 109,
+              "y": 46.5,
+              "t": "Uscita",
+              "cls": "red"
+            },
+            {
+              "x": 59,
+              "y": 36.1,
+              "t": "Fondazione Città di Senigallia"
+            },
+            {
+              "x": 85.3,
+              "y": 40.6,
+              "t": "Fondazione"
+            },
+            {
+              "x": 92,
+              "y": 32.4,
+              "t": "Via Cellini",
+              "rot": 4.5
+            },
+            {
+              "x": 120.3,
+              "y": 68,
+              "t": "Via Po",
+              "rot": -83
+            },
+            {
+              "x": 88,
+              "y": 108.5,
+              "t": "Via Camposanto Vecchio",
+              "rot": -19
+            }
+          ]
+        }
+      },
+      "sedi": [
+        {
+          "id": "senigallia-sede",
+          "nome": "Ospedale di Senigallia",
+          "indirizzo": "Via Cellini",
+          "ingressi": [
+            {
+              "id": "sen-ing-1",
+              "nome": "Ingresso 1",
+              "sigla": "1",
+              "nota": "Palazzina B",
+              "piano": 0,
+              "corpo": "B",
+              "punto": {
+                "x": 109.5,
+                "y": 38.3
+              }
+            },
+            {
+              "id": "sen-ing-2",
+              "nome": "Ingresso 2",
+              "sigla": "2",
+              "nota": "Palazzina A2",
+              "piano": 0,
+              "corpo": "A2",
+              "punto": {
+                "x": 109.7,
+                "y": 58
+              }
+            },
+            {
+              "id": "sen-ing-3",
+              "nome": "Ingresso 3",
+              "sigla": "3",
+              "nota": "Palazzina A3",
+              "piano": 0,
+              "corpo": "A3",
+              "punto": {
+                "x": 109.3,
+                "y": 61.8
+              }
+            },
+            {
+              "id": "sen-ing-5",
+              "nome": "Ingresso 5",
+              "sigla": "5",
+              "nota": "Palazzina A1",
+              "piano": 0,
+              "corpo": "A1",
+              "punto": {
+                "x": 96.8,
+                "y": 79.5
+              }
+            },
+            {
+              "id": "sen-ing-6",
+              "nome": "Ingresso 6",
+              "sigla": "6",
+              "nota": "Palazzina A1",
+              "piano": 0,
+              "corpo": "A1",
+              "punto": {
+                "x": 92.5,
+                "y": 82.3
+              }
+            },
+            {
+              "id": "sen-ing-7",
+              "nome": "Ingresso 7",
+              "sigla": "7",
+              "nota": "Tra le palazzine D1 e A1, in fondo al percorso principale dalla Portineria. Per la A1 al primo piano c'è il tunnel a vetri",
+              "piano": 0,
+              "corpo": "D1",
+              "punto": {
+                "x": 85.7,
+                "y": 79.5
+              }
+            },
+            {
+              "id": "sen-ing-8",
+              "nome": "Ingresso 8",
+              "sigla": "8",
+              "nota": "Palazzina H",
+              "piano": 0,
+              "corpo": "H",
+              "punto": {
+                "x": 88.3,
+                "y": 72
+              }
+            },
+            {
+              "id": "sen-ing-9",
+              "nome": "Ingresso 9",
+              "sigla": "9",
+              "nota": "Palazzina H",
+              "piano": 0,
+              "corpo": "H",
+              "punto": {
+                "x": 93.7,
+                "y": 63.8
+              }
+            },
+            {
+              "id": "sen-ing-10",
+              "nome": "Ingresso 10",
+              "sigla": "10",
+              "nota": "Palazzina D2",
+              "piano": 0,
+              "corpo": "D2",
+              "punto": {
+                "x": 84.9,
+                "y": 55.8
+              }
+            },
+            {
+              "id": "sen-ing-11",
+              "nome": "Ingresso 11",
+              "sigla": "11",
+              "nota": "Palazzina D2",
+              "piano": 0,
+              "corpo": "D2",
+              "punto": {
+                "x": 84.2,
+                "y": 47
+              }
+            },
+            {
+              "id": "sen-ing-12",
+              "nome": "Ingresso 12",
+              "sigla": "12",
+              "nota": "Palazzina D2",
+              "piano": 0,
+              "corpo": "D2",
+              "punto": {
+                "x": 81,
+                "y": 47
+              }
+            },
+            {
+              "id": "sen-ing-13",
+              "nome": "Ingresso 13",
+              "sigla": "13",
+              "nota": "Palazzina D2",
+              "piano": 0,
+              "corpo": "D2",
+              "punto": {
+                "x": 77.8,
+                "y": 47
+              }
+            },
+            {
+              "id": "sen-ing-14",
+              "nome": "Ingresso 14",
+              "sigla": "14",
+              "nota": "Palazzina F",
+              "piano": 0,
+              "corpo": "F",
+              "punto": {
+                "x": 59.8,
+                "y": 58.8
+              }
+            },
+            {
+              "id": "sen-ing-15",
+              "nome": "Ingresso 15",
+              "sigla": "15",
+              "nota": "Palazzina F",
+              "piano": 0,
+              "corpo": "F",
+              "punto": {
+                "x": 59.9,
+                "y": 67.1
+              }
+            },
+            {
+              "id": "sen-ing-16",
+              "nome": "Ingresso 16",
+              "sigla": "16",
+              "nota": "Lato ovest della palazzina D1, in alternativa al 7",
+              "piano": 0,
+              "corpo": "D1",
+              "punto": {
+                "x": 74.6,
+                "y": 78.1
+              }
+            },
+            {
+              "id": "sen-ing-17",
+              "nome": "Ingresso 17",
+              "sigla": "17",
+              "nota": "Palazzina C",
+              "piano": 0,
+              "corpo": "C",
+              "punto": {
+                "x": 54.6,
+                "y": 99
+              }
+            }
+          ],
+          "ascensori": [],
+          "reparti": [
+            {
+              "id": "sen-ps",
+              "nome": "Pronto Soccorso",
+              "tipo": "Emergenza",
+              "piano": 0,
+              "corpo": "A1",
+              "ingresso": null,
+              "ascensore": null,
+              "dove": "Palazzina A1 (verde)",
+              "note": "",
+              "tel": "",
+              "kw": "pronto soccorso ps emergenza urgenza 118"
+            },
+            {
+              "id": "sen-rianimazione",
+              "nome": "Rianimazione",
+              "tipo": "Degenza",
+              "piano": 0,
+              "corpo": "A1",
+              "ingresso": null,
+              "ascensore": null,
+              "dove": "Palazzina A1 (verde)",
+              "note": "Ingresso sul retro della palazzina A1",
+              "tel": "",
+              "kw": "rianimazione terapia intensiva"
+            },
+            {
+              "id": "sen-obi",
+              "nome": "Osservazione Breve Intensiva (O.B.I.)",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "A1",
+              "ingresso": "sen-ing-5",
+              "ascensore": null,
+              "dove": "Palazzina A1 (verde)",
+              "note": "",
+              "tel": "",
+              "kw": "obi osservazione breve intensiva pronto soccorso"
+            },
+            {
+              "id": "sen-chirurgia",
+              "nome": "Chirurgia",
+              "tipo": "Degenza",
+              "piano": 1,
+              "corpo": "A1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Entra dall'ingresso 7 o 16 (palazzina D1), sali al primo piano e attraversa il tunnel a vetri verso la palazzina A1",
+              "note": "",
+              "tel": "",
+              "kw": "chirurgia chirurgico degenza ricovero"
+            },
+            {
+              "id": "sen-amb-chirurgia",
+              "nome": "Ambulatori Area chirurgica",
+              "tipo": "Ambulatorio",
+              "piano": 1,
+              "corpo": "A1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Entra dall'ingresso 7 o 16 (palazzina D1), sali al primo piano e attraversa il tunnel a vetri verso la palazzina A1",
+              "note": "",
+              "tel": "",
+              "kw": "ambulatorio chirurgia chirurgico"
+            },
+            {
+              "id": "sen-sala-gessi",
+              "nome": "Sala gessi",
+              "tipo": "Ambulatorio",
+              "piano": 1,
+              "corpo": "A1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Entra dall'ingresso 7 o 16 (palazzina D1), sali al primo piano e attraversa il tunnel a vetri verso la palazzina A1",
+              "note": "",
+              "tel": "",
+              "kw": "gessi gesso ortopedia frattura"
+            },
+            {
+              "id": "sen-terapia-dolore",
+              "nome": "Ambulatorio Terapia del dolore",
+              "tipo": "Ambulatorio",
+              "piano": 1,
+              "corpo": "A1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Entra dall'ingresso 7 o 16 (palazzina D1), sali al primo piano e attraversa il tunnel a vetri verso la palazzina A1",
+              "note": "",
+              "tel": "",
+              "kw": "terapia dolore antalgica"
+            },
+            {
+              "id": "sen-prericoveri",
+              "nome": "Prericoveri",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "A1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Entra dall'ingresso 7 o 16 (palazzina D1), sali al primo piano e attraversa il tunnel a vetri verso la palazzina A1",
+              "note": "",
+              "tel": "",
+              "kw": "prericovero preospedalizzazione esami preoperatori"
+            },
+            {
+              "id": "sen-cup",
+              "nome": "Cassa ticket – C.U.P.",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "A2",
+              "ingresso": "sen-ing-2",
+              "ascensore": null,
+              "dove": "Palazzina A2 (lilla)",
+              "note": "",
+              "tel": "",
+              "kw": "cup cassa ticket prenotazioni pagamento"
+            },
+            {
+              "id": "sen-accettazione",
+              "nome": "Accettazione ricoveri",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "A2",
+              "ingresso": "sen-ing-2",
+              "ascensore": null,
+              "dove": "Palazzina A2 (lilla)",
+              "note": "",
+              "tel": "",
+              "kw": "accettazione ricoveri ricovero"
+            },
+            {
+              "id": "sen-urp-a2",
+              "nome": "Ufficio Relazioni con il Pubblico (U.R.P.)",
+              "tipo": "Ufficio",
+              "piano": 0,
+              "corpo": "A2",
+              "ingresso": "sen-ing-2",
+              "ascensore": null,
+              "dove": "Palazzina A2 (lilla)",
+              "note": "",
+              "tel": "",
+              "kw": "urp relazioni pubblico reclami informazioni"
+            },
+            {
+              "id": "sen-cartelle",
+              "nome": "Cartelle cliniche",
+              "tipo": "Ufficio",
+              "piano": 0,
+              "corpo": "A2",
+              "ingresso": "sen-ing-2",
+              "ascensore": null,
+              "dove": "Palazzina A2 (lilla)",
+              "note": "",
+              "tel": "",
+              "kw": "cartelle cliniche copia documentazione sanitaria"
+            },
+            {
+              "id": "sen-tribunale-malato",
+              "nome": "Tribunale del malato",
+              "tipo": "Ufficio",
+              "piano": 0,
+              "corpo": "A2",
+              "ingresso": "sen-ing-2",
+              "ascensore": null,
+              "dove": "Palazzina A2 (lilla)",
+              "note": "",
+              "tel": "",
+              "kw": "tribunale malato diritti cittadinanzattiva"
+            },
+            {
+              "id": "sen-dir-amm",
+              "nome": "Direzione amministrativa",
+              "tipo": "Ufficio",
+              "piano": 1,
+              "corpo": "A2",
+              "ingresso": "sen-ing-2",
+              "ascensore": null,
+              "dove": "Palazzina A2 (lilla)",
+              "note": "",
+              "tel": "",
+              "kw": "direzione amministrativa amministrazione"
+            },
+            {
+              "id": "sen-dir-med",
+              "nome": "Direzione medica",
+              "tipo": "Ufficio",
+              "piano": 1,
+              "corpo": "A2",
+              "ingresso": "sen-ing-2",
+              "ascensore": null,
+              "dove": "Palazzina A2 (lilla)",
+              "note": "",
+              "tel": "",
+              "kw": "direzione medica sanitaria"
+            },
+            {
+              "id": "sen-area-inf",
+              "nome": "Area infermieristica e ostetrica",
+              "tipo": "Ufficio",
+              "piano": 1,
+              "corpo": "A2",
+              "ingresso": "sen-ing-2",
+              "ascensore": null,
+              "dove": "Palazzina A2 (lilla)",
+              "note": "",
+              "tel": "",
+              "kw": "area infermieristica ostetrica infermieri"
+            },
+            {
+              "id": "sen-orl",
+              "nome": "Otorinolaringoiatria (O.R.L.)",
+              "tipo": "Reparto",
+              "piano": 1,
+              "corpo": "A3",
+              "ingresso": "sen-ing-3",
+              "ascensore": null,
+              "dove": "Palazzina A3 (arancione)",
+              "note": "",
+              "tel": "",
+              "kw": "orl otorino otorinolaringoiatria orecchio naso gola"
+            },
+            {
+              "id": "sen-endoscopia",
+              "nome": "Ambulatorio Endoscopia digestiva",
+              "tipo": "Ambulatorio",
+              "piano": 2,
+              "corpo": "A3",
+              "ingresso": "sen-ing-3",
+              "ascensore": null,
+              "dove": "Palazzina A3 (arancione)",
+              "note": "",
+              "tel": "",
+              "kw": "endoscopia digestiva gastroscopia colonscopia"
+            },
+            {
+              "id": "sen-laboratorio",
+              "nome": "Patologia clinica (Laboratorio analisi)",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "B",
+              "ingresso": "sen-ing-1",
+              "ascensore": null,
+              "dove": "Palazzina B (azzurra)",
+              "note": "",
+              "tel": "",
+              "kw": "laboratorio analisi prelievi sangue patologia clinica"
+            },
+            {
+              "id": "sen-potes",
+              "nome": "PO.TE.S. – 118",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "B",
+              "ingresso": null,
+              "ascensore": null,
+              "dove": "Palazzina B (azzurra)",
+              "note": "",
+              "tel": "",
+              "kw": "potes 118 emergenza territoriale ambulanze"
+            },
+            {
+              "id": "sen-trasfusionale",
+              "nome": "Medicina trasfusionale",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "trasfusionale donazione sangue avis centro trasfusionale"
+            },
+            {
+              "id": "sen-urp-d1",
+              "nome": "U.R.P. – Palazzina D1",
+              "tipo": "Ufficio",
+              "piano": 0,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "urp relazioni pubblico informazioni"
+            },
+            {
+              "id": "sen-farmacia",
+              "nome": "Farmacia",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "farmacia ospedaliera farmaci"
+            },
+            {
+              "id": "sen-oncologia",
+              "nome": "Oncologia",
+              "tipo": "Reparto",
+              "piano": 1,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "oncologia tumori chemioterapia day hospital"
+            },
+            {
+              "id": "sen-oculistica",
+              "nome": "Oculistica",
+              "tipo": "Reparto",
+              "piano": 1,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "oculistica occhi vista oculista"
+            },
+            {
+              "id": "sen-ortottica",
+              "nome": "Ortottica",
+              "tipo": "Ambulatorio",
+              "piano": 1,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "ortottica vista occhi"
+            },
+            {
+              "id": "sen-utic",
+              "nome": "U.T.I.C.",
+              "tipo": "Degenza",
+              "piano": 2,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "utic unita terapia intensiva coronarica cuore cardiologia"
+            },
+            {
+              "id": "sen-amb-cardiologia",
+              "nome": "Ambulatorio Cardiologia",
+              "tipo": "Ambulatorio",
+              "piano": 2,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "cardiologia cuore ecg elettrocardiogramma ecocardio"
+            },
+            {
+              "id": "sen-fisiatria",
+              "nome": "Fisiatria",
+              "tipo": "Ambulatorio",
+              "piano": 2,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "fisiatria riabilitazione fisioterapia"
+            },
+            {
+              "id": "sen-diabetologia",
+              "nome": "Diabetologia",
+              "tipo": "Ambulatorio",
+              "piano": 3,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "diabetologia diabete"
+            },
+            {
+              "id": "sen-epatologia",
+              "nome": "Ambulatorio di Epatologia – Fibroscan",
+              "tipo": "Ambulatorio",
+              "piano": 3,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "epatologia fegato fibroscan"
+            },
+            {
+              "id": "sen-mici",
+              "nome": "M.I.C.I.",
+              "tipo": "Ambulatorio",
+              "piano": 3,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "mici malattie infiammatorie croniche intestino crohn colite"
+            },
+            {
+              "id": "sen-eeg-emg",
+              "nome": "Elettroencefalografia – Elettromiografia",
+              "tipo": "Ambulatorio",
+              "piano": 3,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "eeg emg elettroencefalogramma elettromiografia"
+            },
+            {
+              "id": "sen-ginecologia",
+              "nome": "Ginecologia e Ostetricia",
+              "tipo": "Degenza",
+              "piano": 4,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "ginecologia ostetricia maternita parto gravidanza"
+            },
+            {
+              "id": "sen-neonatologia",
+              "nome": "Neonatologia (Nido)",
+              "tipo": "Degenza",
+              "piano": 4,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "neonatologia nido neonati"
+            },
+            {
+              "id": "sen-ortopedia",
+              "nome": "Ortopedia",
+              "tipo": "Degenza",
+              "piano": 5,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "ortopedia traumatologia ossa"
+            },
+            {
+              "id": "sen-pediatria",
+              "nome": "Pediatria",
+              "tipo": "Degenza",
+              "piano": 5,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "pediatria bambini"
+            },
+            {
+              "id": "sen-amb-pediatria",
+              "nome": "Ambulatorio pediatrico",
+              "tipo": "Ambulatorio",
+              "piano": 5,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "ambulatorio pediatrico pediatria bambini"
+            },
+            {
+              "id": "sen-guardia-medica",
+              "nome": "Guardia medica",
+              "tipo": "Servizio",
+              "piano": 6,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "guardia medica continuita assistenziale"
+            },
+            {
+              "id": "sen-medico-competente",
+              "nome": "Medico competente – S.P.P.",
+              "tipo": "Ufficio",
+              "piano": 6,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "medico competente spp prevenzione protezione"
+            },
+            {
+              "id": "sen-protocollo",
+              "nome": "Protocollo – Formazione",
+              "tipo": "Ufficio",
+              "piano": 6,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "protocollo formazione"
+            },
+            {
+              "id": "sen-accessi-vascolari",
+              "nome": "Ambulatorio Accessi vascolari",
+              "tipo": "Ambulatorio",
+              "piano": 6,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "accessi vascolari picc cateteri"
+            },
+            {
+              "id": "sen-tac-rm",
+              "nome": "T.A.C. e Risonanza magnetica",
+              "tipo": "Servizio",
+              "piano": -1,
+              "corpo": "D2",
+              "ingresso": "sen-ing-11",
+              "ascensore": null,
+              "dove": "Palazzina D2 (gialla)",
+              "note": "",
+              "tel": "",
+              "kw": "tac risonanza rm rmn tomografia radiologia"
+            },
+            {
+              "id": "sen-dialisi",
+              "nome": "Dialisi",
+              "tipo": "Servizio",
+              "piano": -1,
+              "corpo": "D2",
+              "ingresso": "sen-ing-11",
+              "ascensore": null,
+              "dove": "Palazzina D2 (gialla)",
+              "note": "",
+              "tel": "",
+              "kw": "dialisi emodialisi nefrologia reni"
+            },
+            {
+              "id": "sen-radiologia",
+              "nome": "Diagnostica per immagini (Radiologia)",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "D2",
+              "ingresso": "sen-ing-12",
+              "ascensore": null,
+              "dove": "Palazzina D2 (gialla)",
+              "note": "",
+              "tel": "",
+              "kw": "radiologia raggi rx ecografia diagnostica immagini"
+            },
+            {
+              "id": "sen-medicina",
+              "nome": "Medicina",
+              "tipo": "Degenza",
+              "piano": 1,
+              "corpo": "D2",
+              "ingresso": "sen-ing-13",
+              "ascensore": null,
+              "dove": "Palazzina D2 (gialla)",
+              "note": "",
+              "tel": "",
+              "kw": "medicina interna degenza"
+            },
+            {
+              "id": "sen-cardiologia",
+              "nome": "Cardiologia",
+              "tipo": "Degenza",
+              "piano": 2,
+              "corpo": "D2",
+              "ingresso": "sen-ing-11",
+              "ascensore": null,
+              "dove": "Palazzina D2 (gialla)",
+              "note": "",
+              "tel": "",
+              "kw": "cardiologia cuore degenza"
+            },
+            {
+              "id": "sen-nefrologia",
+              "nome": "Nefrologia",
+              "tipo": "Degenza",
+              "piano": 2,
+              "corpo": "D2",
+              "ingresso": "sen-ing-11",
+              "ascensore": null,
+              "dove": "Palazzina D2 (gialla)",
+              "note": "",
+              "tel": "",
+              "kw": "nefrologia reni"
+            },
+            {
+              "id": "sen-dpa",
+              "nome": "Degenza post acuzie (D.P.A.)",
+              "tipo": "Degenza",
+              "piano": 2,
+              "corpo": "D2",
+              "ingresso": "sen-ing-11",
+              "ascensore": null,
+              "dove": "Palazzina D2 (gialla)",
+              "note": "",
+              "tel": "",
+              "kw": "dpa degenza post acuzie lungodegenza"
+            },
+            {
+              "id": "sen-neurologia",
+              "nome": "Neurologia",
+              "tipo": "Degenza",
+              "piano": 3,
+              "corpo": "D2",
+              "ingresso": "sen-ing-12",
+              "ascensore": null,
+              "dove": "Palazzina D2 (gialla)",
+              "note": "",
+              "tel": "",
+              "kw": "neurologia cervello ictus stroke"
+            },
+            {
+              "id": "sen-gastroenterologia",
+              "nome": "Gastroenterologia",
+              "tipo": "Degenza",
+              "piano": 3,
+              "corpo": "D2",
+              "ingresso": "sen-ing-12",
+              "ascensore": null,
+              "dove": "Palazzina D2 (gialla)",
+              "note": "",
+              "tel": "",
+              "kw": "gastroenterologia stomaco intestino"
+            },
+            {
+              "id": "sen-amb-ginecologia",
+              "nome": "Ambulatorio Ginecologia",
+              "tipo": "Ambulatorio",
+              "piano": 4,
+              "corpo": "D2",
+              "ingresso": "sen-ing-13",
+              "ascensore": null,
+              "dove": "Palazzina D2 (gialla)",
+              "note": "",
+              "tel": "",
+              "kw": "ginecologia ambulatorio"
+            },
+            {
+              "id": "sen-sala-parto",
+              "nome": "Sala parto",
+              "tipo": "Servizio",
+              "piano": 4,
+              "corpo": "D2",
+              "ingresso": "sen-ing-13",
+              "ascensore": null,
+              "dove": "Palazzina D2 (gialla)",
+              "note": "",
+              "tel": "",
+              "kw": "sala parto nascita ostetricia travaglio"
+            },
+            {
+              "id": "sen-bar",
+              "nome": "Bar",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "H",
+              "ingresso": null,
+              "ascensore": null,
+              "dove": "Palazzina H (blu)",
+              "note": "",
+              "tel": "",
+              "kw": "bar caffe ristoro"
+            },
+            {
+              "id": "sen-chiesa",
+              "nome": "Chiesa",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "H",
+              "ingresso": null,
+              "ascensore": null,
+              "dove": "Palazzina H (blu)",
+              "note": "",
+              "tel": "",
+              "kw": "chiesa cappella messa"
+            },
+            {
+              "id": "sen-aula-formazione",
+              "nome": "Aula formazione",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "H",
+              "ingresso": "sen-ing-8",
+              "ascensore": null,
+              "dove": "Palazzina H (blu)",
+              "note": "",
+              "tel": "",
+              "kw": "aula formazione corsi"
+            },
+            {
+              "id": "sen-sert",
+              "nome": "Dip. Dipendenze patologiche (SERT)",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "F",
+              "ingresso": "sen-ing-14",
+              "ascensore": null,
+              "dove": "Palazzina F (rosa)",
+              "note": "",
+              "tel": "",
+              "kw": "sert serd dipendenze patologiche"
+            },
+            {
+              "id": "sen-odontoiatria",
+              "nome": "Odontoiatria – Odontostomatologia",
+              "tipo": "Ambulatorio",
+              "piano": 1,
+              "corpo": "F",
+              "ingresso": "sen-ing-14",
+              "ascensore": null,
+              "dove": "Palazzina F (rosa)",
+              "note": "",
+              "tel": "",
+              "kw": "odontoiatria dentista denti odontostomatologia"
+            },
+            {
+              "id": "sen-psichiatria",
+              "nome": "Psichiatria – Ambulatorio di Psichiatria",
+              "tipo": "Ambulatorio",
+              "piano": 0,
+              "corpo": "F",
+              "ingresso": "sen-ing-15",
+              "ascensore": null,
+              "dove": "Palazzina F (rosa)",
+              "note": "",
+              "tel": "",
+              "kw": "psichiatria salute mentale"
+            },
+            {
+              "id": "sen-ufficio-tecnico",
+              "nome": "Ufficio tecnico",
+              "tipo": "Ufficio",
+              "piano": 0,
+              "corpo": "C",
+              "ingresso": "sen-ing-17",
+              "ascensore": null,
+              "dove": "Palazzina C (verde acqua)",
+              "note": "",
+              "tel": "",
+              "kw": "ufficio tecnico manutenzione"
+            },
+            {
+              "id": "sen-camera-mortuaria",
+              "nome": "Camera mortuaria",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "C",
+              "ingresso": "sen-ing-17",
+              "ascensore": null,
+              "dove": "Palazzina C (verde acqua)",
+              "note": "",
+              "tel": "",
+              "kw": "camera mortuaria obitorio"
+            },
+            {
+              "id": "sen-ufficio-personale",
+              "nome": "Ufficio personale",
+              "tipo": "Ufficio",
+              "piano": 1,
+              "corpo": "C",
+              "ingresso": "sen-ing-17",
+              "ascensore": null,
+              "dove": "Palazzina C (verde acqua), mansarda",
+              "note": "",
+              "tel": "",
+              "kw": "ufficio personale risorse umane"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

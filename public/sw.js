@@ -3,7 +3,7 @@ const VERSION = '__APP_VERSION__';
 const SHELL_CACHE = 'reparti-shell-' + VERSION;
 const DATA_CACHE = 'reparti-data';
 const FONT_CACHE = 'reparti-fonts';
-const SHELL = ['/', '/app.css', '/app.js', '/util.js', '/map3d.js', '/manifest.webmanifest', '/icons/icon.svg', '/icons/icon-192.png'];
+const SHELL = ['/', '/app.css', '/app.js', '/util.js', '/map3d.js', '/map2d.js', '/manifest.webmanifest', '/icons/icon.svg', '/icons/icon-192.png'];
 const NETWORK_TIMEOUT = 5000;
 
 self.addEventListener('install', (event) => {

@@ -1,5 +1,6 @@
 import { html, raw, norm } from './util.js';
 import { renderMap } from './map3d.js';
+import { renderPlan } from './map2d.js';
 
 const $app = document.getElementById('app');
 const VERSION = document.querySelector('meta[name="app-version"]')?.content || 'dev';
@@ -216,6 +217,11 @@ function floorOptions(osp) {
 }
 
 const corpoName = (osp, k) => osp?.mappa?.corpi?.[k]?.label || k || '';
+// Hospitals drawn as a flat plan from above (no 3D) are split into buildings ("palazzine").
+const isPlan = (osp) => osp?.mappa?.tipo === 'pianta';
+const corpoWord = (osp) => (isPlan(osp) ? 'palazzina' : 'corpo');
+const Corpo = (osp) => (isPlan(osp) ? 'Palazzina' : 'Corpo');
+const mapWord = (osp) => (isPlan(osp) ? 'pianta' : 'mappa 3D');
 
 // When a ward moves to another body of a mapped hospital, carry over that body's lift and
 // standard directions, but only where the ward still had the old body's defaults.
@@ -283,7 +289,7 @@ function movement(r) {
   return `${to > from ? 'Sali' : 'Scendi'} di ${n} ${word}`;
 }
 
-const placeText = (o, corpo, punto) => (corpo ? `Corpo ${corpoName(o, corpo)}${punto ? ' · punto preciso' : ' · intera ala'}` : 'Non indicata');
+const placeText = (o, corpo, punto) => (corpo ? `${Corpo(o)} ${corpoName(o, corpo)}${punto ? ' · punto preciso' : isPlan(o) ? '' : ' · intera ala'}` : 'Non indicata');
 
 // ---------------------------------------------------------------- shared UI
 
@@ -397,8 +403,8 @@ function steps(r) {
     <span class="panel-title">Percorso</span>
     <div class="step"><span class="num">1</span><div class="col"><span class="lbl">Vai a</span><b>${multi ? r._sede.nome : r._osp.nome}</b><span class="muted">${[r._sede.indirizzo || r._osp.indirizzo, r._osp.citta].filter(Boolean).join(', ')}</span></div></div>
     <div class="step"><span class="num red">2</span><div class="col"><span class="lbl">Entra da</span><b>${r._ing ? r._ing.nome : 'Ingresso non indicato'}</b>${r._ing && html`<span class="muted">${[r._ing.piano != null ? pianoInfo(r._osp, r._ing.piano).long : '', r._ing.nota].filter(Boolean).join(' · ')}</span>`}</div></div>
-    <div class="step"><span class="num blue">3</span><div class="col"><span class="lbl">Prendi</span><b>${r._asc ? `Ascensore ${r._asc.sigla}${r._asc.tipo ? ' (' + r._asc.tipo + ')' : ''}` : 'Nessun ascensore'}</b>${(movement(r) || r._asc?.nota) && html`<span class="muted">${[movement(r), r._asc?.nota].filter(Boolean).join(' · ')}</span>`}</div></div>
-    <div class="step"><span class="num dark">4</span><div class="col"><span class="lbl">Vai al</span><b>${pi.long}${r.corpo && r._osp.mappa ? ', corpo ' + corpoName(r._osp, r.corpo) : ''}</b>${r.dove && html`<span class="muted">${r.dove}</span>`}</div></div>
+    <div class="step"><span class="num blue">3</span><div class="col"><span class="lbl">Prendi</span><b>${r._asc ? `Ascensore ${r._asc.sigla}${r._asc.tipo ? ' (' + r._asc.tipo + ')' : ''}` : movement(r).startsWith('S') ? 'Scale o ascensore' : 'Nessun ascensore'}</b>${(movement(r) || r._asc?.nota) && html`<span class="muted">${[movement(r), r._asc?.nota].filter(Boolean).join(' · ')}</span>`}</div></div>
+    <div class="step"><span class="num dark">4</span><div class="col"><span class="lbl">Vai al</span><b>${pi.long}${r.corpo && r._osp.mappa ? `, ${corpoWord(r._osp)} ` + corpoName(r._osp, r.corpo) : ''}</b>${r.dove && html`<span class="muted">${r.dove}</span>`}</div></div>
   </div>`;
 }
 
@@ -431,7 +437,7 @@ function viewReparto(id) {
         </div>
         ${hasMap && html`<div class="panel mappanel g-map">
           ${stageHtml(r._osp, r)}
-          <a class="mappanel-link" href="#/ospedale/${encodeURIComponent(r._osp.id)}?sel=${encodeURIComponent(r.id)}">${ICON.layers(16)}Apri la mappa 3D completa</a>
+          <a class="mappanel-link" href="#/ospedale/${encodeURIComponent(r._osp.id)}?sel=${encodeURIComponent(r.id)}">${ICON.layers(16)}Apri la ${mapWord(r._osp)} completa</a>
         </div>`}
         <div class="g-steps">${steps(r)}</div>
         <div class="col gap14 g-rest">
@@ -475,7 +481,7 @@ function viewOspedali() {
           <div class="col gap4 grow">
             <b>${o.nome}</b>
             <span class="muted">${[o.indirizzo, o.citta].filter(Boolean).join(', ')}</span>
-            <span class="muted strong">${sedi.length} ${sedi.length === 1 ? 'sede' : 'sedi'} · ${nrep} reparti${o.mappa ? ' · mappa 3D' : ''}</span>
+            <span class="muted strong">${sedi.length} ${sedi.length === 1 ? 'sede' : 'sedi'} · ${nrep} reparti${o.mappa ? ' · ' + mapWord(o) : ''}</span>
           </div>
           <div class="rcard-go">${ICON.chevron()}</div>
         </a>`;
@@ -515,7 +521,7 @@ function viewOspedale(id) {
     <header class="hero">
       <div class="row between">
         ${o.mappa
-          ? html`<a class="hbtn" href="#/ospedale/${encodeURIComponent(o.id)}">${ICON.back()}Mappa 3D</a>`
+          ? html`<a class="hbtn" href="#/ospedale/${encodeURIComponent(o.id)}">${ICON.back()}${isPlan(o) ? 'Pianta' : 'Mappa 3D'}</a>`
           : html`<a class="hbtn" href="#/ospedali">${ICON.back()}Ospedali</a>`}
         ${S.me.canEdit && html`<a class="hbtn" href="#/ospedale/${encodeURIComponent(o.id)}/gestisci">${ICON.edit(18)}Gestisci</a>`}
       </div>
@@ -623,7 +629,7 @@ function drawStage(el) {
   const o = X.osp[el.dataset.osp];
   const st = stageState(el);
   if (!st) return;
-  const out = renderMap({
+  const out = (isPlan(o) ? renderPlan : renderMap)({
     mappa: o.mappa, reparti: X.repByOsp[o.id] || [], sel: st.sel, lvl: st.lvl, rot: st.rot, exp: st.exp,
     target: st.pick ? st.highlight : undefined, pick: !!st.pick, points: entrancePoints(o),
     route: st.pick ? null : routeFor(X.rep[st.sel]),
@@ -668,9 +674,9 @@ function pickStatus(o, v) {
 function pickPanel(o, v, what) {
   const mode = S.pick.mode;
   return html`<div class="field pickfield">
-    <span>Posizione sulla mappa 3D</span>
+    <span>Posizione sulla ${mapWord(o)}</span>
     <div class="seg light">
-      <button type="button" class="${mode === 'ala' ? 'on' : ''}" data-act="pickMode" data-mode="ala">Intera ala</button>
+      <button type="button" class="${mode === 'ala' ? 'on' : ''}" data-act="pickMode" data-mode="ala">${isPlan(o) ? 'Intera palazzina' : 'Intera ala'}</button>
       <button type="button" class="${mode === 'punto' ? 'on' : ''}" data-act="pickMode" data-mode="punto">Punto preciso</button>
     </div>
     <div class="map-stage pick" data-osp="${o.id}" data-pick="1"></div>
@@ -678,7 +684,7 @@ function pickPanel(o, v, what) {
       <b class="pick-status" id="pick-status">${pickStatus(o, v)}</b>
       <button type="button" class="btn ghost small ${v.corpo ? '' : 'hide'}" id="pick-clear" data-act="pickClear">Rimuovi</button>
     </div>
-    <small class="muted">Scegli il ${o.uso_livelli ? 'livello' : 'piano'}, poi tocca il blocco dove si trova ${what}. Con “Punto preciso” tocca il punto esatto: comparirà un puntino.</small>
+    <small class="muted">${isPlan(o) ? `Tocca la palazzina dove si trova ${what}.` : `Scegli il ${o.uso_livelli ? 'livello' : 'piano'}, poi tocca il blocco dove si trova ${what}.`} Con “Punto preciso” tocca il punto esatto: comparirà un puntino.</small>
   </div>`;
 }
 
@@ -714,7 +720,7 @@ function mapList(o, st) {
   if (words.length) {
     res = all.filter((r) => {
       const ci = corpi[r.corpo];
-      const hay = r._hay + ' ' + norm(`corpo ${ci?.short || ''} livello ${r.piano}`);
+      const hay = r._hay + ' ' + norm(`${corpoWord(o)} ${ci?.short || ''} livello ${r.piano}`);
       return words.every((w) => hay.includes(w));
     });
   } else if (st.lvl !== 'all') {
@@ -723,7 +729,7 @@ function mapList(o, st) {
     res = all.slice();
   }
   res.sort((a, b) => (a.piano ?? 99) - (b.piano ?? 99));
-  const title = words.length ? 'Risultati' : st.lvl === 'all' ? 'Tutti i reparti' : 'Reparti al livello ' + st.lvl;
+  const title = words.length ? 'Risultati' : st.lvl === 'all' ? 'Tutti i reparti' : o.uso_livelli ? 'Reparti al livello ' + st.lvl : 'Reparti: ' + pianoInfo(o, st.lvl).long.toLowerCase();
   return html`
     <div class="row between list-head"><b>${title}</b><span class="muted strong">${res.length} ${res.length === 1 ? 'reparto' : 'reparti'}</span></div>
     <div class="panel list tight">
@@ -731,8 +737,8 @@ function mapList(o, st) {
         const on = r.id === st.sel;
         const ci = corpi[r.corpo];
         return html`<button type="button" class="mrow ${on ? 'on' : ''}" data-act="mapSel" data-id="${r.id}">
-          <span class="mrow-l">L${r.piano ?? '?'}</span>
-          <span class="col gap2 grow"><b>${r.nome}</b><span class="sub">${ci ? 'Corpo ' + ci.label : ''}${r._asc ? ' · ascensori ' + r._asc.sigla : ''}</span></span>
+          <span class="mrow-l">${o.uso_livelli ? 'L' + (r.piano ?? '?') : pianoInfo(o, r.piano).short}</span>
+          <span class="col gap2 grow"><b>${r.nome}</b><span class="sub">${ci ? Corpo(o) + ' ' + ci.label : ''}${r._asc ? ' · ascensori ' + r._asc.sigla : ''}</span></span>
         </button>`;
       })}
       ${!res.length && html`<div class="pad muted center">Nessun reparto trovato.</div>`}
@@ -758,15 +764,15 @@ function viewMappa(id, query) {
         <button type="button" class="sqbtn" data-act="mapSel" data-id="" aria-label="Chiudi scheda">${ICON.close(16)}</button>
       </div>
       <div class="tiles small">
-        <div class="tile dark"><span>LIVELLO</span><b>${sel.piano ?? '—'}</b></div>
-        <div class="tile pink"><span>CORPO</span><b>${ci?.short || '—'}</b></div>
+        <div class="tile dark"><span>${pianoInfo(o, sel.piano).title}</span><b>${pianoInfo(o, sel.piano).short}</b></div>
+        <div class="tile pink"><span>${corpoWord(o).toUpperCase()}</span><b>${ci?.short || '—'}</b></div>
         <div class="tile lblue"><span>ASCENSORI</span><b>${sel._asc ? sel._asc.sigla : '—'}</b></div>
       </div>
       <div class="col gap10 ministeps">
         <div><span class="num">1</span><span>${sel._ing ? sel._ing.nome : 'Ingresso non indicato'}${sel._ing?.piano != null ? ' · ' + pianoInfo(o, sel._ing.piano).long : ''}${sel._ing?.nota ? ' (' + sel._ing.nota + ')' : ''}</span></div>
         <div><span class="num red">2</span><span>${sel.dove || '—'}</span></div>
-        <div><span class="num blue">3</span><span>${[sel._asc ? `Ascensori ${sel._asc.tipo || sel._asc.sigla}` : 'Nessun ascensore', movement(sel)].filter(Boolean).join(': ')}</span></div>
-        <div><span class="num dark">4</span><b>${pianoInfo(o, sel.piano).long}${ci ? ', corpo ' + ci.label : ''} – ${sel.nome}</b></div>
+        <div><span class="num blue">3</span><span>${[sel._asc ? `Ascensori ${sel._asc.tipo || sel._asc.sigla}` : movement(sel).startsWith('S') ? 'Scale o ascensore' : 'Nessun ascensore', movement(sel)].filter(Boolean).join(': ')}</span></div>
+        <div><span class="num dark">4</span><b>${pianoInfo(o, sel.piano).long}${ci ? `, ${corpoWord(o)} ` + ci.label : ''} – ${sel.nome}</b></div>
       </div>
       <div class="row gap8">
         <a class="btn primary grow" href="#/reparto/${encodeURIComponent(sel.id)}">Apri la scheda</a>
@@ -783,7 +789,7 @@ function viewMappa(id, query) {
           <a class="hbtn icon" href="#/ospedali" aria-label="Torna agli ospedali">${ICON.back()}</a>
           <div class="col minw0">
             <span class="brand">${o.nome}</span>
-            <span class="brand-sub">${[o.citta, `${nCorpi} corpi`, levels.length ? `livelli ${levels[0]}–${levels[levels.length - 1]}` : '', `${(X.repByOsp[o.id] || []).length} reparti`].filter(Boolean).join(' · ')}</span>
+            <span class="brand-sub">${[o.citta, `${nCorpi} ${isPlan(o) ? 'palazzine' : 'corpi'}`, levels.length && o.uso_livelli ? `livelli ${levels[0]}–${levels[levels.length - 1]}` : '', `${(X.repByOsp[o.id] || []).length} reparti`].filter(Boolean).join(' · ')}</span>
           </div>
         </div>
         <div class="row gap6 flexnone">
@@ -802,8 +808,8 @@ function viewMappa(id, query) {
       <div class="map-col">
         ${stageHtml(o)}
         <div class="levelbar">
-          <span class="lbl">Livello</span>
-          ${['all', ...levels].map((k) => html`<button type="button" class="lvl ${k === st.lvl ? 'on' : ''}" data-act="mapLvl" data-osp="${o.id}" data-lvl="${k}">${k === 'all' ? 'Tutti' : k}</button>`)}
+          <span class="lbl">${o.uso_livelli ? 'Livello' : 'Piano'}</span>
+          ${['all', ...levels].map((k) => html`<button type="button" class="lvl ${k === st.lvl ? 'on' : ''}" data-act="mapLvl" data-osp="${o.id}" data-lvl="${k}" title="${k === 'all' ? '' : pianoInfo(o, k).long}">${k === 'all' ? 'Tutti' : o.uso_livelli ? k : pianoInfo(o, k).short}</button>`)}
         </div>
       </div>
       <main class="scroll pad col gap12 side-col">
@@ -890,7 +896,7 @@ function gestIngressi(o, sede) {
   const corpi = o.mappa?.corpi ? Object.entries(o.mappa.corpi) : [];
   const corpoOpts = corpoOptions(o);
   return html`
-    <p class="hint">Rinominare un ingresso aggiorna subito tutti i reparti che lo usano.${corpi.length > 0 ? ' Per mettere un puntino preciso sulla mappa 3D usa il pulsante con la mappa.' : ''}</p>
+    <p class="hint">Rinominare un ingresso aggiorna subito tutti i reparti che lo usano.${corpi.length > 0 ? ` Per mettere un puntino preciso sulla ${mapWord(o)} usa il pulsante con la mappa.` : ''}</p>
     <div class="gtable ings ${corpi.length ? 'withc' : ''}">
       <div class="ghead"><span>Sigla</span><span>Nome</span><span>${o.uso_livelli ? 'Livello' : 'Piano'}</span>${corpi.length > 0 && html`<span>Corpo</span>`}<span>Nota</span><span>Indicazione</span><span></span></div>
       ${rows.map((x) => {
@@ -904,7 +910,7 @@ function gestIngressi(o, sede) {
           ${quickSelect('ingressi', x, 'badge', badgeOpts, { label: 'Indicazione' })}
           <div class="row gap6 gact">
             <span class="usage" title="Reparti che usano questo ingresso">${n} rep.</span>
-            <a class="sqbtn" href="#/ingresso/${encodeURIComponent(x.id)}/modifica?ritorno=${encodeURIComponent(location.hash)}" aria-label="${corpi.length ? 'Posizione sulla mappa 3D' : 'Tutti i campi'} di ${x.nome}" title="${corpi.length ? 'Posizione sulla mappa 3D' : 'Tutti i campi'}">${corpi.length ? ICON.layers(18) : ICON.edit(18)}</a>
+            <a class="sqbtn" href="#/ingresso/${encodeURIComponent(x.id)}/modifica?ritorno=${encodeURIComponent(location.hash)}" aria-label="${corpi.length ? 'Posizione sulla ' + mapWord(o) : 'Tutti i campi'} di ${x.nome}" title="${corpi.length ? 'Posizione sulla ' + mapWord(o) : 'Tutti i campi'}">${corpi.length ? ICON.layers(18) : ICON.edit(18)}</a>
             <button type="button" class="sqbtn danger" data-act="gestDel" data-entity="ingressi" data-id="${x.id}" data-n="${n}" aria-label="Elimina ${x.nome}">${ICON.close(16)}</button>
           </div>
         </div>`;
@@ -954,7 +960,7 @@ function gestPiani(o) {
         <label class="field grow"><span>Al ${word}</span><input type="number" id="q-piani-max" data-change="pianiRange" data-osp="${o.id}" data-k="max" value="${floors[floors.length - 1]}" step="1"></label>
       </div>
       <small class="muted">Sono i ${o.uso_livelli ? 'livelli' : 'piani'} proposti quando aggiungi o sposti un reparto. Per la numerazione (piani o livelli) usa “Dati ospedale”.</small>
-      ${mapLv && html`<small class="muted">La mappa 3D disegna i livelli ${mapLv[0]}–${mapLv[mapLv.length - 1]}: un reparto su un livello diverso resta nell'elenco ma non compare sulla piantina.</small>`}
+      ${mapLv && !isPlan(o) && html`<small class="muted">La mappa 3D disegna i livelli ${mapLv[0]}–${mapLv[mapLv.length - 1]}: un reparto su un livello diverso resta nell'elenco ma non compare sulla piantina.</small>`}
       ${outside.length > 0 && html`<small class="warn">Ci sono reparti fuori da questo intervallo (${outside.join(', ')}): restano dove sono finché non li sposti.</small>`}
     </div>
     <div class="panel list">
@@ -1172,7 +1178,7 @@ const FORMS = {
       ['piano', 'Piano dell\'ingresso', 'floor', { hint: 'Il piano a cui si entra: da qui si calcola quanti piani salire o scendere.' }],
       ['nota', 'Nota', 'textarea', { hint: 'Es. Rampa barellati, sosta ambulanze 15 min' }],
       ['badge', 'Indicazione', 'select', { options: [['', 'Nessuna'], ['ambulanze', 'Consigliato ambulanze'], ['no_barelle', 'Non adatto a barelle']] }],
-      ['posizione', 'Posizione sulla mappa 3D', 'mappos'],
+      ['posizione', 'Posizione sulla mappa', 'mappos'],
       ['ordine', 'Ordine', 'number']
     ],
     del: 'Eliminare l\'ingresso? I reparti che lo usano resteranno senza ingresso.'
@@ -1332,9 +1338,11 @@ const ACT = {
       location.hash = `#/reparto/${encodeURIComponent(id)}`;
       return;
     }
-    const st = S.map[X.rep[id]._osp.id];
+    const r = X.rep[id];
+    const st = S.map[r._osp.id];
     st.sel = id;
-    st.lvl = Number(liv);
+    // The 2D plan shows every floor at once: tapping a building opens its first ward's floor.
+    st.lvl = liv === undefined ? r.piano ?? 'all' : Number(liv);
     render();
   },
   mapSel: ({ id }) => {
@@ -1459,7 +1467,8 @@ const ACT = {
   // Click on a block while choosing a position: whole wing, or the exact spot clicked.
   pickBlock: ({ corpo, liv }, el, e) => {
     const stage = el.closest('.map-stage');
-    const L = Number(liv);
+    // The 2D plan has no level to click on: the floor stays the one chosen in the form.
+    const L = liv === undefined ? undefined : Number(liv);
     let punto = null;
     // e.detail is 0 for keyboard activation: there's no click position, so use the whole block.
     if (S.pick.mode === 'punto' && e.detail > 0 && stage._geo) {
@@ -1469,7 +1478,7 @@ const ACT = {
       const clamp = (v, a, z) => Math.min(Math.max(v, a), z);
       punto = { x: clamp(pt.x, b.x0, b.x1), y: clamp(pt.y, b.y0, b.y1) };
     }
-    setPick({ corpo, piano: L, punto });
+    setPick(L === undefined ? { corpo, punto } : { corpo, piano: L, punto });
   },
   pickMode: ({ mode }) => {
     S.pick.mode = mode;
@@ -1663,6 +1672,12 @@ const stagePoint = (stage, e) => {
   return { x: e.clientX - r.left, y: e.clientY - r.top };
 };
 
+// One pointer rotates the 3D model (right/shift-drag pans it); on a flat plan it always pans.
+function singleMode(stage, e) {
+  if (isPlan(X.osp[stage.dataset.osp])) return 'pan';
+  return e.pointerType === 'mouse' && (e.button === 2 || e.shiftKey) ? 'pan' : 'rotate';
+}
+
 function startSingle(g, p, mode) {
   g.mode = mode;
   g.start = { ...p, rot: g.st.rot, panX: g.st.panX, panY: g.st.panY };
@@ -1684,7 +1699,7 @@ document.addEventListener('pointerdown', (e) => {
     gest.moved = true;
     gest.pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1, mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, from: { zoom: gest.st.zoom, panX: gest.st.panX, panY: gest.st.panY } };
   } else if (gest.pts.size === 1) {
-    startSingle(gest, p, e.pointerType === 'mouse' && (e.button === 2 || e.shiftKey) ? 'pan' : 'rotate');
+    startSingle(gest, p, singleMode(stage, e));
   }
 });
 
@@ -1721,8 +1736,8 @@ function endGesture(e) {
   if (!gest || !gest.pts.has(e.pointerId)) return;
   gest.pts.delete(e.pointerId);
   if (gest.pts.size === 1) {
-    // One finger left after a pinch: carry on rotating from where it is, without jumping.
-    startSingle(gest, [...gest.pts.values()][0], 'rotate');
+    // One finger left after a pinch: carry on rotating (or panning) from where it is, without jumping.
+    startSingle(gest, [...gest.pts.values()][0], singleMode(gest.stage, e));
     return;
   }
   if (gest.pts.size > 0) return;

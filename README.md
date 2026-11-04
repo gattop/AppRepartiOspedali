@@ -6,6 +6,7 @@ PWA per gli equipaggi: cerchi un reparto e vedi **ingresso, ascensore e piano**,
 - **Scheda reparto**: ingresso / ascensore / piano, percorso, note per l'equipaggio, "Chiama", verifica dei dati
 - **Ospedali**: sedi (plessi/padiglioni), ingressi (con indicazione "consigliato ambulanze" / "non adatto a barelle"), ascensori, reparti piano per piano
 - **Mappa 3D** per gli ospedali che la hanno (oggi l'Ospedale Carlo Urbani di Jesi): l'ospedale si apre direttamente sulla mappa, e la scheda di ogni reparto la mostra con il reparto evidenziato e il percorso disegnato (ingresso → ascensore → reparto)
+- **Pianta 2D dall'alto** per gli ospedali senza modello 3D (oggi l'Ospedale Civile di Senigallia): palazzine colorate, ingressi numerati come sui cartelli, percorso principale; scegliendo un piano, ogni palazzina mostra i reparti di quel piano
 - **Preferiti** salvati sul dispositivo
 - **Aggiungi / modifica** reparti, ingressi, ascensori, sedi e ospedali (solo per chi ha i permessi)
 - **Gestisci** (matita nella pagina dell'ospedale, solo per chi ha i permessi): tabella per spostare velocemente i reparti (piano, corpo, ingresso, ascensore), rinominare ingressi e ascensori e dare un nome ai piani. Ogni campo si salva appena lo cambi. Se sposti un reparto in un altro corpo della mappa 3D, ascensore e indicazioni standard si aggiornano da soli. La piantina 3D non si modifica da qui.
@@ -116,6 +117,6 @@ Per ripristinare: `docker compose stop app`, copia lo snapshot in `./data/repart
 
 ## Note sui dati
 
-- I dati di Jesi vengono dal Piano di emergenza P.O. Carlo Urbani (rev. 2015) e sono marcati "mai verificato". Il pulsante **"Ho controllato: i dati sono corretti"** registra chi li ha verificati e quando.
+- I dati di Jesi vengono dal Piano di emergenza P.O. Carlo Urbani (rev. 2015), quelli di Senigallia dalla piantina ASUR Marche – Area Vasta 2; tutti sono marcati "mai verificato". Il pulsante **"Ho controllato: i dati sono corretti"** registra chi li ha verificati e quando.
 - I numeri interni (4 cifre) diventano chiamabili solo se nella scheda dell'ospedale imposti il **prefisso per gli interni**.
 - Ogni ingresso ha il suo **piano d'ingresso**: il percorso dice quanti piani salire o scendere. Negli ospedali con mappa 3D, ingressi e reparti si posizionano toccando il modello (intera ala o punto preciso) dal modulo di modifica.

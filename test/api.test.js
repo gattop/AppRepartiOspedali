@@ -184,6 +184,31 @@ test('one-off data fixes update an old database once, without overwriting manual
   assert.equal(store.db.prepare("SELECT COUNT(*) AS n FROM reparti WHERE lower(nome) LIKE '%pneumologia –%'").get().n, 1);
 });
 
+test('seeds Senigallia with its 2D plan, numbered doors and every floor', async () => {
+  const data = await (await req('GET', '/api/data')).json();
+  const sen = data.ospedali.find((o) => o.id === 'senigallia');
+  assert.equal(sen.mappa.tipo, 'pianta');
+  const reps = data.reparti.filter((r) => r.sede_id === 'senigallia-sede');
+  const blocks = new Set(sen.mappa.blocks.map((b) => b.id));
+  assert.ok(reps.length >= 60);
+  assert.ok(reps.every((r) => blocks.has(r.corpo) && r.piano >= -1 && r.piano <= 6));
+  const ingById = Object.fromEntries(data.ingressi.map((i) => [i.id, i]));
+  assert.equal(ingById[reps.find((r) => r.nome === 'Dialisi').ingresso_id].sigla, '11');
+  assert.equal(reps.find((r) => r.nome === 'Ortopedia').piano, 5);
+  assert.ok(data.ingressi.filter((i) => i.sede_id === 'senigallia-sede').every((i) => i.punto && blocks.has(i.corpo)));
+});
+
+test('adds Senigallia once to a database created before it existed', () => {
+  store.remove('ospedali', 'senigallia', 'test');
+  store.db.exec("DELETE FROM correzioni WHERE id = '2026-11-04-senigallia'");
+  applyDataFixes(store);
+  assert.ok(store.get('reparti', 'sen-dialisi'));
+  // Deleted on purpose afterwards: it does not come back at the next start.
+  store.remove('ospedali', 'senigallia', 'test');
+  applyDataFixes(store);
+  assert.equal(store.get('ospedali', 'senigallia'), null);
+});
+
 test('writes one consistent backup per day and keeps the last N', () => {
   const bdir = path.join(dir, 'backup');
   for (const day of ['2026-10-30', '2026-10-31', '2026-11-01', '2026-11-02']) {
