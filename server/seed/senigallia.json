@@ -1315,11 +1315,11 @@
               "id": "sen-endoscopia",
               "nome": "Ambulatorio Endoscopia digestiva",
               "tipo": "Ambulatorio",
-              "piano": 2,
-              "corpo": "A3",
-              "ingresso": "sen-ing-3",
+              "piano": 3,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
               "ascensore": null,
-              "dove": "Palazzina A3 (arancione)",
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
               "note": "",
               "tel": "",
               "kw": "endoscopia digestiva gastroscopia colonscopia"
@@ -1742,16 +1742,16 @@
             },
             {
               "id": "sen-gastroenterologia",
-              "nome": "Gastroenterologia",
+              "nome": "Gastroenterologia ed Endoscopia digestiva",
               "tipo": "Degenza",
               "piano": 3,
-              "corpo": "D2",
-              "ingresso": "sen-ing-12",
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
               "ascensore": null,
-              "dove": "Palazzina D2 (gialla)",
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
               "note": "",
               "tel": "",
-              "kw": "gastroenterologia stomaco intestino"
+              "kw": "gastroenterologia stomaco intestino endoscopia digestiva"
             },
             {
               "id": "sen-amb-ginecologia",
@@ -1895,6 +1895,71 @@
               "note": "",
               "tel": "",
               "kw": "ufficio personale risorse umane"
+            },
+            {
+              "id": "sen-autoparco",
+              "nome": "Autoparco",
+              "tipo": "Servizio",
+              "piano": 6,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "autoparco auto aziendali mezzi veicoli"
+            },
+            {
+              "id": "sen-citopatologia",
+              "nome": "Citopatologia",
+              "tipo": "Servizio",
+              "piano": 6,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "citopatologia citologia pap test laboratorio"
+            },
+            {
+              "id": "sen-sala-rosa",
+              "nome": "Sala Rosa Giulia – A.N.D.O.S.",
+              "tipo": "Servizio",
+              "piano": 6,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "sala rosa giulia andos associazione donne operate al seno"
+            },
+            {
+              "id": "sen-ottava-nota",
+              "nome": "Ottava Nota You",
+              "tipo": "Servizio",
+              "piano": 6,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "Associazione",
+              "tel": "",
+              "kw": "ottava nota you associazione"
+            },
+            {
+              "id": "sen-amb-pediatria-3",
+              "nome": "Ambulatorio pediatrico (3° piano)",
+              "tipo": "Ambulatorio",
+              "piano": 3,
+              "corpo": "D1",
+              "ingresso": "sen-ing-7",
+              "ascensore": null,
+              "dove": "Palazzina D1 (fucsia): ingresso 7 oppure 16",
+              "note": "",
+              "tel": "",
+              "kw": "ambulatorio pediatrico pediatria bambini"
             }
           ]
         }

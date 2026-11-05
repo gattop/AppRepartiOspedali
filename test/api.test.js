@@ -223,6 +223,25 @@ test('seeds Senigallia with its 2D plan, numbered doors and every floor', async 
   assert.ok(data.ingressi.filter((i) => i.sede_id === 'senigallia-sede').every((i) => i.punto && blocks.has(i.corpo)));
 });
 
+test('the Monoblocco D1 sign reaches an old Senigallia database once', () => {
+  // As seeded before the check on site; the endoscopy clinic had already been moved by hand.
+  store.db.prepare("UPDATE reparti SET corpo = 'D2', nome = 'Gastroenterologia', kw = 'gastroenterologia stomaco intestino' WHERE id = 'sen-gastroenterologia'").run();
+  store.db.prepare("UPDATE reparti SET corpo = 'F', piano = 1 WHERE id = 'sen-endoscopia'").run();
+  store.db.prepare("DELETE FROM reparti WHERE id IN ('sen-autoparco', 'sen-citopatologia', 'sen-sala-rosa', 'sen-ottava-nota', 'sen-amb-pediatria-3')").run();
+  store.db.prepare("DELETE FROM correzioni WHERE id = '2026-11-06-senigallia-cartello-d1'").run();
+
+  applyDataFixes(store);
+  const gastro = store.get('reparti', 'sen-gastroenterologia');
+  assert.equal(gastro.corpo, 'D1');
+  assert.equal(gastro.nome, 'Gastroenterologia ed Endoscopia digestiva');
+  assert.equal(store.get('reparti', 'sen-endoscopia').corpo, 'F', 'a ward moved by hand is left alone');
+  for (const id of ['sen-autoparco', 'sen-citopatologia', 'sen-sala-rosa', 'sen-ottava-nota']) assert.equal(store.get('reparti', id).piano, 6, id);
+  assert.equal(store.get('reparti', 'sen-amb-pediatria-3').piano, 3);
+
+  applyDataFixes(store);
+  assert.equal(store.db.prepare("SELECT COUNT(*) AS n FROM reparti WHERE nome = 'Autoparco'").get().n, 1);
+});
+
 test('adds Senigallia once to a database created before it existed', () => {
   store.remove('ospedali', 'senigallia', 'test');
   store.db.exec("DELETE FROM correzioni WHERE id = '2026-11-04-senigallia'");

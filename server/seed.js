@@ -163,6 +163,75 @@ const DATA_FIXES = [
         log('reparti', 'jesi-bar', { nome: 'Bar' });
       }
     }
+  },
+  {
+    // Senigallia, "Monoblocco D1" sign (checked on site 2026-11-06): the 6th floor offices and
+    // associations, a second paediatric clinic on the 3rd floor, Gastroenterology and digestive
+    // endoscopy on the 3rd floor of D1. Only rows still as seeded are moved or renamed.
+    id: '2026-11-06-senigallia-cartello-d1',
+    run(store, log) {
+      if (!store.get('sedi', 'senigallia-sede')) return;
+      const D1 = { corpo: 'D1', ingresso_id: store.get('ingressi', 'sen-ing-7') ? 'sen-ing-7' : null, dove: "Palazzina D1 (fucsia): ingresso 7 oppure 16" };
+      const gastro = store.get('reparti', 'sen-gastroenterologia');
+      if (gastro && gastro.corpo === 'D2' && gastro.piano === 3) {
+        store.db.prepare('UPDATE reparti SET corpo = ?, ingresso_id = ?, dove = ?, punto = NULL, nome = ?, kw = ? WHERE id = ?')
+          .run(D1.corpo, D1.ingresso_id, D1.dove, gastro.nome === 'Gastroenterologia' ? "Gastroenterologia ed Endoscopia digestiva" : gastro.nome, addWords(gastro.kw, 'endoscopia digestiva'), gastro.id);
+        log('reparti', gastro.id, { corpo: 'D1' });
+      }
+      const endo = store.get('reparti', 'sen-endoscopia');
+      if (endo && endo.corpo === 'A3' && endo.piano === 2) {
+        store.db.prepare('UPDATE reparti SET corpo = ?, piano = 3, ingresso_id = ?, dove = ?, punto = NULL WHERE id = ?').run(D1.corpo, D1.ingresso_id, D1.dove, endo.id);
+        log('reparti', endo.id, { corpo: 'D1', piano: 3 });
+      }
+      const NEW = [
+        {
+          "id": "sen-autoparco",
+          "nome": "Autoparco",
+          "tipo": "Servizio",
+          "piano": 6,
+          "kw": "autoparco auto aziendali mezzi veicoli",
+          "note": ""
+        },
+        {
+          "id": "sen-citopatologia",
+          "nome": "Citopatologia",
+          "tipo": "Servizio",
+          "piano": 6,
+          "kw": "citopatologia citologia pap test laboratorio",
+          "note": ""
+        },
+        {
+          "id": "sen-sala-rosa",
+          "nome": "Sala Rosa Giulia – A.N.D.O.S.",
+          "tipo": "Servizio",
+          "piano": 6,
+          "kw": "sala rosa giulia andos associazione donne operate al seno",
+          "note": ""
+        },
+        {
+          "id": "sen-ottava-nota",
+          "nome": "Ottava Nota You",
+          "tipo": "Servizio",
+          "piano": 6,
+          "kw": "ottava nota you associazione",
+          "note": "Associazione"
+        },
+        {
+          "id": "sen-amb-pediatria-3",
+          "nome": "Ambulatorio pediatrico (3° piano)",
+          "tipo": "Ambulatorio",
+          "piano": 3,
+          "kw": "ambulatorio pediatrico pediatria bambini",
+          "note": ""
+        }
+      ];
+      for (const n of NEW) {
+        const same = store.db.prepare("SELECT 1 FROM reparti WHERE sede_id = 'senigallia-sede' AND lower(nome) = lower(?)").get(n.nome);
+        if (same || store.get('reparti', n.id)) continue;
+        store.insertRaw('reparti', { ...n, sede_id: 'senigallia-sede', ...D1 }, 'aggiornamento dati');
+        log('reparti', n.id, { nome: n.nome });
+      }
+    }
   }
 ];
 
