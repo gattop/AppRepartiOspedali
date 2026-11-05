@@ -33,7 +33,7 @@ test('seeds Jesi and demo data on first start', async () => {
   const data = await (await req('GET', '/api/data')).json();
   const jesi = data.ospedali.find((o) => o.id === 'jesi');
   assert.ok(jesi.mappa.blocks.length > 0);
-  assert.equal(data.reparti.filter((r) => r.sede_id === 'jesi-sede').length, 39);
+  assert.equal(data.reparti.filter((r) => r.sede_id === 'jesi-sede').length, 40);
   const byId = Object.fromEntries(data.reparti.map((r) => [r.id, r]));
   assert.equal(byId['jesi-orto-deg'].corpo, 'D');
   assert.equal(byId['jesi-gessi'].corpo, 'D');
@@ -185,6 +185,28 @@ test('one-off data fixes update an old database once, without overwriting manual
   applyDataFixes(store);
   assert.equal(store.get('reparti', 'jesi-orto-deg').corpo, 'B');
   assert.equal(store.db.prepare("SELECT COUNT(*) AS n FROM reparti WHERE lower(nome) LIKE '%pneumologia –%'").get().n, 1);
+});
+
+test('names and keywords from the Blocco fucsia sign reach an old database once', () => {
+  // As seeded before the check on site; Centro prelievi had already been renamed by hand.
+  store.db.prepare("UPDATE reparti SET nome = 'Pediatria – Degenze', kw = 'pediatria bambini degenza' WHERE id = 'jesi-pediatria'").run();
+  store.db.prepare("UPDATE reparti SET nome = 'Prelievi (a mano)' WHERE id = 'jesi-prelievi'").run();
+  store.db.prepare("UPDATE reparti SET kw = 'medicina b area medica degenza' WHERE id = 'jesi-medicina-b'").run();
+  store.db.prepare("DELETE FROM reparti WHERE id = 'jesi-bar'").run();
+  store.db.prepare("DELETE FROM correzioni WHERE id = '2026-11-05-jesi-cartello-blocco-fucsia'").run();
+
+  applyDataFixes(store);
+  assert.equal(store.get('reparti', 'jesi-pediatria').nome, 'Pediatria e Neonatologia – Degenze');
+  assert.match(store.get('reparti', 'jesi-pediatria').kw, /\bneonatologia\b/);
+  assert.equal(store.get('reparti', 'jesi-prelievi').nome, 'Prelievi (a mano)', 'a ward renamed by hand is left alone');
+  assert.equal(store.get('reparti', 'jesi-medicina-b').kw, 'medicina b area medica degenza broncopneumologia dermatologia nefrologia dialisi');
+  const bar = store.get('reparti', 'jesi-bar');
+  assert.equal(bar.piano, 2);
+  assert.equal(bar.corpo, 'nC');
+
+  // Runs once: a second start adds no second bar and no repeated keywords.
+  applyDataFixes(store);
+  assert.equal(store.db.prepare("SELECT COUNT(*) AS n FROM reparti WHERE lower(nome) = 'bar' AND sede_id = 'jesi-sede'").get().n, 1);
 });
 
 test('seeds Senigallia with its 2D plan, numbered doors and every floor', async () => {

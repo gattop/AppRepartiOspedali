@@ -441,7 +441,7 @@
             },
             {
               "id": "jesi-prelievi",
-              "nome": "Punto prelievi",
+              "nome": "Centro prelievi",
               "tipo": "Ambulatorio",
               "piano": 1,
               "corpo": "D",
@@ -516,6 +516,19 @@
               "note": "",
               "tel": "2181",
               "kw": "portineria informazioni ingresso principale centralino"
+            },
+            {
+              "id": "jesi-bar",
+              "nome": "Bar",
+              "tipo": "Servizio",
+              "piano": 2,
+              "corpo": "nC",
+              "ingresso": "ing-principale",
+              "ascensore": null,
+              "dove": "Accanto alla portineria, nel corpo centrale",
+              "note": "",
+              "tel": "",
+              "kw": "bar caffe ristoro colazione"
             },
             {
               "id": "jesi-amb-med",
@@ -697,11 +710,11 @@
               "dove": "Corpo Destro centrale – dalla portineria segui il corridoio verso i corpi C-D",
               "note": "",
               "tel": "2392",
-              "kw": "medicina c area medica degenza"
+              "kw": "medicina c area medica degenza broncopneumologia dermatologia nefrologia dialisi"
             },
             {
               "id": "jesi-pediatria",
-              "nome": "Pediatria – Degenze",
+              "nome": "Pediatria e Neonatologia – Degenze",
               "tipo": "Degenza",
               "piano": 4,
               "corpo": "C",
@@ -710,7 +723,7 @@
               "dove": "Corpo C – dalla portineria segui il corridoio verso i corpi C-D",
               "note": "",
               "tel": "2384",
-              "kw": "pediatria bambini degenza"
+              "kw": "pediatria neonatologia neonati bambini degenza"
             },
             {
               "id": "jesi-amb-gine",
@@ -762,7 +775,7 @@
               "dove": "Corpo Destro centrale – dalla portineria segui il corridoio verso i corpi C-D",
               "note": "",
               "tel": "2393",
-              "kw": "medicina b area medica degenza"
+              "kw": "medicina b area medica degenza broncopneumologia dermatologia nefrologia dialisi"
             },
             {
               "id": "jesi-ostetricia",

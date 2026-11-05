@@ -130,8 +130,48 @@ const DATA_FIXES = [
         log('reparti', gessi.id, { corpo: 'D' });
       }
     }
+  },
+  {
+    // Names and keywords as on the "Blocco fucsia" sign (lifts C-D, level 1, checked on site 2026-11-05);
+    // the Bar next to the porter's lodge. A ward already renamed by hand is left alone.
+    id: '2026-11-05-jesi-cartello-blocco-fucsia',
+    run(store, log) {
+      const rename = (id, from, to, kw) => {
+        const r = store.get('reparti', id);
+        if (!r || r.nome !== from) return;
+        store.db.prepare('UPDATE reparti SET nome = ?, kw = ? WHERE id = ?').run(to, kw ? addWords(r.kw, kw) : r.kw, id);
+        log('reparti', id, { nome: to });
+      };
+      const addKw = (id, words) => {
+        const r = store.get('reparti', id);
+        if (!r) return;
+        const kw = addWords(r.kw, words);
+        if (kw === r.kw) return;
+        store.db.prepare('UPDATE reparti SET kw = ? WHERE id = ?').run(kw, id);
+        log('reparti', id, { kw });
+      };
+      rename('jesi-pediatria', 'Pediatria – Degenze', 'Pediatria e Neonatologia – Degenze', 'neonatologia neonati');
+      rename('jesi-prelievi', 'Punto prelievi', 'Centro prelievi');
+      for (const id of ['jesi-medicina-b', 'jesi-medicina-c']) addKw(id, 'broncopneumologia dermatologia nefrologia dialisi');
+      const hasBar = store.db.prepare("SELECT 1 FROM reparti WHERE sede_id = 'jesi-sede' AND lower(nome) LIKE 'bar%'").get();
+      if (store.get('sedi', 'jesi-sede') && !hasBar && !store.get('reparti', 'jesi-bar')) {
+        store.insertRaw('reparti', {
+          id: 'jesi-bar', sede_id: 'jesi-sede', nome: 'Bar', tipo: 'Servizio', piano: 2, corpo: 'nC',
+          ingresso_id: store.get('ingressi', 'ing-principale') ? 'ing-principale' : null,
+          dove: 'Accanto alla portineria, nel corpo centrale', kw: 'bar caffe ristoro colazione'
+        }, 'aggiornamento dati');
+        log('reparti', 'jesi-bar', { nome: 'Bar' });
+      }
+    }
   }
 ];
+
+// Keywords with the new words appended, each word once.
+function addWords(kw, words) {
+  const have = String(kw || '').split(/\s+/).filter(Boolean);
+  for (const w of words.split(/\s+/)) if (!have.includes(w)) have.push(w);
+  return have.join(' ');
+}
 
 export function applyDataFixes(store) {
   store.db.exec('CREATE TABLE IF NOT EXISTS correzioni (id TEXT PRIMARY KEY, ts TEXT NOT NULL)');
