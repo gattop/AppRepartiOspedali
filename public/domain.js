@@ -41,8 +41,11 @@ export const corpoName = (osp, k) => osp?.mappa?.corpi?.[k]?.label || k || '';
 // Hospitals made of several buildings ("palazzine"): their map is a plan of the site, shown as a
 // 3D model of the buildings or flat from above. The others are one building split into "corpi".
 export const isPlan = (osp) => osp?.mappa?.tipo === 'pianta';
-export const corpoWord = (osp) => (isPlan(osp) ? 'palazzina' : 'corpo');
-export const Corpo = (osp) => (isPlan(osp) ? 'Palazzina' : 'Corpo');
+// What a block of the map is called: separate buildings are "palazzine", parts of one building
+// "corpi". A site plan can say which with `mappa.unita` (Torrette: one building of many "corpi").
+export const corpoWord = (osp) => osp?.mappa?.unita || (isPlan(osp) ? 'palazzina' : 'corpo');
+export const Corpo = (osp) => corpoWord(osp).replace(/^./, (c) => c.toUpperCase());
+export const isPalazzine = (osp) => corpoWord(osp) === 'palazzina';
 export const mapWord = () => 'mappa 3D';
 
 // When a ward moves to another body of a mapped hospital, carry over that body's lift and
@@ -112,4 +115,4 @@ export function movement(r) {
   return `${to > from ? 'Sali' : 'Scendi'} di ${n} ${n === 1 ? fw.word : fw.words}`;
 }
 
-export const placeText = (o, corpo, punto) => (corpo ? `${Corpo(o)} ${corpoName(o, corpo)}${punto ? ' · punto preciso' : isPlan(o) ? '' : ' · intera ala'}` : 'Non indicata');
+export const placeText = (o, corpo, punto) => (corpo ? `${Corpo(o)} ${corpoName(o, corpo)}${punto ? ' · punto preciso' : isPalazzine(o) ? '' : ' · intera ala'}` : 'Non indicata');

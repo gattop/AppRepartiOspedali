@@ -42,7 +42,8 @@ Internet ──► Traefik ──► oauth2-proxy ──► app (Node 24 + SQLit
 | `app.css` | un blocco per componente; i colori delle mappe sono variabili `--m-*` su `.map-stage` |
 
 Gli eventi sono delegati: un elemento con `data-act="nome"` esegue `handlers.act.nome` della sua schermata (lo stesso per `data-input`, `data-change`, `data-submit`). Un nome usato da due schermate blocca l'avvio con un errore, così non si sovrascrivono a vicenda.
-- `server/seed/`: dati caricati al primo avvio, solo se il database è vuoto. `jesi.json` è reale (Piano di emergenza 2015, da verificare); `demo.json` è finto e si carica solo con `SEED_DEMO=true`.
+- `server/seed/`: dati caricati al primo avvio, solo se il database è vuoto. `jesi.json` (Piano di emergenza 2015 e controlli sul posto), `senigallia.json` (pianta e cartelli dell'ospedale) e `torrette.json` (Ospedale di Torrette, Ancona: reparti, piani e ascensori dal sito dell'AOU delle Marche; la mappa è uno schema non in scala) sono reali ma da verificare; `demo.json` è finto e si carica solo con `SEED_DEMO=true`.
+- `tools/mappe/`: gli script che generano i file dei dati iniziali con la loro mappa (oggi `torrette.mjs`: `node tools/mappe/torrette.mjs`). Per correggere una mappa si modifica lo script e si rigenera il JSON; per portare la correzione in un database già in uso va alzata `mappa.versione`.
 - Il database è `data/reparti.db` nella cartella del compose (montata in `/data` nel container, esclusa da git). Ogni modifica finisce anche nella tabella `modifiche` (chi, quando, cosa).
 
 La consultazione è pubblica: oauth2-proxy lascia passare senza login la pagina, i file dell'app e `GET /api/data`. Il login (pulsante "Accedi") serve solo per `/api/me` e per le modifiche. L'app non gestisce login: si fida degli header `X-Forwarded-Preferred-Username/Email/Groups` messi da oauth2-proxy. Per questo il container `app` **non va mai collegato alla rete di Traefik né esposto con una porta**.

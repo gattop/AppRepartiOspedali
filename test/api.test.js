@@ -242,6 +242,57 @@ test('the Monoblocco D1 sign reaches an old Senigallia database once', () => {
   assert.equal(store.db.prepare("SELECT COUNT(*) AS n FROM reparti WHERE nome = 'Autoparco'").get().n, 1);
 });
 
+test('seeds Torrette: bodies with their floors, numbered lifts, entrances on the plan', async () => {
+  const data = await (await req('GET', '/api/data')).json();
+  const tor = data.ospedali.find((o) => o.id === 'torrette');
+  assert.equal(tor.mappa.tipo, 'pianta');
+  assert.equal(tor.mappa.unita, 'corpo');
+  const lv = Object.fromEntries(tor.mappa.blocks.map((b) => [b.id, b.lv]));
+  const reps = data.reparti.filter((r) => r.sede_id === 'torrette-sede');
+  assert.ok(reps.length >= 70);
+  // every ward and entrance sits on a floor its body really has, so the 3D map can show it
+  for (const r of reps) assert.ok(lv[r.corpo]?.includes(r.piano), r.id);
+  const ing = data.ingressi.filter((i) => i.sede_id === 'torrette-sede');
+  for (const i of ing) assert.ok(i.punto && lv[i.corpo]?.includes(i.piano), i.id);
+  assert.equal(ing.find((i) => i.badge === 'ambulanze').nome, 'Pronto Soccorso');
+  const asc = Object.fromEntries(data.ascensori.filter((a) => a.sede_id === 'torrette-sede').map((a) => [a.id, a]));
+  assert.deepEqual(Object.values(asc).map((a) => a.sigla), ['1', '2-3', '4', '5', '6', '7']);
+  for (const a of Object.values(asc)) assert.ok(lv[a.corpo], a.id);
+  const utic = reps.find((r) => r.id === 'tor-utic');
+  assert.deepEqual([utic.corpo, utic.piano, asc[utic.ascensore_id].sigla], ['T1', 4, '1']);
+});
+
+test('the seed files agree with their own maps', () => {
+  // A ward on a floor its block doesn't have would be invisible on the map: catch it before deploy.
+  for (const f of ['jesi.json', 'senigallia.json', 'torrette.json']) {
+    for (const o of JSON.parse(fs.readFileSync(new URL('../server/seed/' + f, import.meta.url), 'utf8')).ospedali) {
+      const lv = Object.fromEntries(o.mappa.blocks.map((b) => [b.id, b.lv]));
+      const ids = new Set();
+      for (const s of o.sedi) {
+        const ing = new Set(s.ingressi.map((x) => x.id)), asc = new Set((s.ascensori || []).map((x) => x.id));
+        for (const r of s.reparti) {
+          assert.ok(!ids.has(r.id), 'duplicate id ' + r.id);
+          ids.add(r.id);
+          assert.ok(lv[r.corpo]?.includes(r.piano), `${f}: ${r.id} on floor ${r.piano} of ${r.corpo}`);
+          assert.ok(!r.ingresso || ing.has(r.ingresso), `${f}: ${r.id} entrance`);
+          assert.ok(!r.ascensore || asc.has(r.ascensore), `${f}: ${r.id} lift`);
+        }
+      }
+    }
+  }
+});
+
+test('adds Torrette once to a database created before it existed', () => {
+  store.remove('ospedali', 'torrette', 'test');
+  store.db.exec("DELETE FROM correzioni WHERE id = '2026-11-10-torrette'");
+  applyDataFixes(store);
+  assert.ok(store.get('reparti', 'tor-ps'));
+  // Deleted on purpose afterwards: it does not come back at the next start.
+  store.remove('ospedali', 'torrette', 'test');
+  applyDataFixes(store);
+  assert.equal(store.get('ospedali', 'torrette'), null);
+});
+
 test('adds Senigallia once to a database created before it existed', () => {
   store.remove('ospedali', 'senigallia', 'test');
   store.db.exec("DELETE FROM correzioni WHERE id = '2026-11-04-senigallia'");

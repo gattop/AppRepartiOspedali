@@ -2,7 +2,7 @@
 import { html, raw, norm } from '../util.js';
 import { S, X, api } from '../data.js';
 import { ICON } from '../icons.js';
-import { pianoInfo, pianoDefault, floorOptions, floorWord, isPlan, mapWord, Corpo, corpoPatch } from '../domain.js';
+import { pianoInfo, pianoDefault, floorOptions, floorWord, isPlan, isPalazzine, mapWord, Corpo, corpoPatch } from '../domain.js';
 import { render, flash, mutate } from '../ui.js';
 import { href } from '../router.js';
 import { banner, tabbar, viewNotFound, viewForbidden } from './common.js';
@@ -40,7 +40,7 @@ function gestReparti(o, sede, g) {
   const ingOpts = [['', 'Nessuno'], ...ingressi.map((x) => [x.id, x.nome])];
   const ascOpts = [['', 'Nessuno (a piedi)'], ...ascensori.map((x) => [x.id, x.sigla + (x.tipo ? ' · ' + x.tipo : '')])];
   return html`
-    <p class="hint">Ogni modifica si salva da sola appena cambi un campo.${corpi.length > 0 ? ` Se sposti un reparto in un${isPlan(o) ? 'a' : ''} altr${isPlan(o) ? 'a' : 'o'} ${Corpo(o).toLowerCase()}, ascensore e indicazioni standard si aggiornano di conseguenza.` : ''}</p>
+    <p class="hint">Ogni modifica si salva da sola appena cambi un campo.${corpi.length > 0 ? ` Se sposti un reparto in un${isPalazzine(o) ? 'a' : ''} altr${isPalazzine(o) ? 'a' : 'o'} ${Corpo(o).toLowerCase()}, ascensore e indicazioni standard si aggiornano di conseguenza.` : ''}</p>
     <div class="row gap8">
       <label class="search light grow">${ICON.search(18)}<span class="sr">Filtra reparti</span><input type="search" data-input="gestQ" data-osp="${o.id}" value="${g.q}" placeholder="Filtra reparti…" autocomplete="off"></label>
       <a class="btn primary small" href="${href('aggiungi', null, { sede: sede.id })}">${ICON.plus(16)}Reparto</a>
@@ -110,7 +110,7 @@ function gestAscensori(o, sede) {
   const rows = X.ascBySede[sede.id] || [];
   const corpoOpts = corpoOptions(o);
   return html`
-    <p class="hint">Rinominare un ascensore aggiorna subito tutti i reparti che lo usano.${corpoOpts.length > 1 ? ` ${isPlan(o) ? 'La palazzina' : 'Il corpo'} indica dove si trova il vano sulla ${mapWord(o)}: serve a disegnare il percorso.` : ''}</p>
+    <p class="hint">Rinominare un ascensore aggiorna subito tutti i reparti che lo usano.${corpoOpts.length > 1 ? ` ${isPalazzine(o) ? 'La palazzina' : 'Il corpo'} indica dove si trova il vano sulla ${mapWord(o)}: serve a disegnare il percorso.` : ''}</p>
     <div class="gtable ascs ${corpoOpts.length > 1 ? 'withc' : ''}">
       <div class="ghead"><span>Sigla</span><span>Tipo</span>${corpoOpts.length > 1 && html`<span>${Corpo(o)}</span>`}<span>Dove si trova</span><span></span></div>
       ${rows.map((x) => {

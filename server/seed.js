@@ -232,6 +232,13 @@ const DATA_FIXES = [
         log('reparti', n.id, { nome: n.nome });
       }
     }
+  },
+  {
+    // Ospedale di Torrette (Ancona), added to the seed after the database was created.
+    id: '2026-11-10-torrette',
+    run(store) {
+      if (!store.get('ospedali', 'torrette')) loadSeedFile(store, 'torrette.json', 'aggiornamento dati');
+    }
   }
 ];
 
@@ -260,5 +267,5 @@ function loadSeedFile(store, f, user) {
 }
 
 export function seed(store, { demo = false } = {}) {
-  for (const f of ['jesi.json', 'senigallia.json', ...(demo ? ['demo.json'] : [])]) loadSeedFile(store, f);
+  for (const f of ['jesi.json', 'senigallia.json', 'torrette.json', ...(demo ? ['demo.json'] : [])]) loadSeedFile(store, f);
 }

@@ -13,7 +13,7 @@
 // and, after it, the buttons and the legend (redrawn only when the gesture ends).
 import { html } from '../util.js';
 import { S, X } from '../data.js';
-import { isPlan, mapWord, floorWord, floorTag, Corpo, pianoInfo, placeText, corpoPatch, entrancePoints, routeFor } from '../domain.js';
+import { isPlan, isPalazzine, mapWord, floorWord, floorTag, Corpo, pianoInfo, placeText, corpoPatch, entrancePoints, routeFor } from '../domain.js';
 import { $app, render } from '../ui.js';
 import { renderMap } from './map3d.js';
 import { renderPlan } from './map2d.js';
@@ -172,7 +172,7 @@ export function pickPanel(o, v, what) {
   return html`<div class="field pickfield">
     <span>Posizione sulla ${mapWord(o)}</span>
     <div class="seg light">
-      <button type="button" class="${mode === 'ala' ? 'on' : ''}" data-act="pickMode" data-mode="ala">${isPlan(o) ? 'Intera palazzina' : 'Intera ala'}</button>
+      <button type="button" class="${mode === 'ala' ? 'on' : ''}" data-act="pickMode" data-mode="ala">${isPalazzine(o) ? 'Intera palazzina' : isPlan(o) ? 'Intero corpo' : 'Intera ala'}</button>
       <button type="button" class="${mode === 'punto' ? 'on' : ''}" data-act="pickMode" data-mode="punto">Punto preciso</button>
     </div>
     <div class="map-stage pick" data-osp="${o.id}" data-stage="pick"></div>
@@ -180,7 +180,7 @@ export function pickPanel(o, v, what) {
       <b class="pick-status" id="pick-status">${pickStatus(o, v)}</b>
       <button type="button" class="btn ghost small ${v.corpo ? '' : 'hide'}" id="pick-clear" data-act="pickClear">Rimuovi</button>
     </div>
-    <small class="muted">${isPlan(o) ? `Tocca la palazzina dove si trova ${what}.` : `Scegli il ${floorWord(o).word}, poi tocca il blocco dove si trova ${what}.`} Con “Punto preciso” tocca il punto esatto: comparirà un puntino.</small>
+    <small class="muted">${isPlan(o) ? `Tocca ${isPalazzine(o) ? 'la palazzina' : 'il corpo'} dove si trova ${what}.` : `Scegli il ${floorWord(o).word}, poi tocca il blocco dove si trova ${what}.`} Con “Punto preciso” tocca il punto esatto: comparirà un puntino.</small>
   </div>`;
 }
 

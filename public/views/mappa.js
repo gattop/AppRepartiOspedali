@@ -2,7 +2,7 @@
 import { html, norm } from '../util.js';
 import { S, X } from '../data.js';
 import { ICON, repIcon } from '../icons.js';
-import { pianoInfo, floorWord, floorTag, isPlan, corpoWord, Corpo, telInfo, movement } from '../domain.js';
+import { pianoInfo, floorWord, floorTag, isPalazzine, corpoWord, Corpo, telInfo, movement } from '../domain.js';
 import { $app, render } from '../ui.js';
 import { mapStageHtml, newStage, homeView } from '../map/stage.js';
 import { href } from '../router.js';
@@ -131,7 +131,7 @@ export function viewMappa(id, query) {
           <a class="hbtn icon" href="${href('home')}" aria-label="Torna agli ospedali">${ICON.back()}</a>
           <div class="col minw0">
             <span class="brand">${o.nome}</span>
-            <span class="brand-sub">${[o.citta, `${nCorpi} ${isPlan(o) ? 'palazzine' : 'corpi'}`, levels.length && o.uso_livelli ? `livelli ${levels[0]}–${levels[levels.length - 1]}` : '', `${(X.repByOsp[o.id] || []).length} reparti`].filter(Boolean).join(' · ')}</span>
+            <span class="brand-sub">${[o.citta, `${nCorpi} ${isPalazzine(o) ? 'palazzine' : 'corpi'}`, levels.length && o.uso_livelli ? `livelli ${levels[0]}–${levels[levels.length - 1]}` : '', `${(X.repByOsp[o.id] || []).length} reparti`].filter(Boolean).join(' · ')}</span>
           </div>
         </div>
         <div class="row gap6 flexnone">

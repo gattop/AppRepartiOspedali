@@ -1,0 +1,1856 @@
+{
+  "ospedali": [
+    {
+      "id": "torrette",
+      "nome": "Ospedale di Torrette",
+      "citta": "Ancona",
+      "indirizzo": "Via Conca 71",
+      "uso_livelli": false,
+      "prefisso_tel": "",
+      "fonte": "Reparti, piani e ascensori dal sito dell'AOU delle Marche (novembre 2026). La mappa è uno schema non in scala: i corpi A, B, C, E, I, L, N seguono la pianta dell'edificio originale, la posizione degli altri è indicativa. Da verificare sul posto.",
+      "piani": {
+        "min": -1,
+        "max": 6
+      },
+      "mappa": {
+        "tipo": "pianta",
+        "unita": "corpo",
+        "versione": 1,
+        "rot": -20,
+        "livelli": [
+          -1,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "view": {
+          "x0": -3,
+          "y0": 6,
+          "x1": 124,
+          "y1": 110
+        },
+        "blocks": [
+          {
+            "id": "I",
+            "label": "I",
+            "colore": "#90A4AE",
+            "lv": [
+              -1,
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "poly": [
+              [
+                57,
+                34
+              ],
+              [
+                63,
+                34
+              ],
+              [
+                64,
+                46
+              ],
+              [
+                56,
+                46
+              ]
+            ]
+          },
+          {
+            "id": "IB",
+            "label": "IB",
+            "colore": "#78909C",
+            "lv": [
+              -1,
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "poly": [
+              [
+                56,
+                46
+              ],
+              [
+                64,
+                46
+              ],
+              [
+                65,
+                62
+              ],
+              [
+                55,
+                62
+              ]
+            ]
+          },
+          {
+            "id": "B",
+            "label": "B",
+            "colore": "#90A4AE",
+            "lv": [
+              -1,
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "poly": [
+              [
+                55,
+                62
+              ],
+              [
+                65,
+                62
+              ],
+              [
+                63,
+                76
+              ],
+              [
+                57,
+                76
+              ]
+            ]
+          },
+          {
+            "id": "N",
+            "label": "N",
+            "colore": "#4285F4",
+            "lv": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "poly": [
+              [
+                59.2,
+                27.7
+              ],
+              [
+                23.5,
+                17.8
+              ],
+              [
+                21.1,
+                26.5
+              ],
+              [
+                56.8,
+                36.3
+              ]
+            ]
+          },
+          {
+            "id": "L",
+            "label": "L",
+            "colore": "#26A69A",
+            "lv": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "poly": [
+              [
+                63.9,
+                36.1
+              ],
+              [
+                97.4,
+                20.4
+              ],
+              [
+                93.6,
+                12.3
+              ],
+              [
+                60.1,
+                27.9
+              ]
+            ]
+          },
+          {
+            "id": "E",
+            "label": "E",
+            "colore": "#7CB342",
+            "lv": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "poly": [
+              [
+                65,
+                50
+              ],
+              [
+                100,
+                50
+              ],
+              [
+                100,
+                58
+              ],
+              [
+                65,
+                58
+              ]
+            ]
+          },
+          {
+            "id": "A",
+            "label": "A",
+            "colore": "#E4572E",
+            "lv": [
+              -1,
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "poly": [
+              [
+                56.8,
+                73.7
+              ],
+              [
+                21.1,
+                83.5
+              ],
+              [
+                23.5,
+                92.2
+              ],
+              [
+                59.2,
+                82.3
+              ]
+            ]
+          },
+          {
+            "id": "C",
+            "label": "C",
+            "colore": "#F3A712",
+            "lv": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "poly": [
+              [
+                60.1,
+                82.1
+              ],
+              [
+                93.6,
+                97.7
+              ],
+              [
+                97.4,
+                89.6
+              ],
+              [
+                63.9,
+                73.9
+              ]
+            ]
+          },
+          {
+            "id": "F",
+            "label": "F",
+            "colore": "#AB7DF6",
+            "lv": [
+              -1,
+              0,
+              1,
+              2
+            ],
+            "poly": [
+              [
+                30,
+                40
+              ],
+              [
+                54,
+                40
+              ],
+              [
+                54,
+                70
+              ],
+              [
+                30,
+                70
+              ]
+            ]
+          },
+          {
+            "id": "H",
+            "label": "H",
+            "colore": "#EC6FA9",
+            "lv": [
+              -1,
+              0
+            ],
+            "poly": [
+              [
+                56,
+                20
+              ],
+              [
+                64,
+                20
+              ],
+              [
+                64,
+                27
+              ],
+              [
+                56,
+                27
+              ]
+            ]
+          },
+          {
+            "id": "S",
+            "label": "S",
+            "colore": "#D4C24A",
+            "lv": [
+              0,
+              1,
+              2
+            ],
+            "poly": [
+              [
+                67,
+                61
+              ],
+              [
+                84,
+                61
+              ],
+              [
+                84,
+                70
+              ],
+              [
+                67,
+                70
+              ]
+            ]
+          },
+          {
+            "id": "R",
+            "label": "R",
+            "colore": "#C0392B",
+            "lv": [
+              0,
+              1
+            ],
+            "poly": [
+              [
+                34,
+                71.5
+              ],
+              [
+                53,
+                71.5
+              ],
+              [
+                53,
+                74
+              ],
+              [
+                34,
+                78.5
+              ]
+            ]
+          },
+          {
+            "id": "ATR",
+            "label": "Atrio",
+            "colore": "#E0E0E0",
+            "lv": [
+              -1,
+              0,
+              1
+            ],
+            "poly": [
+              [
+                9,
+                82
+              ],
+              [
+                20,
+                82
+              ],
+              [
+                20,
+                93
+              ],
+              [
+                9,
+                93
+              ]
+            ]
+          },
+          {
+            "id": "T",
+            "label": "T",
+            "colore": "#5C6BC0",
+            "lv": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "poly": [
+              [
+                2,
+                62
+              ],
+              [
+                14,
+                62
+              ],
+              [
+                14,
+                80
+              ],
+              [
+                2,
+                80
+              ]
+            ]
+          },
+          {
+            "id": "T1",
+            "label": "T1",
+            "colore": "#7986CB",
+            "lv": [
+              0,
+              1,
+              2,
+              3,
+              4
+            ],
+            "poly": [
+              [
+                15,
+                66
+              ],
+              [
+                24,
+                66
+              ],
+              [
+                24,
+                80
+              ],
+              [
+                15,
+                80
+              ]
+            ]
+          },
+          {
+            "id": "V",
+            "label": "V",
+            "colore": "#9FA8DA",
+            "lv": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "poly": [
+              [
+                2,
+                50
+              ],
+              [
+                14,
+                50
+              ],
+              [
+                14,
+                61
+              ],
+              [
+                2,
+                61
+              ]
+            ]
+          },
+          {
+            "id": "U",
+            "label": "U",
+            "colore": "#26C6DA",
+            "lv": [
+              -1,
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "poly": [
+              [
+                6,
+                95
+              ],
+              [
+                30,
+                95
+              ],
+              [
+                30,
+                106
+              ],
+              [
+                6,
+                106
+              ]
+            ]
+          },
+          {
+            "id": "MI",
+            "label": "Mal. Infettive",
+            "colore": "#8D6E63",
+            "lv": [
+              -1,
+              0,
+              1,
+              2
+            ],
+            "poly": [
+              [
+                104,
+                70
+              ],
+              [
+                118,
+                70
+              ],
+              [
+                118,
+                80
+              ],
+              [
+                104,
+                80
+              ]
+            ]
+          },
+          {
+            "id": "RT",
+            "label": "Radioterapia",
+            "colore": "#A1887F",
+            "lv": [
+              0
+            ],
+            "poly": [
+              [
+                108,
+                84
+              ],
+              [
+                120,
+                84
+              ],
+              [
+                120,
+                92
+              ],
+              [
+                108,
+                92
+              ]
+            ]
+          }
+        ],
+        "corpi": {
+          "I": {
+            "label": "I",
+            "short": "I",
+            "dove": "Corpo I (nodo centrale, ascensore 7)"
+          },
+          "IB": {
+            "label": "IB",
+            "short": "IB",
+            "dove": "Corpo IB (nodo centrale, ascensore 6)"
+          },
+          "B": {
+            "label": "B",
+            "short": "B",
+            "dove": "Corpo B (nodo centrale, ascensore 5)"
+          },
+          "N": {
+            "label": "N",
+            "short": "N",
+            "dove": "Corpo N"
+          },
+          "L": {
+            "label": "L",
+            "short": "L",
+            "dove": "Corpo L"
+          },
+          "E": {
+            "label": "E",
+            "short": "E",
+            "dove": "Corpo E"
+          },
+          "A": {
+            "label": "A",
+            "short": "A",
+            "dove": "Corpo A"
+          },
+          "C": {
+            "label": "C",
+            "short": "C",
+            "dove": "Corpo C"
+          },
+          "F": {
+            "label": "F",
+            "short": "F",
+            "dove": "Corpo F (piastra centrale)"
+          },
+          "H": {
+            "label": "H",
+            "short": "H",
+            "dove": "Corpo H"
+          },
+          "S": {
+            "label": "S",
+            "short": "S",
+            "dove": "Corpo S"
+          },
+          "R": {
+            "label": "R",
+            "short": "R",
+            "dove": "Corpo R"
+          },
+          "ATR": {
+            "label": "Atrio",
+            "short": "Atrio",
+            "dove": "Atrio dell'ingresso principale"
+          },
+          "T": {
+            "label": "T",
+            "short": "T",
+            "dove": "Corpo T"
+          },
+          "T1": {
+            "label": "T1",
+            "short": "T1",
+            "dove": "Corpo T1"
+          },
+          "V": {
+            "label": "V",
+            "short": "V",
+            "dove": "Corpo V"
+          },
+          "U": {
+            "label": "U",
+            "short": "U",
+            "dove": "Corpo U"
+          },
+          "MI": {
+            "label": "Mal. Infettive",
+            "short": "MI",
+            "dove": "Palazzina Malattie Infettive (staccata dal corpo centrale)"
+          },
+          "RT": {
+            "label": "Radioterapia",
+            "short": "RT",
+            "dove": "Padiglione di Radioterapia, dietro la palazzina Malattie Infettive"
+          }
+        },
+        "decor": {
+          "scritte": [
+            {
+              "x": 18,
+              "y": 109,
+              "t": "Ingresso principale · via Conca 71",
+              "cls": "big"
+            },
+            {
+              "x": 100,
+              "y": 101,
+              "t": "Pronto Soccorso",
+              "cls": "red"
+            }
+          ]
+        }
+      },
+      "sedi": [
+        {
+          "id": "torrette-sede",
+          "nome": "Presidio di Torrette",
+          "indirizzo": "Via Conca 71, Torrette di Ancona",
+          "ingressi": [
+            {
+              "id": "tor-ing-principale",
+              "nome": "Ingresso principale – Reception",
+              "sigla": "P",
+              "piano": 0,
+              "corpo": "ATR",
+              "punto": {
+                "x": 10,
+                "y": 91
+              },
+              "nota": "Via Conca 71, Piano 0. Dalla reception: ascensore 1 a sinistra, ascensore 4 a destra, ascensori 5, 6 e 7 avanti lungo la linea verde"
+            },
+            {
+              "id": "tor-ing-ps",
+              "nome": "Pronto Soccorso",
+              "sigla": "PS",
+              "piano": 1,
+              "corpo": "C",
+              "punto": {
+                "x": 92,
+                "y": 92
+              },
+              "badge": "ambulanze",
+              "nota": "Piano 1, Corpo C (accesso ambulanze: da verificare sul posto)"
+            },
+            {
+              "id": "tor-ing-posteriore",
+              "nome": "Ingresso posteriore – Blocco B",
+              "sigla": "B",
+              "piano": 1,
+              "corpo": "B",
+              "punto": {
+                "x": 63,
+                "y": 69
+              },
+              "nota": "Piano 1: area dei servizi per l'utenza (bar, edicola, bancomat)"
+            },
+            {
+              "id": "tor-ing-mi",
+              "nome": "Palazzina Malattie Infettive",
+              "sigla": "MI",
+              "piano": 0,
+              "corpo": "MI",
+              "punto": {
+                "x": 105,
+                "y": 75
+              },
+              "nota": "Dalla strada interna, dopo la rotatoria dell'elisoccorso: segnaletica \"Malattie Infettive\""
+            },
+            {
+              "id": "tor-ing-rt",
+              "nome": "Radioterapia",
+              "sigla": "RT",
+              "piano": 0,
+              "corpo": "RT",
+              "punto": {
+                "x": 109,
+                "y": 88
+              },
+              "nota": "Padiglione dietro Malattie Infettive: dalla rotatoria sopra l'elisoccorso entrare nel parcheggio dipendenti e seguire i cartelli"
+            }
+          ],
+          "ascensori": [
+            {
+              "id": "tor-asc-1",
+              "sigla": "1",
+              "corpo": "T",
+              "nota": "A sinistra dell'ingresso principale: corpi T, T1 e V"
+            },
+            {
+              "id": "tor-asc-23",
+              "sigla": "2-3",
+              "corpo": "ATR",
+              "nota": "Nell'atrio, accanto alla scalinata: scendono al Piano -1"
+            },
+            {
+              "id": "tor-asc-4",
+              "sigla": "4",
+              "corpo": "U",
+              "nota": "A destra della reception: corpo U"
+            },
+            {
+              "id": "tor-asc-5",
+              "sigla": "5",
+              "corpo": "B",
+              "nota": "Avanti lungo la linea verde: corpi A e C"
+            },
+            {
+              "id": "tor-asc-6",
+              "sigla": "6",
+              "corpo": "IB",
+              "nota": "Avanti lungo il corridoio: corpi C, E, F e A"
+            },
+            {
+              "id": "tor-asc-7",
+              "sigla": "7",
+              "corpo": "I",
+              "nota": "In fondo al corridoio: corpi N, L e H"
+            }
+          ],
+          "reparti": [
+            {
+              "id": "tor-immunologia",
+              "nome": "Immunologia clinica",
+              "tipo": "Ambulatorio",
+              "piano": -1,
+              "corpo": "A",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-23",
+              "dove": "Dall'atrio scendere al Piano -1 (scalinata o ascensori 2-3) e andare in direzione \"Farmacia\" fino all'insegna \"Immunologia\" (porta blu AS18)",
+              "note": "",
+              "tel": "071 5964093",
+              "kw": "immunologia allergie immunologo malattie rare trapianti"
+            },
+            {
+              "id": "tor-medicina-nucleare",
+              "nome": "Medicina Nucleare",
+              "tipo": "Servizio",
+              "piano": -1,
+              "corpo": "F",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-23",
+              "dove": "Seguire la linea verde fino alla Segreteria unificata della Radiologia (Piano 0): lì indicano la linea colorata da seguire",
+              "note": "",
+              "tel": "071 5964140",
+              "kw": "medicina nucleare pet scintigrafia"
+            },
+            {
+              "id": "tor-farmacia",
+              "nome": "Farmacia",
+              "tipo": "Servizio",
+              "piano": -1,
+              "corpo": "H",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Corpo H – ascensore 7",
+              "note": "",
+              "tel": "",
+              "kw": "farmacia ospedaliera farmaci"
+            },
+            {
+              "id": "tor-riabilitativa",
+              "nome": "Medicina Riabilitativa",
+              "tipo": "Ambulatorio",
+              "piano": -1,
+              "corpo": "U",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-4",
+              "dove": "Corpo U – ascensore 4",
+              "note": "",
+              "tel": "",
+              "kw": "medicina riabilitativa fisiatria fisioterapia riabilitazione palestra"
+            },
+            {
+              "id": "tor-neuroriabilitazione-amb",
+              "nome": "Clinica di Neuroriabilitazione – Ambulatori",
+              "tipo": "Ambulatorio",
+              "piano": -1,
+              "corpo": "U",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-23",
+              "dove": "Dall'ingresso principale scendere la scalinata (o ascensori 2-3) e girare a sinistra",
+              "note": "",
+              "tel": "071 5965107",
+              "kw": "neuroriabilitazione riabilitazione neurologica"
+            },
+            {
+              "id": "tor-fisica-sanitaria",
+              "nome": "Fisica Sanitaria",
+              "tipo": "Servizio",
+              "piano": -1,
+              "corpo": "MI",
+              "ingresso": "tor-ing-mi",
+              "ascensore": null,
+              "dove": "Piano -1 della palazzina Malattie Infettive. Dall'interno: ascensore 6, scendere al Piano -1 e seguire il corridoio verso la Radioterapia",
+              "note": "",
+              "tel": "071 5964847",
+              "kw": "fisica sanitaria radioprotezione"
+            },
+            {
+              "id": "tor-reception",
+              "nome": "Portineria – Reception",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "ATR",
+              "ingresso": "tor-ing-principale",
+              "ascensore": null,
+              "dove": "Subito all'ingresso principale (via Conca 71)",
+              "note": "",
+              "tel": "071 5961",
+              "kw": "portineria reception informazioni centralino ingresso principale"
+            },
+            {
+              "id": "tor-cup",
+              "nome": "CUP",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "ATR",
+              "ingresso": "tor-ing-principale",
+              "ascensore": null,
+              "dove": "Vicino all'ingresso principale, accanto alla Segreteria della Radiologia",
+              "note": "",
+              "tel": "",
+              "kw": "cup prenotazioni cassa ticket accettazione"
+            },
+            {
+              "id": "tor-urp",
+              "nome": "Ufficio Relazioni con il Pubblico (U.R.P.)",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "ATR",
+              "ingresso": "tor-ing-principale",
+              "ascensore": null,
+              "dove": "Piano 0, di fianco alla Portineria",
+              "note": "",
+              "tel": "",
+              "kw": "urp relazioni pubblico reclami informazioni"
+            },
+            {
+              "id": "tor-radiologia",
+              "nome": "Clinica di Radiologia",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "F",
+              "ingresso": "tor-ing-principale",
+              "ascensore": null,
+              "dove": "Segreteria unificata della Radiologia al Piano 0, vicino all'ingresso principale (linea verde). Sale anche al Piano -1 e al Pronto Soccorso (Piano 1)",
+              "note": "",
+              "tel": "071 5964085",
+              "kw": "radiologia rx tac risonanza ecografia diagnostica per immagini neuroradiologia"
+            },
+            {
+              "id": "tor-radiologia-interventistica",
+              "nome": "Radiologia Interventistica",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "A",
+              "ingresso": "tor-ing-principale",
+              "ascensore": null,
+              "dove": "Accanto alla Segreteria della Radiologia: seguire la linea bianca indicata dal personale",
+              "note": "",
+              "tel": "071 5964107",
+              "kw": "radiologia interventistica angiografia"
+            },
+            {
+              "id": "tor-direzione",
+              "nome": "Direzione aziendale",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "C",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "Pochi metri dopo l'ingresso principale, vicino all'ascensore 5",
+              "note": "",
+              "tel": "071 5963115",
+              "kw": "direzione generale aziendale"
+            },
+            {
+              "id": "tor-trasfusionale",
+              "nome": "Medicina Trasfusionale",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "C",
+              "ingresso": "tor-ing-principale",
+              "ascensore": null,
+              "dove": "Piano 0, tra i corpi C e S: dopo la reception girare a destra e seguire \"Medicina trasfusionale\"",
+              "note": "",
+              "tel": "071 5964003",
+              "kw": "trasfusionale donatori sangue centro trasfusionale"
+            },
+            {
+              "id": "tor-ematologia-amb",
+              "nome": "Clinica Ematologica – Ambulatori",
+              "tipo": "Ambulatorio",
+              "piano": 0,
+              "corpo": "C",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "Corpo C – ascensore 5",
+              "note": "Ambulatori C, D ed E al Piano 0; la degenza è al Piano 2",
+              "tel": "",
+              "kw": "ematologia ambulatori sangue leucemia linfoma"
+            },
+            {
+              "id": "tor-nefrologia",
+              "nome": "Nefrologia",
+              "tipo": "Degenza",
+              "piano": 0,
+              "corpo": "L",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Corpo L – ascensore 7",
+              "note": "",
+              "tel": "",
+              "kw": "nefrologia reni trapianto rene"
+            },
+            {
+              "id": "tor-dialisi",
+              "nome": "Dialisi e ambulatori Trapianto di rene",
+              "tipo": "Ambulatorio",
+              "piano": 0,
+              "corpo": "N",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Corpo N – ascensore 7",
+              "note": "",
+              "tel": "",
+              "kw": "dialisi emodialisi peritoneale trapianto rene nefrologia"
+            },
+            {
+              "id": "tor-mal-inf-amb",
+              "nome": "Malattie Infettive – Piano 0",
+              "tipo": "Ambulatorio",
+              "piano": 0,
+              "corpo": "MI",
+              "ingresso": "tor-ing-mi",
+              "ascensore": null,
+              "dove": "Palazzina Malattie Infettive",
+              "note": "",
+              "tel": "071 5963466",
+              "kw": "malattie infettive ambulatori epatiti parassitologia tropicali"
+            },
+            {
+              "id": "tor-radioterapia",
+              "nome": "Radioterapia",
+              "tipo": "Servizio",
+              "piano": 0,
+              "corpo": "RT",
+              "ingresso": "tor-ing-rt",
+              "ascensore": null,
+              "dove": "Padiglione di Radioterapia, dietro la palazzina Malattie Infettive",
+              "note": "Parcheggio dedicato: serve l'autorizzazione o l'impegnativa per la visita",
+              "tel": "071 5964842",
+              "kw": "radioterapia oncologia"
+            },
+            {
+              "id": "tor-ps",
+              "nome": "Pronto Soccorso e Medicina d'Urgenza",
+              "tipo": "Emergenza",
+              "piano": 1,
+              "corpo": "C",
+              "ingresso": "tor-ing-ps",
+              "ascensore": "tor-asc-6",
+              "dove": "Corpo C, Piano 1. Dall'ingresso principale: ascensore 6",
+              "note": "",
+              "tel": "071 5965096",
+              "kw": "pronto soccorso ps emergenza urgenza triage"
+            },
+            {
+              "id": "tor-rianimazione",
+              "nome": "Clinica di Anestesia e Rianimazione generale",
+              "tipo": "Degenza",
+              "piano": 1,
+              "corpo": "C",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Ascensore 6 fino al Piano 1, poi a destra",
+              "note": "La Rianimazione clinica è al Piano 2",
+              "tel": "071 5964602",
+              "kw": "rianimazione terapia intensiva anestesia"
+            },
+            {
+              "id": "tor-rianimazione-trapianti",
+              "nome": "Anestesia e Rianimazione dei Trapianti e Chirurgia maggiore",
+              "tipo": "Degenza",
+              "piano": 1,
+              "corpo": "A",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "Ascensore 5 fino al Piano 1, poi a sinistra",
+              "note": "",
+              "tel": "071 5963399",
+              "kw": "rianimazione trapianti terapia intensiva anestesia"
+            },
+            {
+              "id": "tor-rianimazione-cardio",
+              "nome": "Anestesia e Rianimazione Cardiochirurgica",
+              "tipo": "Degenza",
+              "piano": 1,
+              "corpo": "R",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "Ascensore 5 fino al Piano 1, poi a destra: è alla destra della sala operatoria",
+              "note": "",
+              "tel": "071 5965312",
+              "kw": "rianimazione cardiochirurgica terapia intensiva"
+            },
+            {
+              "id": "tor-cardiochirurgia-ti",
+              "nome": "Cardiochirurgia – Piano 1",
+              "tipo": "Degenza",
+              "piano": 1,
+              "corpo": "T",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Corpo T, Piano 1: seguire dritto il corridoio in direzione dell'ascensore 6",
+              "note": "",
+              "tel": "",
+              "kw": "cardiochirurgia terapia intensiva"
+            },
+            {
+              "id": "tor-psichiatria",
+              "nome": "Clinica Psichiatrica",
+              "tipo": "Degenza",
+              "piano": 1,
+              "corpo": "N",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Ascensore 7 fino al Piano 1, poi a sinistra seguendo la riga verde fino in fondo al corridoio (corpi L e N; area adolescenti nei corpi F e N)",
+              "note": "",
+              "tel": "071 5963499",
+              "kw": "psichiatria spdc salute mentale adolescenti"
+            },
+            {
+              "id": "tor-anatomia",
+              "nome": "Anatomia Patologica",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "F",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Ascensore 6, poi a sinistra verso la Cappella. Laboratori e accettazione campioni al Piano 1, segreteria al Piano 2",
+              "note": "Il corpo non è indicato sul sito: da verificare",
+              "tel": "071 5965786",
+              "kw": "anatomia patologica istologico biopsie"
+            },
+            {
+              "id": "tor-donazione-organi",
+              "nome": "Coordinamento Donazione Organi",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "F",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Stanza 158, accanto alla Direzione medica e vicino all'atrio del bar",
+              "note": "",
+              "tel": "071 5965383",
+              "kw": "donazione organi trapianti coordinamento"
+            },
+            {
+              "id": "tor-professioni-sanitarie",
+              "nome": "Area Professioni Sanitarie",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "F",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Corpo F – ascensore 6",
+              "note": "",
+              "tel": "071 5965455",
+              "kw": "professioni sanitarie direzione infermieristica"
+            },
+            {
+              "id": "tor-igiene",
+              "nome": "Igiene Ospedaliera",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "I",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Corpo I – ascensore 7",
+              "note": "",
+              "tel": "071 5963691",
+              "kw": "igiene ospedaliera"
+            },
+            {
+              "id": "tor-spp",
+              "nome": "Prevenzione e Protezione",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "IB",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Di fronte all'ascensore 6, al Piano 1",
+              "note": "",
+              "tel": "071 5965304",
+              "kw": "prevenzione protezione spp sicurezza"
+            },
+            {
+              "id": "tor-direzione-medica",
+              "nome": "Direzione Medica Ospedaliera",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "B",
+              "ingresso": "tor-ing-posteriore",
+              "ascensore": null,
+              "dove": "Piano 1, Blocco B: dall'ingresso posteriore, davanti ai servizi per l'utenza (bar, edicola, bancomat)",
+              "note": "",
+              "tel": "071 5964186",
+              "kw": "direzione medica dmo"
+            },
+            {
+              "id": "tor-servizio-sociale",
+              "nome": "Servizio Sociale",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "B",
+              "ingresso": "tor-ing-posteriore",
+              "ascensore": null,
+              "dove": "Piano 1, Blocco B, dall'ingresso posteriore",
+              "note": "",
+              "tel": "",
+              "kw": "servizio sociale assistenti sociali"
+            },
+            {
+              "id": "tor-medico-competente",
+              "nome": "Medico Competente",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "B",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "Corpo B – ascensore 5",
+              "note": "",
+              "tel": "071 5964309",
+              "kw": "medico competente sorveglianza sanitaria"
+            },
+            {
+              "id": "tor-bar",
+              "nome": "Bar – Edicola – Bancomat",
+              "tipo": "Servizio",
+              "piano": 1,
+              "corpo": "B",
+              "ingresso": "tor-ing-posteriore",
+              "ascensore": null,
+              "dove": "Piano 1, nell'atrio dell'ingresso posteriore",
+              "note": "",
+              "tel": "",
+              "kw": "bar caffe edicola bancomat ristoro"
+            },
+            {
+              "id": "tor-mal-inf-tropicali",
+              "nome": "Clinica Malattie Infettive tropicali, Parassitologia, Epatiti croniche",
+              "tipo": "Degenza",
+              "piano": 1,
+              "corpo": "MI",
+              "ingresso": "tor-ing-mi",
+              "ascensore": null,
+              "dove": "Palazzina Malattie Infettive",
+              "note": "",
+              "tel": "071 5963466",
+              "kw": "malattie infettive tropicali parassitologia epatiti"
+            },
+            {
+              "id": "tor-medicina-urgenza",
+              "nome": "Medicina Interna e d'Urgenza – settore ordinario",
+              "tipo": "Degenza",
+              "piano": 2,
+              "corpo": "A",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Corpo A – ascensore 6",
+              "note": "",
+              "tel": "",
+              "kw": "medicina interna urgenza degenza"
+            },
+            {
+              "id": "tor-medicina-subintensiva",
+              "nome": "Medicina d'Urgenza – Subintensiva",
+              "tipo": "Degenza",
+              "piano": 2,
+              "corpo": "S",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Corpo S – ascensore 6",
+              "note": "",
+              "tel": "",
+              "kw": "medicina urgenza subintensiva semintensiva"
+            },
+            {
+              "id": "tor-ematologia",
+              "nome": "Clinica Ematologica",
+              "tipo": "Degenza",
+              "piano": 2,
+              "corpo": "C",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Corpo C, Piano 2: ascensore 6 o 7",
+              "note": "",
+              "tel": "",
+              "kw": "ematologia leucemia linfoma trapianto midollo"
+            },
+            {
+              "id": "tor-oncologia",
+              "nome": "Clinica Oncologica – Degenza",
+              "tipo": "Degenza",
+              "piano": 2,
+              "corpo": "L",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Ascensore 6 o 7 fino al Piano 2, a sinistra, poi seguire la segnaletica",
+              "note": "",
+              "tel": "071 5964169",
+              "kw": "oncologia tumori chemioterapia degenza"
+            },
+            {
+              "id": "tor-oncologia-dh",
+              "nome": "Clinica Oncologica – Day Hospital",
+              "tipo": "Day Hospital",
+              "piano": 2,
+              "corpo": "N",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Ascensore 6 o 7 fino al Piano 2, a sinistra, poi seguire la segnaletica",
+              "note": "",
+              "tel": "071 5964169",
+              "kw": "oncologia tumori chemioterapia day hospital"
+            },
+            {
+              "id": "tor-laboratorio",
+              "nome": "Laboratorio Analisi",
+              "tipo": "Servizio",
+              "piano": 2,
+              "corpo": "F",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Percorso verde fino all'ascensore 6, Piano 2: usciti dall'ascensore a sinistra e poi ancora a sinistra",
+              "note": "",
+              "tel": "",
+              "kw": "laboratorio analisi prelievi esami"
+            },
+            {
+              "id": "tor-mal-inf-emergenti",
+              "nome": "Malattie Infettive emergenti e degli immunodepressi",
+              "tipo": "Degenza",
+              "piano": 2,
+              "corpo": "MI",
+              "ingresso": "tor-ing-mi",
+              "ascensore": null,
+              "dove": "Palazzina Malattie Infettive",
+              "note": "",
+              "tel": "071 5963412",
+              "kw": "malattie infettive immunodepressi hiv"
+            },
+            {
+              "id": "tor-clinica-chirurgica",
+              "nome": "Clinica Chirurgica",
+              "tipo": "Degenza",
+              "piano": 3,
+              "corpo": "U",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-4",
+              "dove": "Linea verde a destra, ascensore 4",
+              "note": "",
+              "tel": "071 5966607",
+              "kw": "chirurgia generale clinica chirurgica"
+            },
+            {
+              "id": "tor-cardiochirurgia",
+              "nome": "Cardiochirurgia",
+              "tipo": "Degenza",
+              "piano": 3,
+              "corpo": "T",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-1",
+              "dove": "A sinistra dell'ingresso principale, ascensore 1",
+              "note": "",
+              "tel": "",
+              "kw": "cardiochirurgia cuore"
+            },
+            {
+              "id": "tor-medicina-lavoro",
+              "nome": "Medicina del Lavoro",
+              "tipo": "Ambulatorio",
+              "piano": 3,
+              "corpo": "T",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-1",
+              "dove": "Corpo T – ascensore 1",
+              "note": "",
+              "tel": "071 5964305",
+              "kw": "medicina del lavoro"
+            },
+            {
+              "id": "tor-clinica-medica",
+              "nome": "Clinica Medica",
+              "tipo": "Degenza",
+              "piano": 3,
+              "corpo": "C",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "Linea verde avanti fino all'ascensore 5",
+              "note": "",
+              "tel": "071 5964205",
+              "kw": "clinica medica medicina interna"
+            },
+            {
+              "id": "tor-gastro-a",
+              "nome": "Gastroenterologia ed Epatologia – Degenza A (ciclo ordinario)",
+              "tipo": "Degenza",
+              "piano": 3,
+              "corpo": "L",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Ascensore 6 o 7",
+              "note": "",
+              "tel": "071 5964600",
+              "kw": "gastroenterologia epatologia endoscopia digestiva fegato danno epatico trapianti malattie apparato digerente"
+            },
+            {
+              "id": "tor-gastro-b",
+              "nome": "Gastroenterologia ed Epatologia – Degenza B (ciclo breve)",
+              "tipo": "Degenza",
+              "piano": 3,
+              "corpo": "N",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Ascensore 6 o 7",
+              "note": "",
+              "tel": "071 5964688",
+              "kw": "gastroenterologia epatologia endoscopia digestiva mici malattie infiammatorie croniche intestinali"
+            },
+            {
+              "id": "tor-dietetica",
+              "nome": "Dietetica e Nutrizione clinica",
+              "tipo": "Ambulatorio",
+              "piano": 3,
+              "corpo": "E",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Corpo E – ascensore 6",
+              "note": "",
+              "tel": "071 5963585",
+              "kw": "dietetica nutrizione clinica dietista"
+            },
+            {
+              "id": "tor-medicina-legale",
+              "nome": "Medicina Legale",
+              "tipo": "Servizio",
+              "piano": 3,
+              "corpo": "E",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Corpo E – ascensore 6",
+              "note": "",
+              "tel": "071 5964717",
+              "kw": "medicina legale"
+            },
+            {
+              "id": "tor-ortopedia-clinica",
+              "nome": "Clinica di Ortopedia adulta e pediatrica",
+              "tipo": "Degenza",
+              "piano": 4,
+              "corpo": "U",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-4",
+              "dove": "A destra della reception, ascensore 4",
+              "note": "",
+              "tel": "071 5964441",
+              "kw": "ortopedia clinica ortopedica adulta pediatrica"
+            },
+            {
+              "id": "tor-ortopedia",
+              "nome": "Ortopedia e Traumatologia",
+              "tipo": "Degenza",
+              "piano": 4,
+              "corpo": "U",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-4",
+              "dove": "Ascensore 4 fino al Piano 4",
+              "note": "Sala gessi: ascensore 5, Piano 4, in fondo al corridoio principale a destra",
+              "tel": "071 5964480",
+              "kw": "ortopedia traumatologia fratture sala gessi"
+            },
+            {
+              "id": "tor-utic",
+              "nome": "Cardiologia Ospedaliera e UTIC",
+              "tipo": "Degenza",
+              "piano": 4,
+              "corpo": "T1",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-1",
+              "dove": "Linea verde a sinistra fino all'ascensore 1, Piano 4: la degenza è a sinistra della sala d'attesa, l'UTIC a destra",
+              "note": "",
+              "tel": "071 5965705",
+              "kw": "cardiologia utic unita coronarica cuore infarto"
+            },
+            {
+              "id": "tor-cardiologia-clinica",
+              "nome": "Clinica di Cardiologia e Aritmologia",
+              "tipo": "Degenza",
+              "piano": 4,
+              "corpo": "A",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "Ascensore 5 fino al Piano 4 (reparto a sinistra), oppure ascensore 6 (reparto a destra)",
+              "note": "",
+              "tel": "071 5965440",
+              "kw": "cardiologia aritmologia cuore pacemaker"
+            },
+            {
+              "id": "tor-unita-spinale",
+              "nome": "Unità Spinale",
+              "tipo": "Degenza",
+              "piano": 4,
+              "corpo": "C",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "Ascensore 5 o 6",
+              "note": "",
+              "tel": "071 5964949",
+              "kw": "unita spinale midollo lesioni"
+            },
+            {
+              "id": "tor-senologia",
+              "nome": "Chirurgia Senologica",
+              "tipo": "Degenza",
+              "piano": 4,
+              "corpo": "N",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Linea verde, ascensori 6 e 7",
+              "note": "",
+              "tel": "071 5963416",
+              "kw": "senologia chirurgia seno mammella"
+            },
+            {
+              "id": "tor-orl",
+              "nome": "Otorinolaringoiatria – Degenze",
+              "tipo": "Degenza",
+              "piano": 4,
+              "corpo": "N",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Corpo N – ascensore 6",
+              "note": "Gli ambulatori sono al Piano 6 del corpo E",
+              "tel": "071 5964041",
+              "kw": "otorinolaringoiatria orl otorino"
+            },
+            {
+              "id": "tor-chirurgia-mano",
+              "nome": "Chirurgia Ricostruttiva e Chirurgia della Mano",
+              "tipo": "Degenza",
+              "piano": 4,
+              "corpo": "L",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Ascensori 6 e 7",
+              "note": "",
+              "tel": "071 5963226",
+              "kw": "chirurgia mano ricostruttiva"
+            },
+            {
+              "id": "tor-toracica",
+              "nome": "Chirurgia Toracica",
+              "tipo": "Degenza",
+              "piano": 4,
+              "corpo": "L",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Corpo L – ascensore 7",
+              "note": "",
+              "tel": "071 5963563",
+              "kw": "chirurgia toracica polmoni torace"
+            },
+            {
+              "id": "tor-virologia",
+              "nome": "Virologia",
+              "tipo": "Servizio",
+              "piano": 4,
+              "corpo": "E",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Linea verde, ascensore 6 o 7",
+              "note": "",
+              "tel": "071 5964928",
+              "kw": "virologia laboratorio"
+            },
+            {
+              "id": "tor-neurochirurgia-clinica",
+              "nome": "Clinica di Neurochirurgia oncologica e d'urgenza",
+              "tipo": "Degenza",
+              "piano": 5,
+              "corpo": "U",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "Corpo U – ascensore 5",
+              "note": "",
+              "tel": "071 5965220",
+              "kw": "neurochirurgia clinica oncologica urgenza"
+            },
+            {
+              "id": "tor-neurochirurgia",
+              "nome": "Neurochirurgia generale",
+              "tipo": "Degenza",
+              "piano": 5,
+              "corpo": "U",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "A destra della reception, in direzione dell'ascensore 5",
+              "note": "",
+              "tel": "071 5965658",
+              "kw": "neurochirurgia"
+            },
+            {
+              "id": "tor-odontostomatologia",
+              "nome": "Odontostomatologia chirurgica e speciale – Degenza",
+              "tipo": "Degenza",
+              "piano": 5,
+              "corpo": "U",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "Corpo U – ascensore 5",
+              "note": "",
+              "tel": "071 5963159",
+              "kw": "odontostomatologia odontoiatria denti"
+            },
+            {
+              "id": "tor-cardiochirurgia-pediatrica",
+              "nome": "Cardiochirurgia e Cardiologia pediatrica e congenita",
+              "tipo": "Degenza",
+              "piano": 5,
+              "corpo": "V",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-1",
+              "dove": "Corpi T e V, Piano 5: linea verde, ascensore 1",
+              "note": "",
+              "tel": "071 5965316",
+              "kw": "cardiochirurgia cardiologia pediatrica congenita bambini cuore"
+            },
+            {
+              "id": "tor-neurologia",
+              "nome": "Clinica Neurologica – Degenza",
+              "tipo": "Degenza",
+              "piano": 5,
+              "corpo": "N",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Avanti fino all'ascensore 7, Piano 5, poi a sinistra",
+              "note": "Qui dentro c'è anche la degenza della Neuroriabilitazione",
+              "tel": "071 5964530",
+              "kw": "neurologia clinica neurologica neuroriabilitazione degenza"
+            },
+            {
+              "id": "tor-neurologia-dh",
+              "nome": "Clinica Neurologica – Day Hospital",
+              "tipo": "Day Hospital",
+              "piano": 5,
+              "corpo": "L",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Corpo L – ascensore 7",
+              "note": "",
+              "tel": "071 5964530",
+              "kw": "neurologia day hospital"
+            },
+            {
+              "id": "tor-vascolare",
+              "nome": "Chirurgia Vascolare",
+              "tipo": "Degenza",
+              "piano": 5,
+              "corpo": "N",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "Corpo N – ascensore 5",
+              "note": "Il sito indica l'ascensore 5 per l'ambulatorio e l'ascensore 1 per la sala d'attesa del reparto: da verificare",
+              "tel": "071 5965258",
+              "kw": "chirurgia vascolare"
+            },
+            {
+              "id": "tor-dermatologia",
+              "nome": "Clinica di Dermatologia – Degenza",
+              "tipo": "Degenza",
+              "piano": 5,
+              "corpo": "A",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "Corpo A – ascensore 5",
+              "note": "",
+              "tel": "071 5963432",
+              "kw": "dermatologia pelle"
+            },
+            {
+              "id": "tor-endocrinologia",
+              "nome": "Clinica di Endocrinologia e Malattie del Metabolismo",
+              "tipo": "Degenza",
+              "piano": 5,
+              "corpo": "A",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "Ascensore 5 fino al Piano 5, poi a sinistra",
+              "note": "",
+              "tel": "071 5964442",
+              "kw": "endocrinologia metabolismo diabete tiroide"
+            },
+            {
+              "id": "tor-plastica",
+              "nome": "Clinica di Chirurgia Plastica e Ricostruttiva",
+              "tipo": "Degenza",
+              "piano": 5,
+              "corpo": "A",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Linea verde fino all'ascensore 6, Piano 5, poi a destra",
+              "note": "",
+              "tel": "",
+              "kw": "chirurgia plastica ricostruttiva ustioni"
+            },
+            {
+              "id": "tor-urologia",
+              "nome": "Clinica Urologica",
+              "tipo": "Degenza",
+              "piano": 6,
+              "corpo": "T",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-1",
+              "dove": "Corpo T, Piano 6. Ambulatori: linea verde a sinistra, ascensore 1. Accettazione ricoveri: ascensore 5",
+              "note": "",
+              "tel": "071 5963519",
+              "kw": "urologia"
+            },
+            {
+              "id": "tor-maxillo",
+              "nome": "Chirurgia Maxillo-Facciale",
+              "tipo": "Degenza",
+              "piano": 6,
+              "corpo": "T",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-1",
+              "dove": "Corpo T, Piano 6. Ambulatori: ascensore 1. Accettazione ricoveri: ascensore 5. Visitatori: ascensore 4 fino al Piano 5",
+              "note": "",
+              "tel": "071 5964544",
+              "kw": "chirurgia maxillo facciale"
+            },
+            {
+              "id": "tor-trauma-center",
+              "nome": "Trauma Center",
+              "tipo": "Servizio",
+              "piano": 6,
+              "corpo": "E",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Corpo E, Piano 6: ascensore 6, di fronte agli ambulatori di Otorinolaringoiatria",
+              "note": "",
+              "tel": "071 5965518",
+              "kw": "trauma center"
+            },
+            {
+              "id": "tor-elisoccorso",
+              "nome": "Elisoccorso",
+              "tipo": "Servizio",
+              "piano": 6,
+              "corpo": "E",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Corpo E, Piano 6: ascensore 6, di fronte agli ambulatori di Otorinolaringoiatria",
+              "note": "",
+              "tel": "071 5964037",
+              "kw": "elisoccorso icaro 118"
+            },
+            {
+              "id": "tor-orl-amb",
+              "nome": "Otorinolaringoiatria – Ambulatori",
+              "tipo": "Ambulatorio",
+              "piano": 6,
+              "corpo": "E",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-6",
+              "dove": "Corpo E – ascensore 6",
+              "note": "",
+              "tel": "071 5964041",
+              "kw": "otorinolaringoiatria orl otorino ambulatori"
+            },
+            {
+              "id": "tor-pma",
+              "nome": "Medicina della Riproduzione (PMA)",
+              "tipo": "Ambulatorio",
+              "piano": 6,
+              "corpo": "C",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "Ascensore 5 fino al Piano 6 (a sinistra), oppure ascensore 6",
+              "note": "",
+              "tel": "071 5966904",
+              "kw": "pma fecondazione assistita medicina riproduzione"
+            },
+            {
+              "id": "tor-genetica",
+              "nome": "Genetica Medica e Malattie Rare",
+              "tipo": "Ambulatorio",
+              "piano": 6,
+              "corpo": "C",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-5",
+              "dove": "Corpo C – ascensore 5",
+              "note": "",
+              "tel": "",
+              "kw": "genetica medica malattie rare"
+            },
+            {
+              "id": "tor-allergologia",
+              "nome": "Allergologia",
+              "tipo": "Ambulatorio",
+              "piano": 6,
+              "corpo": "N",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Corpo N – ascensore 7",
+              "note": "",
+              "tel": "071 5963245",
+              "kw": "allergologia allergie"
+            },
+            {
+              "id": "tor-pneumologia",
+              "nome": "Pneumologia",
+              "tipo": "Degenza",
+              "piano": 6,
+              "corpo": "L",
+              "ingresso": "tor-ing-principale",
+              "ascensore": "tor-asc-7",
+              "dove": "Corpo L – ascensore 7",
+              "note": "",
+              "tel": "071 5964375",
+              "kw": "pneumologia polmoni respiratorio broncoscopia"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
