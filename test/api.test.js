@@ -331,6 +331,14 @@ test('serves the app shell with the build version', async () => {
   assert.equal((await req('GET', '/healthz')).status, 200);
 });
 
+test('a photo added to the seed reaches a hospital seeded without one', () => {
+  // As Torrette went into production before it had a photo: the column holds '' (not NULL).
+  // (Torrette itself is deleted by an earlier test; Jesi follows the same rule.)
+  store.db.prepare("UPDATE ospedali SET foto = '' WHERE id = 'jesi'").run();
+  updateSeededMaps(store);
+  assert.equal(store.get('ospedali', 'jesi').foto, '/img/jesi.webp');
+});
+
 test('hospital cards have a photo that is served as an image', async () => {
   // (Senigallia was deleted on purpose by an earlier test, so only its photo file is checked.)
   const data = await (await req('GET', '/api/data')).json();
