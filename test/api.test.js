@@ -335,7 +335,14 @@ test('hospital cards have a photo that is served as an image', async () => {
   // (Senigallia was deleted on purpose by an earlier test, so only its photo file is checked.)
   const data = await (await req('GET', '/api/data')).json();
   assert.equal(data.ospedali.find((o) => o.id === 'jesi').foto, '/img/jesi.webp');
-  for (const f of ['/img/jesi.webp', '/img/senigallia.webp']) {
+  // Torrette's data is still being checked: its card says so, the others have no warning.
+  const tor = data.ospedali.find((o) => o.id === 'torrette');
+  if (tor) {
+    assert.equal(tor.foto, '/img/torrette.webp');
+    assert.match(tor.avviso, /beta/i);
+  }
+  assert.equal(data.ospedali.find((o) => o.id === 'jesi').avviso, '');
+  for (const f of ['/img/jesi.webp', '/img/senigallia.webp', '/img/torrette.webp']) {
     const res = await req('GET', f);
     assert.equal(res.status, 200);
     assert.equal(res.headers.get('content-type'), 'image/webp');

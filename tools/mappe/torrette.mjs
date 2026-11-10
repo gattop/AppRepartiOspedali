@@ -199,6 +199,8 @@ const data = {
     nome: 'Ospedale di Torrette',
     citta: 'Ancona',
     indirizzo: 'Via Conca 71',
+    foto: '/img/torrette.webp',
+    avviso: 'Beta: disposizione dei reparti da verificare',
     uso_livelli: false,
     prefisso_tel: '',
     fonte: 'Reparti, piani e ascensori dal sito dell\'AOU delle Marche (novembre 2026). La mappa è uno schema non in scala: i corpi A, B, C, E, I, L, N seguono la pianta dell\'edificio originale, la posizione degli altri è indicativa. Da verificare sul posto.',

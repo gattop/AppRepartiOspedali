@@ -83,7 +83,7 @@ CREATE INDEX IF NOT EXISTS idx_reparti_sede ON reparti(sede_id);
 // `parent` is the foreign key that must point to an existing row.
 export const ENTITIES = {
   ospedali: {
-    fields: { nome: 'text!', citta: 'text', indirizzo: 'text', foto: 'text', uso_livelli: 'bool', prefisso_tel: 'text', fonte: 'text', mappa: 'json', piani: 'json' },
+    fields: { nome: 'text!', citta: 'text', indirizzo: 'text', foto: 'text', avviso: 'text', uso_livelli: 'bool', prefisso_tel: 'text', fonte: 'text', mappa: 'json', piani: 'json' },
     order: 'nome'
   },
   sedi: {
@@ -180,6 +180,8 @@ const ADDED_COLUMNS = [
   ['ospedali', 'piani', 'TEXT'],
   // path or URL of the photo shown on the hospital's card
   ['ospedali', 'foto', 'TEXT'],
+  // short warning shown on the hospital's card (e.g. data still in beta); empty = none
+  ['ospedali', 'avviso', 'TEXT'],
   ['ingressi', 'piano', 'INTEGER'],
   ['ingressi', 'corpo', 'TEXT'],
   ['ingressi', 'punto', 'TEXT'],

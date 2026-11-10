@@ -36,6 +36,7 @@ export function viewOspedali() {
           <span class="hcard-shade"></span>
           <span class="hcard-num">${String(i + 1).padStart(2, '0')}<i>/</i>${o.citta || 'Ospedale'}</span>
           <span class="hcard-text">
+            ${o.avviso && html`<span class="hcard-beta">${ICON.info(14)}${o.avviso}</span>`}
             <b>${o.nome}</b>
             <span class="hcard-city">${[o.indirizzo, o.citta].filter(Boolean).join(', ')}</span>
             <span class="hcard-meta">${sedi.length} ${sedi.length === 1 ? 'sede' : 'sedi'} · ${nrep} reparti${o.mappa ? ' · ' + mapWord(o) : ''}</span>

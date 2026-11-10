@@ -141,6 +141,7 @@ const FORMS = {
       ['nome', 'Nome', 'text', { required: true }],
       ['citta', 'Città', 'text'],
       ['indirizzo', 'Indirizzo principale', 'text'],
+      ['avviso', 'Avviso sulla scheda dell\'ospedale', 'text', { hint: 'Compare sulla foto nella pagina iniziale, es. "Beta: disposizione dei reparti da verificare". Lascia vuoto per non mostrarlo.' }],
       ['uso_livelli', 'Numerazione dei piani', 'select', { options: [['0', 'Piani (T, 1°, 2°…)'], ['1', 'Livelli (L0, L1…)']] }],
       ['prefisso_tel', 'Prefisso per gli interni', 'text', { hint: 'Es. 0731534: con l\'interno 2240 il tasto Chiama compone 07315342240.', inputmode: 'tel' }],
       ['fonte', 'Fonte dei dati / avvertenze', 'textarea']

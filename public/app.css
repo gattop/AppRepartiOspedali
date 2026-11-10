@@ -703,6 +703,12 @@ a.lrow:hover b { color: var(--accent-ink); }
   text-shadow: 0 0 .6vw rgba(6, 6, 7, .5), 0 2px 18px rgba(6, 6, 7, .6); text-wrap: balance;
 }
 .hcard-city { font-size: 14px; color: rgba(242, 241, 238, .85); }
+/* warning on a card (e.g. data still in beta): on the photo, so fixed colours readable in both themes */
+.hcard-beta {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; margin-bottom: 2px;
+  background: #ffc14d; color: #1a1300; font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; line-height: 1.3;
+}
+.hcard-beta svg { flex: none; }
 .hcard-meta { font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #74aaff; }
 .hcard-go {
   position: absolute; right: 0; bottom: 0; width: 52px; height: 52px; background: #f2f1ee; color: #0b0b0c;
