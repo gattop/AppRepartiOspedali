@@ -6,6 +6,8 @@
 //    on https://portale.ospedaliriuniti.marche.it (Reparti - SOD);
 //  - shape of the original building (spine I - IB - B with the wings N, L, E, A, C): the structural
 //    scheme published by SEITEC for the seismic retrofit ("Ospedale Regionale Torrette - Ancona").
+//  - roads and the position of the Malattie Infettive building: OpenStreetMap (© OpenStreetMap
+//    contributors, ODbL), fitted onto the scheme; see strade-torrette.json.
 // The plan is a SCHEME, not to scale. The position of the other bodies (F, H, R, S, T, T1, U, V, the
 // entrance hall, Malattie Infettive, Radioterapia) is only indicative: it follows what the directions
 // say (lift 1 left of the entrance, lift 4 right, lifts 5-6-7 along the green line) and must be
@@ -50,8 +52,9 @@ const BLOCKS = [
   ['V', 'V', '#9FA8DA', box(2, 50, 14, 61), 'Corpo V'],
   ['U', 'U', '#26C6DA', box(6, 95, 30, 106), 'Corpo U'],
   // separate buildings
-  ['MI', 'Mal. Infettive', '#8D6E63', box(104, 70, 118, 80), 'Palazzina Malattie Infettive (staccata dal corpo centrale)'],
-  ['RT', 'Radioterapia', '#A1887F', box(108, 84, 120, 92), 'Padiglione di Radioterapia, dietro la palazzina Malattie Infettive']
+  // separate buildings: Malattie Infettive with its real outline (OpenStreetMap), south of the main building
+  ['MI', 'Mal. Infettive', '#8D6E63', [[43.2, 122.5], [39.7, 128.3], [19.4, 125.1], [17.6, 135.2], [38.6, 138.7], [37.4, 141.3], [36.2, 143.4], [16.4, 140.9], [15, 151.9], [33, 154.4], [45.2, 171.1], [54.5, 164.4], [40.8, 145.7], [41.7, 143.7], [43, 141.6], [57.2, 157.9], [64.9, 151.2], [52.4, 137], [56.4, 130.2]], 'Palazzina Malattie Infettive (staccata dal corpo centrale, a sud)'],
+  ['RT', 'Radioterapia', '#A1887F', box(60, 162, 72, 171), 'Padiglione di Radioterapia, dietro la palazzina Malattie Infettive']
 ];
 // Floors a body has even where no ward is listed on them.
 const FLOORS = { I: [-1, 6], IB: [-1, 6], B: [-1, 6], ATR: [-1, 1], H: [-1, 0], R: [0, 1], S: [0, 2], MI: [-1, 2], RT: [0, 0] };
@@ -62,8 +65,8 @@ const INGRESSI = [
   { id: 'tor-ing-principale', nome: 'Ingresso principale – Reception', sigla: 'P', piano: 0, corpo: 'ATR', punto: { x: 10, y: 91 }, nota: 'Via Conca 71, Piano 0. Dalla reception: ascensore 1 a sinistra, ascensore 4 a destra, ascensori 5, 6 e 7 avanti lungo la linea verde' },
   { id: 'tor-ing-ps', nome: 'Pronto Soccorso', sigla: 'PS', piano: 1, corpo: 'C', punto: { x: 92, y: 92 }, badge: 'ambulanze', nota: 'Piano 1, Corpo C (accesso ambulanze: da verificare sul posto)' },
   { id: 'tor-ing-posteriore', nome: 'Ingresso posteriore – Blocco B', sigla: 'B', piano: 1, corpo: 'B', punto: { x: 63, y: 69 }, nota: 'Piano 1: area dei servizi per l\'utenza (bar, edicola, bancomat)' },
-  { id: 'tor-ing-mi', nome: 'Palazzina Malattie Infettive', sigla: 'MI', piano: 0, corpo: 'MI', punto: { x: 105, y: 75 }, nota: 'Dalla strada interna, dopo la rotatoria dell\'elisoccorso: segnaletica "Malattie Infettive"' },
-  { id: 'tor-ing-rt', nome: 'Radioterapia', sigla: 'RT', piano: 0, corpo: 'RT', punto: { x: 109, y: 88 }, nota: 'Padiglione dietro Malattie Infettive: dalla rotatoria sopra l\'elisoccorso entrare nel parcheggio dipendenti e seguire i cartelli' }
+  { id: 'tor-ing-mi', nome: 'Palazzina Malattie Infettive', sigla: 'MI', piano: 0, corpo: 'MI', punto: { x: 30, y: 127.5 }, nota: 'Dalla strada interna, dopo la rotatoria dell\'elisoccorso: segnaletica "Malattie Infettive"' },
+  { id: 'tor-ing-rt', nome: 'Radioterapia', sigla: 'RT', piano: 0, corpo: 'RT', punto: { x: 63, y: 163 }, nota: 'Padiglione dietro Malattie Infettive: dalla rotatoria sopra l\'elisoccorso entrare nel parcheggio dipendenti e seguire i cartelli' }
 ];
 const ASCENSORI = [
   { id: 'tor-asc-1', sigla: '1', corpo: 'T', nota: 'A sinistra dell\'ingresso principale: corpi T, T1 e V' },
@@ -193,6 +196,16 @@ const blocks = BLOCKS.map(([id, lab, colore, poly]) => {
   return { id, label: lab, colore, lv: Array.from({ length: hi - lo + 1 }, (_, i) => lo + i), poly };
 });
 
+// Roads (from OpenStreetMap, already in plan coordinates and kept clear of the blocks), width by kind.
+const ROADS_FILE = path.join(path.dirname(fileURLToPath(import.meta.url)), 'strade-torrette.json');
+const WIDTH = { primary: 3.2, primary_link: 2.4, secondary: 3, tertiary: 2.6, tertiary_link: 2, residential: 2.4, unclassified: 2.2, service: 1.7 };
+const strade = fs.existsSync(ROADS_FILE)
+  ? JSON.parse(fs.readFileSync(ROADS_FILE, 'utf8')).roads.map((r) => ({ pts: r.pts, w: WIDTH[r.kind] || 2, ...(r.name ? { nome: r.name } : {}) }))
+  : [];
+// What the 2D plan shows: the blocks with some air around them (the roads go on beyond).
+const allPts = BLOCKS.flatMap(([, , , poly]) => poly);
+const view = { x0: Math.min(...allPts.map((p) => p[0])) - 6, y0: Math.min(...allPts.map((p) => p[1])) - 6, x1: Math.max(...allPts.map((p) => p[0])) + 6, y1: Math.max(...allPts.map((p) => p[1])) + 6 };
+
 const data = {
   ospedali: [{
     id: 'torrette',
@@ -203,18 +216,19 @@ const data = {
     avviso: 'Beta: disposizione dei reparti da verificare',
     uso_livelli: false,
     prefisso_tel: '',
-    fonte: 'Reparti, piani e ascensori dal sito dell\'AOU delle Marche (novembre 2026). La mappa è uno schema non in scala: i corpi A, B, C, E, I, L, N seguono la pianta dell\'edificio originale, la posizione degli altri è indicativa. Da verificare sul posto.',
+    fonte: 'Reparti, piani e ascensori dal sito dell\'AOU delle Marche (novembre 2026). La mappa è uno schema non in scala: i corpi A, B, C, E, I, L, N seguono la pianta dell\'edificio originale, la posizione degli altri è indicativa. Strade e palazzina Malattie Infettive: © OpenStreetMap contributors. Da verificare sul posto.',
     piani: { min: -1, max: 6 },
     mappa: {
       tipo: 'pianta',
       unita: 'corpo',
-      versione: 1,
+      versione: 2,
       rot: -20,
       livelli: [-1, 0, 1, 2, 3, 4, 5, 6],
-      view: { x0: -3, y0: 6, x1: 124, y1: 110 },
+      view,
       blocks,
       corpi: Object.fromEntries(BLOCKS.map(([id, lab, , , d]) => [id, { label: lab, short: id === 'ATR' ? 'Atrio' : id, dove: d }])),
       decor: {
+        strade,
         scritte: [
           { x: 18, y: 109, t: 'Ingresso principale · via Conca 71', cls: 'big' },
           { x: 100, y: 101, t: 'Pronto Soccorso', cls: 'red' }
