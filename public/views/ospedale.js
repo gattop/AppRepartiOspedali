@@ -2,7 +2,7 @@
 import { html } from '../util.js';
 import { S, X } from '../data.js';
 import { ICON, repIcon } from '../icons.js';
-import { pianoInfo, floorWord, isPlan, ingShort } from '../domain.js';
+import { pianoInfo, floorWord, ingShort } from '../domain.js';
 import { render } from '../ui.js';
 import { href } from '../router.js';
 import { banner, tabbar, viewNotFound, linkOrDiv } from './common.js';
@@ -33,7 +33,7 @@ export function viewOspedale(id) {
     <header class="hero">
       <div class="row between">
         ${o.mappa
-          ? html`<a class="hbtn" href="${href('ospedale', o.id)}">${ICON.back()}${isPlan(o) ? 'Pianta' : 'Mappa 3D'}</a>`
+          ? html`<a class="hbtn" href="${href('ospedale', o.id)}">${ICON.back()}Mappa 3D</a>`
           : html`<a class="hbtn" href="${href('home')}">${ICON.back()}Ospedali</a>`}
         ${S.me.canEdit && html`<a class="hbtn" href="${href('gestisci', o.id)}">${ICON.edit(18)}Gestisci</a>`}
       </div>

@@ -522,19 +522,36 @@ a.lrow:hover b { color: var(--accent-ink); }
 .map-stage.dragging .mf-btn { cursor: grabbing; }
 .map-stage.dragging .map-hint { opacity: 0; }
 
-/* 3D blocks: each face is a full-stage layer cut to shape with clip-path */
+/* the drawing (redrawn at every frame of a gesture) sits under the buttons and the legend */
+.map-draw { position: absolute; inset: 0; }
+
+/* 3D model: one SVG; each floor plate of a block is a group (.mi) of its side walls and its top (.face) */
+.map-3d { position: absolute; left: 0; top: 0; }
+.map-3d polygon { stroke: rgba(11, 18, 32, .55); stroke-width: .75; stroke-linejoin: round; }
+.mi.t-sel .face { fill: var(--m-sel-top); } .mi.t-sel .side-a { fill: var(--m-sel-a); } .mi.t-sel .side-b { fill: var(--m-sel-b); }
+.mi.t-lift .face { fill: var(--m-lift-top); } .mi.t-lift .side-a { fill: var(--m-lift-a); } .mi.t-lift .side-b { fill: var(--m-lift-b); }
+.mi.t-lift-on .face { fill: var(--m-lift-on-top); } .mi.t-lift-on .side-a { fill: var(--m-lift-on-a); } .mi.t-lift-on .side-b { fill: var(--m-lift-on-b); }
+.mi.t-on .face { fill: var(--m-on-top); } .mi.t-on .side-a { fill: var(--m-on-a); } .mi.t-on .side-b { fill: var(--m-on-b); }
+.mi.t-base .face { fill: var(--m-top); } .mi.t-base .side-a { fill: var(--m-a); } .mi.t-base .side-b { fill: var(--m-b); }
+/* buildings in their own colour (--bc, set on the group), walls in two darker shades of it */
+.mi.t-own .face { fill: var(--bc); }
+.mi.t-own .side-a { fill: color-mix(in srgb, var(--bc) 66%, #05070c); }
+.mi.t-own .side-b { fill: color-mix(in srgb, var(--bc) 44%, #05070c); }
+.mi.t-own.sel polygon { stroke: var(--m-ink-light); stroke-width: 2.5; }
+.mi.exact { opacity: .85; }
+/* floors under the one shown fade, those above almost vanish; neither takes taps meant for it */
+.mi.fade { opacity: .2; pointer-events: none; }
+.mi.ghost { opacity: .06; pointer-events: none; }
+.map-3d [data-act] { cursor: pointer; }
+.map-3d [data-act]:focus { outline: none; }
+.map-3d [data-act]:focus-visible, .map-stage.pick .map-3d [data-act]:hover { filter: brightness(1.2); }
+.map-stage.dragging .map-3d [data-act] { cursor: grabbing; }
+
+/* flat plan: each building's button is a full-stage layer cut to its shape with clip-path */
 .mf { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; pointer-events: none; }
 .mf-btn { pointer-events: auto; cursor: pointer; }
 .mf-btn:focus-visible { outline: none; filter: brightness(1.25); }
 .map-stage.pick .mf-btn:hover { filter: brightness(1.15); }
-.mf.t-sel.face { background: var(--m-sel-top); } .mf.t-sel.side-a { background: var(--m-sel-a); } .mf.t-sel.side-b { background: var(--m-sel-b); }
-.mf.t-lift.face { background: var(--m-lift-top); } .mf.t-lift.side-a { background: var(--m-lift-a); } .mf.t-lift.side-b { background: var(--m-lift-b); }
-.mf.t-lift-on.face { background: var(--m-lift-on-top); } .mf.t-lift-on.side-a { background: var(--m-lift-on-a); } .mf.t-lift-on.side-b { background: var(--m-lift-on-b); }
-.mf.t-on.face { background: var(--m-on-top); } .mf.t-on.side-a { background: var(--m-on-a); } .mf.t-on.side-b { background: var(--m-on-b); }
-.mf.t-base.face { background: var(--m-top); } .mf.t-base.side-a { background: var(--m-a); } .mf.t-base.side-b { background: var(--m-b); }
-.mf.exact { opacity: .85; }
-.mf.fade { opacity: .2; }
-.mf.ghost { opacity: .06; }
 @keyframes jpulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
 .jpulse { animation: jpulse 1.4s ease-in-out infinite; }
 
@@ -582,6 +599,7 @@ a.lrow:hover b { color: var(--accent-ink); }
 }
 .map-cbtn:hover:not([disabled]), .map-cbtn.on { background: #f2f1ee; color: #0b0b0c; border-color: #f2f1ee; }
 .map-cbtn[disabled] { opacity: 0.4; cursor: default; }
+.map-cbtn.txt { font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: .04em; }
 /* small stages (ward page, position picker): compact controls so the column fits */
 .map-stage.small .map-ctrl, .pickfield .map-ctrl { gap: 4px; top: 8px; right: 8px; }
 .map-stage.small .map-cbtn, .pickfield .map-cbtn { width: 40px; height: 40px; }
@@ -599,6 +617,7 @@ a.lrow:hover b { color: var(--accent-ink); }
 .map-legend .sw.ing { background: var(--m-door); }
 .map-legend .sw.door { background: #16A34A; }
 .map-legend .sw.ring { background: transparent; border: 2.5px solid var(--m-sel-top); }
+.map-legend .sw.ring.white { border-color: var(--m-ink-light); }
 .map-legend .sw.line { width: 16px; height: 0; border-top: 3px dashed var(--m-route); }
 .map-legend .sw.dash { width: 16px; height: 0; border-top: 2px dashed #F87171; }
 

@@ -1,11 +1,12 @@
 import { html, raw } from '../util.js';
-import { highlightOf, labelSpace, pinHtml, routeSvg, controls, hintAndLegend } from './common.js';
+import { highlightOf, labelSpace, pinHtml, routeSvg, controls, hintAndLegend, inkOn } from './common.js';
 
 // Flat plan seen from above, for hospitals without a 3D drawing (map `tipo: 'pianta'`).
 // `mappa`   = { view: {x0, y0, x1, y1}, blocks: [{id, label, poly: [[x, y]...], l: [x, y], colore, lv}],
 //              decor: { area, strade, edifici, percorsi, scritte }, corpi, livelli }
-// Same options and return value as renderMap (map3d.js); the level only decides which
-// buildings are lit and whose ward names are written, since every floor shares the plan.
+// Same options and return value as renderMap (map3d.js), which draws the same buildings in 3D; here
+// the level only decides which buildings are lit and whose ward names are written, since every
+// floor shares the plan.
 export function renderPlan({ mappa, reparti, sel, lvl, width, height = 300, target, points = [], pick = false, route = null, zoom = 1, panX = 0, panY = 0, corpoWord = 'Palazzina' }) {
   const B = mappa.blocks || [];
   const byId = Object.fromEntries(B.map((b) => [b.id, b]));
@@ -68,7 +69,7 @@ export function renderPlan({ mappa, reparti, sel, lvl, width, height = 300, targ
       buttons.push(html`<button type="button" class="mf mf-btn" data-act="mapPick" data-id="${list[0].id}" ${levelAttr} aria-label="${label}" style="${css}"></button>`);
     }
     const [lx, ly] = anchor(b);
-    const style = `left: ${sx(lx).toFixed(1)}px; top: ${sy(ly).toFixed(1)}px; color: ${ink(b.colore)}${lit ? '' : '; opacity: 0.45'}`;
+    const style = `left: ${sx(lx).toFixed(1)}px; top: ${sy(ly).toFixed(1)}px; color: ${inkOn(b.colore)}${lit ? '' : '; opacity: 0.45'}`;
     // With one level shown, each lit building also lists what's on that floor.
     const names = lvl !== 'all' && lit && list.length > 0 ? list.map((x) => x.nome.split(' – ')[0]).join(' · ') : '';
     const letter = { w: 16, h: 16, html: html`<span class="map-plabel" style="${style}"><b>${b.label || b.id}</b></span>` };
@@ -109,21 +110,25 @@ export function renderPlan({ mappa, reparti, sel, lvl, width, height = 300, targ
   // cover a door or another label is dropped, leaving just the building's letter.
   const labels = space.place(cands, { fallback: true });
 
-  const out = html`
+  const draw = html`
     <svg class="map-plan" width="${W}" height="${H}" viewBox="${`0 0 ${W} ${H}`}" aria-hidden="true">${decor}${shapes}</svg>
-    ${buttons}${text}${path}${markers}${labels}${pin}
-    ${controls({ zoom, panX, panY })}
+    ${buttons}${text}${path}${markers}${labels}${pin}`;
+  const ui = html`
+    ${controls({ zoom, panX, panY, other: '3D' })}
     ${hintAndLegend(big ? 'Trascina per spostare · rotella o due dita per lo zoom' : 'Due dita: zoom e sposta', [
       ['ring', pick ? 'Posizione scelta' : 'Reparto'],
       points.length > 0 && ['round door', 'Ingressi'],
       d.percorsi?.length > 0 && ['dash', 'Percorso principale']
     ])}`;
 
-  out.geo = {
-    unproject: (px, py) => ({ x: (px - ox) / f, y: (py - oy) / f }),
-    block: (id) => byId[id] && bbox(byId[id].poly)
+  return {
+    draw: String(draw),
+    ui: String(ui),
+    geo: {
+      unproject: (px, py) => ({ x: (px - ox) / f, y: (py - oy) / f }),
+      block: (id) => byId[id] && bbox(byId[id].poly)
+    }
   };
-  return out;
 }
 
 function bbox(poly) {
@@ -131,11 +136,4 @@ function bbox(poly) {
   const b = { x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) };
   b.c = [(b.x0 + b.x1) / 2, (b.y0 + b.y1) / 2];
   return b;
-}
-
-// Dark text on light buildings, white on dark ones.
-function ink(hex) {
-  const n = parseInt(hex.slice(1), 16);
-  const lum = 0.2126 * (n >> 16) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255);
-  return lum > 150 ? '#0F172A' : '#FFFFFF';
 }

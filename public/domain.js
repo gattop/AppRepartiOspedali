@@ -38,11 +38,12 @@ export function floorOptions(osp) {
 }
 
 export const corpoName = (osp, k) => osp?.mappa?.corpi?.[k]?.label || k || '';
-// Hospitals drawn as a flat plan from above (no 3D) are split into buildings ("palazzine").
+// Hospitals made of several buildings ("palazzine"): their map is a plan of the site, shown as a
+// 3D model of the buildings or flat from above. The others are one building split into "corpi".
 export const isPlan = (osp) => osp?.mappa?.tipo === 'pianta';
 export const corpoWord = (osp) => (isPlan(osp) ? 'palazzina' : 'corpo');
 export const Corpo = (osp) => (isPlan(osp) ? 'Palazzina' : 'Corpo');
-export const mapWord = (osp) => (isPlan(osp) ? 'pianta' : 'mappa 3D');
+export const mapWord = () => 'mappa 3D';
 
 // When a ward moves to another body of a mapped hospital, carry over that body's lift and
 // standard directions, but only where the ward still had the old body's defaults.
@@ -92,7 +93,8 @@ export function routeFor(r) {
   const ing = r._ing;
   if (!ing?.corpo || ing.piano == null) return null;
   const pts = [{ corpo: ing.corpo, liv: ing.piano, punto: ing.punto, kind: 'ing' }];
-  const shaft = r._asc?.corpo;
+  // Without a placed lift, in a hospital of several buildings the way up is inside the ward's own building.
+  const shaft = r._asc?.corpo || (isPlan(r._osp) ? r.corpo : null);
   if (shaft && ing.piano !== r.piano) {
     pts.push({ corpo: shaft, liv: ing.piano, kind: 'asc' }, { corpo: shaft, liv: r.piano, kind: 'asc' });
   }

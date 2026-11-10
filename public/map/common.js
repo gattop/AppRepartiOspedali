@@ -72,12 +72,23 @@ const ICONS = {
   fit: svg('<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path>')
 };
 
+// Dark text on light surfaces, white on dark ones.
+export function inkOn(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  const lum = 0.2126 * (n >> 16) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255);
+  return lum > 150 ? '#0F172A' : '#FFFFFF';
+}
+
 const cbtn = (act, label, icon, extra = '') =>
   html`<button type="button" class="map-cbtn" data-act="${act}" aria-label="${label}" title="${label}" ${raw(extra)}>${raw(icon)}</button>`;
 
+const OTHER_VIEW = { '2D': 'Pianta dall\'alto', '3D': 'Vista 3D' };
+
 // Buttons in the corner: rotate and "separa i piani" only on the 3D map, zoom on both.
-export function controls({ rotate = false, exp = false, zoom, panX, panY }) {
+// `other` ('2D' | '3D') adds the button that switches to the other view, for hospitals that have both.
+export function controls({ rotate = false, exp = false, zoom, panX, panY, other = null }) {
   return html`<div class="map-ctrl">
+      ${other && html`<button type="button" class="map-cbtn txt" data-act="mapFlat" aria-label="${OTHER_VIEW[other]}" title="${OTHER_VIEW[other]}">${other}</button>`}
       ${rotate && html`${cbtn('mapRot', 'Ruota a sinistra', ICONS.rotL, 'data-d="-45"')}
       ${cbtn('mapRot', 'Ruota a destra', ICONS.rotR, 'data-d="45"')}
       <button type="button" class="map-cbtn${exp ? ' on' : ''}" data-act="mapExp" aria-label="${exp ? 'Unisci i piani' : 'Separa i piani'}" title="${exp ? 'Unisci i piani' : 'Separa i piani'}" aria-pressed="${exp}">${raw(ICONS.layers)}</button>`}

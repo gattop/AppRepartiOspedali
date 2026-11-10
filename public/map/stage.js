@@ -6,7 +6,11 @@
 //   rep:<hospital>  the small map on a ward page, which always shows that ward
 //   pick            the map used in a form to choose where a ward or an entrance is
 // All of them share the same view fields, created by newStage(): rot (degrees), exp (floors
-// pulled apart), zoom, panX, panY.
+// pulled apart), zoom, panX, panY, and flat (the plan from above instead of the 3D model, for the
+// hospitals that have both).
+//
+// A stage element holds two layers: .map-draw (the drawing, redrawn at every frame of a gesture)
+// and, after it, the buttons and the legend (redrawn only when the gesture ends).
 import { html } from '../util.js';
 import { S, X } from '../data.js';
 import { isPlan, mapWord, floorWord, floorTag, Corpo, pianoInfo, placeText, corpoPatch, entrancePoints, routeFor } from '../domain.js';
@@ -20,7 +24,10 @@ const ZOOM_MIN = 1, ZOOM_MAX = 6;
 // The angle a hospital's 3D map opens at.
 export const defaultRot = (o) => o.mappa.rot ?? DEFAULT_ROT;
 
-export const newStage = (o, extra = {}) => ({ rot: defaultRot(o), exp: false, zoom: 1, panX: 0, panY: 0, ...extra });
+export const newStage = (o, extra = {}) => ({ rot: defaultRot(o), exp: false, flat: false, zoom: 1, panX: 0, panY: 0, ...extra });
+
+// Hospitals made of several buildings have the plan from above too; the stage shows one or the other.
+export const isFlat = (o, st) => isPlan(o) && !!st.flat;
 
 export const stageKind = (el) => (el.dataset.stage || '').split(':')[0];
 
@@ -44,20 +51,23 @@ export function stageState(el) {
   return st;
 }
 
-export function drawStage(el) {
+// `light`: only the drawing (during a gesture or an animation); the buttons keep their state until the full redraw.
+export function drawStage(el, { light = false } = {}) {
   const o = X.osp[el.dataset.osp];
   const st = stageState(el);
   if (!st) return;
   const pick = stageKind(el) === 'pick';
-  const out = (isPlan(o) ? renderPlan : renderMap)({
-    mappa: o.mappa, reparti: X.repByOsp[o.id] || [], sel: st.sel, lvl: st.lvl, rot: st.rot, exp: st.exp,
+  const out = (isFlat(o, st) ? renderPlan : renderMap)({
+    mappa: o.mappa, reparti: X.repByOsp[o.id] || [], sel: st.sel, lvl: st.lvl, rot: st.rot, rot0: defaultRot(o), exp: st.exp,
     target: pick ? st.highlight : undefined, pick, points: entrancePoints(o),
     route: pick ? null : routeFor(X.rep[st.sel]),
     zoom: st.zoom, panX: st.panX, panY: st.panY,
     width: el.clientWidth || 390, height: el.clientHeight || 300,
     floorTag: (L) => floorTag(o, L), floorName: (L) => pianoInfo(o, L).long, corpoWord: Corpo(o)
   });
-  el.innerHTML = String(out);
+  const layer = light && el.querySelector(':scope > .map-draw');
+  if (layer) layer.innerHTML = out.draw;
+  else el.innerHTML = `<div class="map-draw">${out.draw}</div>${out.ui}`;
   el._geo = out.geo;
   // Zoomed in, one-finger drags belong to the map instead of scrolling the page.
   el.classList.toggle('zoomed', st.zoom > 1.001);
@@ -94,17 +104,43 @@ export function zoomAt(stage, st, z, anchor, to = anchor, from = st) {
   st.panY = Math.min(limY, Math.max(-limY, to.y - H / 2 - (by - H / 2) * z));
 }
 
+// One light redraw per frame, however many pointer events arrive in it.
 export function redrawSoon(stage) {
   if (stage._raf) return;
   stage._raf = requestAnimationFrame(() => {
     stage._raf = 0;
-    if (stage.isConnected) drawStage(stage);
+    if (stage.isConnected) drawStage(stage, { light: true });
   });
 }
 
-// The rotation animation of the ±45° buttons; a drag stops it.
+// A full redraw shortly after the last of a burst of changes (wheel zoom), to refresh the buttons.
+export function settleSoon(stage) {
+  clearTimeout(stage._settle);
+  stage._settle = setTimeout(() => { if (stage.isConnected) drawStage(stage); }, 160);
+}
+
+// The model turning by itself: the ±45° buttons, and the momentum after a drag. Touching the map stops it.
 let rotRaf = 0;
 export const stopRotation = () => cancelAnimationFrame(rotRaf);
+const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Keeps turning at `speed` (degrees per millisecond), slowing down as if by friction.
+export function spin(stage, st, speed) {
+  stopRotation();
+  if (reducedMotion() || Math.abs(speed) < 0.03) return drawStage(stage);
+  let v = Math.max(-1.2, Math.min(1.2, speed)), last = performance.now();
+  const step = (now) => {
+    const dt = Math.min(now - last, 50);
+    last = now;
+    st.rot += v * dt;
+    v *= Math.exp(-dt / 260);
+    if (!stage.isConnected) return;
+    if (Math.abs(v) < 0.012) return drawStage(stage);
+    drawStage(stage, { light: true });
+    rotRaf = requestAnimationFrame(step);
+  };
+  rotRaf = requestAnimationFrame(step);
+}
 
 // ---------------------------------------------------------------- choosing a position (ward and entrance forms)
 // S.stages.pick = { key, target: 'draft' | 'form', mode: 'ala' | 'punto', label, corpo, piano, punto, ...view }
@@ -186,6 +222,7 @@ export const handlers = {
     },
     mapReset: (_, el) => {
       const stage = stageOf(el);
+      stopRotation();
       Object.assign(homeView(stageState(stage)), { rot: defaultRot(X.osp[stage.dataset.osp]) });
       drawStage(stage);
     },
@@ -199,27 +236,38 @@ export const handlers = {
       const stage = stageOf(el);
       const st = stageState(stage);
       const from = st.rot, to = st.rot + Number(d), t0 = performance.now();
-      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const reduce = reducedMotion();
       stopRotation();
       const step = (now) => {
         const t = reduce ? 1 : Math.min(1, (now - t0) / 340);
         const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
         st.rot = from + (to - from) * e;
-        if (stage.isConnected) drawStage(stage);
-        if (t < 1 && stage.isConnected) rotRaf = requestAnimationFrame(step);
+        if (!stage.isConnected) return;
+        drawStage(stage, { light: t < 1 });
+        if (t < 1) rotRaf = requestAnimationFrame(step);
       };
       rotRaf = requestAnimationFrame(step);
     },
-    // Click on a block while choosing a position: whole wing, or the exact spot clicked.
-    pickBlock: ({ corpo, liv }, el, e) => {
+    // Hospitals with both views: 3D model <-> plan from above.
+    mapFlat: (_, el) => {
       const stage = stageOf(el);
-      // The 2D plan has no level to click on: the floor stays the one chosen in the form.
+      const st = stageState(stage);
+      stopRotation();
+      st.flat = !st.flat;
+      homeView(st);
+      drawStage(stage);
+    },
+    // Click on a block while choosing a position: whole wing, or the exact spot clicked.
+    pickBlock: ({ corpo, liv, zl }, el, e) => {
+      const stage = stageOf(el);
+      // Without `liv` (the flat plan, a whole building) the floor stays the one chosen in the form;
+      // `zl` is the level of the surface tapped, to find the point on it.
       const L = liv === undefined ? undefined : Number(liv);
       let punto = null;
       // e.detail is 0 for keyboard activation: there's no click position, so use the whole block.
       if (S.stages.pick.mode === 'punto' && e.detail > 0 && stage._geo) {
         const rect = stage.getBoundingClientRect();
-        const pt = stage._geo.unproject(e.clientX - rect.left, e.clientY - rect.top, L);
+        const pt = stage._geo.unproject(e.clientX - rect.left, e.clientY - rect.top, zl === undefined ? L : Number(zl));
         const b = stage._geo.block(corpo);
         const clamp = (v, a, z) => Math.min(Math.max(v, a), z);
         punto = { x: clamp(pt.x, b.x0, b.x1), y: clamp(pt.y, b.y0, b.y1) };

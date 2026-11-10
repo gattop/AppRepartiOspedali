@@ -120,6 +120,11 @@ document.addEventListener('submit', (e) => {
 document.addEventListener('keydown', (e) => {
   const k = e.target.dataset?.input;
   if (k && H.key[k]) H.key[k](e.target, e);
+  // Parts of a drawing that act as buttons (the blocks of the 3D map) answer to Enter and Space like real ones.
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches?.('svg [role="button"][data-act]')) {
+    e.preventDefault();
+    e.target.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  }
 });
 installGestures();
 installSearchDrop();
